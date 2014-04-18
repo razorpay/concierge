@@ -24,6 +24,11 @@
 			margin: 16px 0 0 0;
 		}
 	</style>
+	<script type="text/javascript">
+	function displayform(){
+	 document.getElementById("custom_form").style.visibility="visible";
+	}
+	</script>
 </head>
 <body>
 	<div class="content">
@@ -68,6 +73,18 @@
 		@endforeach
     @endforeach
     <br/>
+
+    <form action="" method="POST"><input type="hidden" name="rule_type" value="ssh" /><input type="submit" value="Get SSH Access on this Group" /></form>
+    <form action="" method="POST"><input type="hidden" name="rule_type" value="https" /><input type="submit" value="Get HTTPS Access on this Group" /></form>
+    <button onclick="javascript: displayform()">Get Custom Access</button>
+    <form id="custom_form" style="visibility:hidden" action="" method="POST">
+    <input type="hidden" name="rule_type" value="custom" />
+    <input type="text" name="protocol" value="" placeholder="tcp/udp"/>
+    <input type="text" name="port_from" placeholder="From Port:"/>
+    <input type="text" name="port_to" placeholder="To port:"/>
+    <input type="submit" value="Get Access" />
+    </form>
+    
 	</div>
 </body>
 </html>
