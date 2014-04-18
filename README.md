@@ -5,7 +5,7 @@ Created as replacement of Dome9 & Cloudpassage for managing & secure access cont
 
 Installation
 --------------
-*Basic installation
+* Basic installation
 ```sh
 git clone [git-repo-url]
 chmod -R o+wx storage/
@@ -22,6 +22,4 @@ return array(
 );
 ```
 * Create a symlink to public director in `/var/www` folder or create an apache vhost for the site & open in your browser.
-
-
-    
+* Copy `app/LaravelDuo/LaravelDuo.sample.php` to `app/LaravelDuo/LaravelDuo.php` and update it with necessary values.    
