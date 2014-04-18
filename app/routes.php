@@ -11,6 +11,6 @@
 |
 */
 
-Route::get('/', 'BaseController@getIndex');
+Route::get('/', 'HomeController@getIndex');
 
-Route::get('/manage/{group_id}', 'BaseController@getManage');
+Route::get('/manage/{group_id}', 'HomeController@getManage');
