@@ -36,7 +36,7 @@
 <body>
 	<div class="content">
 		@foreach($security_groups as $security_group)
-        <a href="{{{$security_group['GroupId']}}}">{{{$security_group['GroupName']}}}</a><br/>{{{$security_group['Description']}}}<br/>
+        <a href="/manage/{{{$security_group['GroupId']}}}">{{{$security_group['GroupName']}}}</a><br/>{{{$security_group['Description']}}}<br/>
 		@endforeach
 	</div>
 </body>

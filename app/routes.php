@@ -11,8 +11,6 @@
 |
 */
 
-Route::get('/', function()
-{
-	return View::make('hello');
-});
-Route::get('/test', 'BaseController@getIndex');
+Route::get('/', 'BaseController@getIndex');
+
+Route::get('/manage/{group_id}', 'BaseController@getManage');

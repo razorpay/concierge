@@ -36,4 +36,17 @@ class BaseController extends Controller {
         return View::make('getIndex')->with('security_groups', $security_groups);
 	}
 
+	public function getManage($group_id)
+	{
+
+		$ec2 = App::make('aws')->get('ec2');
+		$security_group=$ec2->describeSecurityGroups(array(
+			'GroupIds' => array($group_id),
+        ));
+
+		$security_group=$security_group['SecurityGroups'][0];
+		//var_dump($security_group);
+		return View::make('getManage')->with('security_group', $security_group);
+	}
+
 }
