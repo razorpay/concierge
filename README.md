@@ -22,4 +22,6 @@ return array(
 );
 ```
 * Create a symlink to public director in `/var/www` folder or create an apache vhost for the site & open in your browser.
-* Copy `app/LaravelDuo/LaravelDuo.sample.php` to `app/LaravelDuo/LaravelDuo.php` and update it with necessary values.    
+* Copy `app/LaravelDuo/LaravelDuo.sample.php` to `app/LaravelDuo/LaravelDuo.php` and update it with necessary values. 
+* Copy `app/config/database.sample.php` to `app/config/database.php` and update the password
+* Migrate the db with `php artisan migrate` &  seed with `php artisan db:seed`
