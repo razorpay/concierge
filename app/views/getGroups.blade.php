@@ -34,6 +34,7 @@
 	</style>
 </head>
 <body>
+<a href="{{action('HomeController@getLogout')}}">Logout</a>
 	<div class="content">
 		@foreach($security_groups as $security_group)
         <a href="/manage/{{{$security_group['GroupId']}}}">{{{$security_group['GroupName']}}}</a><br/>{{{$security_group['Description']}}}<br/>

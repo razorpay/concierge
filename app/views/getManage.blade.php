@@ -31,6 +31,7 @@
 	</script>
 </head>
 <body>
+<a href="{{action('HomeController@getLogout')}}">Logout</a>
 	<div class="content">
 	Name: {{$security_group['GroupName']}}<br/>
 	Id: {{$security_group['GroupId']}}<br/>

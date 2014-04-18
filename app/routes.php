@@ -11,6 +11,20 @@
 |
 */
 
-Route::get('/', 'HomeController@getIndex');
+Route::group(array('before' => 'auth'), function()
+{
+Route::get('/groups', 'HomeController@getGroups');
 
 Route::get('/manage/{group_id}', 'HomeController@getManage');
+
+Route::get('/logout', 'HomeController@getLogout');
+});
+
+Route::group(array('before' => 'guest'), function()
+{
+Route::get('/', 'HomeController@getIndex');
+
+Route::post('/signin', 'HomeController@postSignin');
+
+Route::post('/duologin', 'HomeController@postDuologin');
+});

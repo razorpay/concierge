@@ -1,5 +1,5 @@
 <?php
-
+use LaravelDuo\LaravelDuo;
 class HomeController extends BaseController {
 
 	/*
@@ -14,11 +14,110 @@ class HomeController extends BaseController {
 	|	Route::get('/', 'HomeController@showWelcome');
 	|
 	*/
+        private $_laravelDuo;
+
+    function __construct(LaravelDuo $laravelDuo)
+    {
+        $this->_laravelDuo = $laravelDuo;
+    }
+
+    /**
+     * Stage One - The Login form
+     */
+    public function getIndex()
+    {
+        return View::make('pages.login');
+    }
+
+    /**
+     * Stage Two - The Duo Auth form
+     */
+    public function postSignin()
+    {
+        $user = array(
+            'username' => Input::get('username'),
+            'password' => Input::get('password')
+        );
+
+        /**
+         * Validate the user details, but don't log the user in
+         */
+        if(Auth::validate($user))
+        {
+            $U    = Input::get('username');
+
+            $duoinfo = array(
+                'HOST' => $this->_laravelDuo->get_host(),
+                'POST' => URL::to('/') . '/duologin',
+                'USER' => $U,
+                'SIG'  => $this->_laravelDuo->signRequest($this->_laravelDuo->get_ikey(), $this->_laravelDuo->get_skey(), $this->_laravelDuo->get_akey(), $U)
+            );
+
+            return View::make('pages.duologin')->with(compact('duoinfo'));
+        }
+        else
+        {
+            return Redirect::to('/')->with('message', 'Your username and/or password was incorrect')->withInput();
+        }
+
+    }
+
+    /**
+     * Stage Three - After Duo Auth Form
+     */
+    public function postDuologin()
+    {
+        /**
+         * Sent back from Duo
+         */
+        $response = $_POST['sig_response'];
+
+        $U = $this->_laravelDuo->verifyResponse($this->_laravelDuo->get_ikey(), $this->_laravelDuo->get_skey(), $this->_laravelDuo->get_akey(), $response);
+
+        /**
+         * Duo response returns USER field from Stage Two
+         */
+        if($U){
+
+            /**
+             * Get the id of the authenticated user from their email address
+             */
+            $id = User::getIdFromUsername($U);
+
+            /**
+             * Log the user in by their ID
+             */
+            Auth::loginUsingId($id);
+
+            /**
+             * Check Auth worked, redirect to homepage if so
+             */
+            if(Auth::check())
+            {
+                return Redirect::to('/');
+            }
+        }
+
+        /**
+         * Otherwise, Auth failed, redirect to homepage with message
+         */
+        return Redirect::to('/')->with('message', 'Unable to authenticate you.');
+
+    }
+
+    /**
+     * Log user out
+     */
+    public function getLogout()
+    {
+        Auth::logout();
+        return Redirect::to('/');
+    }
 
 	/**
 	 * Get the list of all security groups
 	 */
-	public function getIndex()
+	public function getGroups()
 	{
 
 		$ec2 = App::make('aws')->get('ec2');
@@ -33,7 +132,7 @@ class HomeController extends BaseController {
 
 		$security_groups=$security_groups['SecurityGroups'];
 
-        return View::make('getIndex')->with('security_groups', $security_groups);
+        return View::make('getGroups')->with('security_groups', $security_groups);
 	}
 
 	public function getManage($group_id)
