@@ -15,4 +15,25 @@ class BaseController extends Controller {
 		}
 	}
 
+	/**
+	 * Get the list of all security groups
+	 */
+	public function getIndex()
+	{
+
+		$ec2 = App::make('aws')->get('ec2');
+		$security_groups=$ec2->describeSecurityGroups(array(
+			'Filters' => array(
+				array(
+					'Name' => 'vpc-id',
+					'Values' => array('vpc-4ff9012a'),
+                ),
+            ),
+        ));
+
+		$security_groups=$security_groups['SecurityGroups'];
+
+        return View::make('getIndex')->with('security_groups', $security_groups);
+	}
+
 }
