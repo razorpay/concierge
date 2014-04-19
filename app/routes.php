@@ -17,6 +17,8 @@ Route::get('/groups', 'HomeController@getGroups');
 
 Route::get('/manage/{group_id}', 'HomeController@getManage');
 
+Route::post('/manage/{group_id}', 'HomeController@postManage');
+
 Route::get('/logout', 'HomeController@getLogout');
 });
 
