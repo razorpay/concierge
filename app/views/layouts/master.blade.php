@@ -33,6 +33,9 @@
                     <a href="{{ URL::to('/logout') }}">Logout</a>
                 </p>
             </div>
+            <div class="container">
+                @yield('content')
+            </div>
         @else
             <div class="container">
                 @yield('content')
