@@ -145,7 +145,9 @@ class HomeController extends BaseController {
 
 		$security_group=$security_group['SecurityGroups'][0];
 		//var_dump($security_group);
-		return View::make('getManage')->with('security_group', $security_group);
+
+        $leases= Lease::getByGroupId($group_id);
+        return View::make('getManage')->with('security_group', $security_group)->with('leases', $leases);
 	}
 
     public function postManage($group_id)

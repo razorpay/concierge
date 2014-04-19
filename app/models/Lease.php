@@ -9,4 +9,12 @@ class Lease extends Eloquent
         return $this->belongsTo('User');
     }
 
+    /*
+     *Returns active leases
+     */
+    public static function getByGroupId($group_id)
+	{
+		$leases = self::where('group_id', $group_id)->get();
+		return $leases;
+	}
 }
