@@ -1,5 +1,13 @@
 @extends('layouts.master')
-
+@section('headincludes')
+	 @parent
+	 <script typpe="text/javascript">
+	 function displayform()
+	 {
+	 	document.getElementById('custom_form').style.visibility="visible";
+	 }
+	 </script>
+@stop
 @section('content')
 	<div class="row">
         <div class="col-md-6 col-md-offset-3 modal-outer noPad">
@@ -20,15 +28,25 @@
 			@foreach($security_group['IpPermissions'] as $rule)
 			   @foreach($rule['UserIdGroupPairs'] as $rule_group)
 			    <tr>
+					@if("-1"!=$rule['IpProtocol'])
 					<td>{{$rule['IpProtocol']}}</td>
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
+					@else
+					<td>All</td>
+					<td>All</td>
+					@endif
 					<td>Security Group: <a href="/manage/{{$rule_group['GroupId']}}">{{$rule_group['GroupId']}}</a></td>
 			    </tr>
 				@endforeach
 			    @foreach($rule['IpRanges'] as $rule_ip)
 			    <tr>
+			    	@if("-1"!=$rule['IpProtocol'])
 					<td>{{$rule['IpProtocol']}}</td>
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
+					@else
+					<td>All</td>
+					<td>All</td>
+					@endif
 					<td>CIDR IP(s): {{$rule_ip['CidrIp']}}</td>
 			    </tr>
 				@endforeach
@@ -48,15 +66,25 @@
 			@foreach($security_group['IpPermissionsEgress'] as $rule)
 			    @foreach($rule['UserIdGroupPairs'] as $rule_group)
 			    <tr>
+					@if("-1"!=$rule['IpProtocol'])
 					<td>{{$rule['IpProtocol']}}</td>
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
+					@else
+					<td>All</td>
+					<td>All</td>
+					@endif
 					<td>Security Group: <a href="/manage/{{$rule_group['GroupId']}}">{{$rule_group['GroupId']}}</a></td>
 				</tr>
 				@endforeach
 			    @foreach($rule['IpRanges'] as $rule_ip)
 			    <tr>
+					@if("-1"!=$rule['IpProtocol'])
 					<td>{{$rule['IpProtocol']}}</td>
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
+					@else
+					<td>All</td>
+					<td>All</td>
+					@endif
 					<td>CIDR IP(s): {{$rule_ip['CidrIp']}}</td>
 				</tr>
 				@endforeach
@@ -70,9 +98,9 @@
 		    <button onclick="javascript: displayform()">Get Custom Access</button>
 		    <form id="custom_form" style="visibility:hidden" action="" method="POST">
 		    <input type="hidden" name="rule_type" value="custom" />
-		    <input type="text" name="protocol" value="" placeholder="tcp/udp"/>
-		    <input type="text" name="port_from" placeholder="From Port:"/>
-		    <input type="text" name="port_to" placeholder="To port:"/>
+		    Protocol: <input type="text" name="protocol" value="" placeholder="tcp/udp"/><br/>
+		    From Port:<input type="text" name="port_from" placeholder="From Port:"/>
+		    To Port:<input type="text" name="port_to" placeholder="To port:"/> <br/> Keep From & To Port samefor single port access.<br/>
 		    <input type="submit" value="Get Access" />
 		    </form>
 		</div>    
