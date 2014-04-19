@@ -14,6 +14,37 @@
           	Name: {{$security_group['GroupName']}}<br/>
 			Id: {{$security_group['GroupId']}}<br/>
 			Description: {{$security_group['Description']}}<br/>
+			Active Leases:
+			<table class="table-bordered table-striped">
+	        <thead>
+	          <tr>
+	            <th>Created By:</th>
+	            <th>Leased Ip:</th>
+	            <th>Protocol</th>
+	            <th>Port(s)</th>
+	            <th>Time Left</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	        	@foreach($leases as $lease)
+	        	<tr>
+	        		<td>{{{User::find($lease->user_id)->username}}}</td>
+	        		<td>{{{$lease->lease_ip}}}</td>
+	        		<td>{{{$lease->protocol}}}</td>
+	        		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
+	        		<td>
+	        		<?php
+	        			$time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
+    					$hours=intval(floor($time_left/3600)); 
+    					$minutes=intval(floor(($time_left-$hours*3600)/60));
+    					echo "$hours hours $minutes minutes";
+    				?>
+    				</td>	
+	        	</tr>
+	        	@endforeach
+	        </tbody>
+	        </table>
+
 			Security Group Rules:<br/>
             Inbound Rules: 
 	        <table class="table-bordered table-striped">
