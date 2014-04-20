@@ -121,14 +121,7 @@ class HomeController extends BaseController {
 	{
         $leases= Lease::get();
 		$ec2 = App::make('aws')->get('ec2');
-		$security_groups=$ec2->describeSecurityGroups(array(
-			'Filters' => array(
-				array(
-					'Name' => 'vpc-id',
-					'Values' => array('vpc-4ff9012a'),
-                ),
-            ),
-        ));
+		$security_groups=$ec2->describeSecurityGroups();
 
 		$security_groups=$security_groups['SecurityGroups'];
 

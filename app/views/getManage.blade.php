@@ -15,7 +15,11 @@
 			Id: {{{$security_group['GroupId']}}}<br/>
 			Description: {{{$security_group['Description']}}}<br/>
 			VPC-Id: {{{$security_group['VpcId']}}} <br/>
-			Name Tag: {{{$security_group['Tags']['0']['Value']}}}<br/>
+			Name Tag: 
+			@if(isset($security_group['Tags']['0']['Value']))
+			{{{$security_group['Tags']['0']['Value']}}}
+			@endif
+			<br/>
 			<h2>Active Leases:</h2>
 			<table class="table-bordered table-striped">
 	        <thead>

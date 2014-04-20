@@ -66,7 +66,11 @@
 			<td>{{{$security_group['GroupId']}}}</td>
 			<td>{{{$security_group['Description']}}}</td>
 			<td>{{{$security_group['VpcId']}}}</td>
-			<td>{{{$security_group['Tags']['0']['Value']}}}</td>
+			<td>
+			@if(isset($security_group['Tags']['0']['Value']))
+			{{{$security_group['Tags']['0']['Value']}}}
+			@endif
+			</td>
 			</tr>
 			@endforeach
 			</tbody>
