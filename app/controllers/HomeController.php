@@ -153,36 +153,56 @@ class HomeController extends BaseController {
     public function postManage($group_id)
     {
         $input=Input::all();
-        if("ssh"==$input["rule_type"])
-        {
-            $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"22", 'port_to'=>"22", 'expiry'=>'3600');
-            $lease=Lease::create($data);
-            var_dump($lease);
-        }
-        elseif("https"==$input["rule_type"])
-        {
-            $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
-            $lease=Lease::create($data);
-            var_dump($lease);
-        }
-        elseif("custom"==$input["rule_type"])
-        {
-            $protocol=$input['protocol'];
-            $port_from=$input['port_from'];
-            $port_to=$input['port_to'];
-            if($protocol != "tcp" && $protocol!="udp") die("Invalid Protocol");
-            if(!is_numeric($port_from) || $port_from>65535 || $port_from<=0) die("Invalid From port");
-            if(!is_numeric($port_to) || $port_to>65535 || $port_to<=0) die("Invalid To port");
-            if($port_from>$port_to) die("From port Must be less than equal to To Port");
+        if(isset($input['rule_type'])){
+            if("ssh"==$input["rule_type"])
+            {
+                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"22", 'port_to'=>"22", 'expiry'=>'3600');
+                $lease=Lease::create($data);
+                var_dump($lease);
+            }
+            elseif("https"==$input["rule_type"])
+            {
+                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
+                $lease=Lease::create($data);
+                var_dump($lease);
+            }
+            elseif("custom"==$input["rule_type"])
+            {
+                $protocol=$input['protocol'];
+                $port_from=$input['port_from'];
+                $port_to=$input['port_to'];
+                if($protocol != "tcp" && $protocol!="udp") die("Invalid Protocol");
+                if(!is_numeric($port_from) || $port_from>65535 || $port_from<=0) die("Invalid From port");
+                if(!is_numeric($port_to) || $port_to>65535 || $port_to<=0) die("Invalid To port");
+                if($port_from>$port_to) die("From port Must be less than equal to To Port");
 
-            $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
-            $lease=Lease::create($data);
-            var_dump($lease);
+                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
+                $lease=Lease::create($data);
+                var_dump($lease);
+            }
+            else
+            {
+                App::abort(403, 'Unauthorized action.');
+            }
         }
-        else
-        {
+        elseif(isset($input['lease_id'])){
+            try
+            {
+                $lease=Lease::findorFail($input['lease_id']);
+            }
+            catch(Exception $e)
+            {
+                $message="Lease not found";
+                return Redirect::to("/manage/$group_id")->with('message', $message);
+            }
+            $lease->delete();
+            $message="Lease terminated successfully";
+            return Redirect::to("/manage/$group_id")->with('message', $message);
+        }
+        else{
             App::abort(403, 'Unauthorized action.');
         }
+        
         /*$ec2 = App::make('aws')->get('ec2');
         $security_group=$ec2->describeSecurityGroups(array(
             'GroupIds' => array($group_id),

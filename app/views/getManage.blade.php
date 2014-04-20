@@ -23,6 +23,7 @@
 	            <th>Protocol</th>
 	            <th>Port(s)</th>
 	            <th>Time Left</th>
+	            <th>Terminate?</th>
 	          </tr>
 	        </thead>
 	        <tbody>
@@ -39,7 +40,8 @@
     					$minutes=intval(floor(($time_left-$hours*3600)/60));
     					echo "$hours hours $minutes minutes";
     				?>
-    				</td>	
+    				</td>
+    				<td><form method="post" action=""><input type="hidden" name="lease_id" value="{{{$lease->id}}}" /><button type="submit" onclick="return confirm('Are you sure you want to terminate this lease?');"><span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span></button></form></td>	
 	        	</tr>
 	        	@endforeach
 	        </tbody>
