@@ -28,7 +28,7 @@
 	        <tbody>
 	        	@foreach($leases as $lease)
 	        	<tr>
-	        		<td>{{{User::find($lease->user_id)->username}}}</td>
+	        		<td>{{{$lease->user->username}}}</td>
 	        		<td>{{{$lease->lease_ip}}}</td>
 	        		<td>{{{$lease->protocol}}}</td>
 	        		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
