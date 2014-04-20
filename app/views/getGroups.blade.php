@@ -3,6 +3,7 @@
 @section('content')
      <div class="row">
         <div class="col-md-6 col-md-offset-3 modal-outer noPad">
+	        <h1>Active Leases</h1>
 	        <table class="table-bordered table-striped">
 		    <thead>
 		        <tr>
@@ -41,13 +42,35 @@
 	    			</td>
 		       	</tr>
 		       	@endforeach
+		       	@if(!$leases->count())
+		       	<tr><td colspan="7">No Active Leases</td></tr>
+		       	@endif
 		    </tbody>
    		    </table>
    		    <br/>
- 
+ 			<h1>Security Groups</h1>
+ 			<table class="table-bordered table-striped">
+		    <thead>
+		        <tr>
+		        <th>Group Name:</th>
+		        <th>Group Id:</th>
+		        <th>Group Description:</th>
+		        <th>VPC:</th>
+		        <th>Name Tag:</th>
+		        </tr>
+		    </thead>
+		    <tbody>
 			@foreach($security_groups as $security_group)
-	        <a href="/manage/{{{$security_group['GroupId']}}}">{{{$security_group['GroupName']}}} - {{{$security_group['GroupId']}}}</a><br/>{{{$security_group['Description']}}}<br/>
+			<tr>
+			<td><a href="/manage/{{{$security_group['GroupId']}}}">{{{$security_group['GroupName']}}}</a></td>
+			<td>{{{$security_group['GroupId']}}}</td>
+			<td>{{{$security_group['Description']}}}</td>
+			<td>{{{$security_group['VpcId']}}}</td>
+			<td>{{{$security_group['Tags']['0']['Value']}}}</td>
+			</tr>
 			@endforeach
+			</tbody>
+			</table>
 		</div>
 	</div>
 @stop

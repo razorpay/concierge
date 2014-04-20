@@ -11,10 +11,12 @@
 @section('content')
 	<div class="row">
         <div class="col-md-6 col-md-offset-3 modal-outer noPad">
-          	Name: {{$security_group['GroupName']}}<br/>
-			Id: {{$security_group['GroupId']}}<br/>
-			Description: {{$security_group['Description']}}<br/>
-			Active Leases:
+          	Name: {{{$security_group['GroupName']}}}<br/>
+			Id: {{{$security_group['GroupId']}}}<br/>
+			Description: {{{$security_group['Description']}}}<br/>
+			VPC-Id: {{{$security_group['VpcId']}}} <br/>
+			Name Tag: {{{$security_group['Tags']['0']['Value']}}}<br/>
+			<h2>Active Leases:</h2>
 			<table class="table-bordered table-striped">
 	        <thead>
 	          <tr>
@@ -50,10 +52,13 @@
     				</td>	
 	        	</tr>
 	        	@endforeach
+	        	@if(!$leases->count())
+		       	<tr><td colspan="6">No Active Leases</td></tr>
+		       	@endif
 	        </tbody>
 	        </table>
 
-			Security Group Rules:<br/>
+			<h2>Security Group Rules:</h2>
             Inbound Rules: 
 	        <table class="table-bordered table-striped">
 	        <thead>
