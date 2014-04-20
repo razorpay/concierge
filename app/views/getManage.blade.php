@@ -41,7 +41,13 @@
     					echo "$hours hours $minutes minutes";
     				?>
     				</td>
-    				<td><form method="post" action=""><input type="hidden" name="lease_id" value="{{{$lease->id}}}" /><button type="submit" onclick="return confirm('Are you sure you want to terminate this lease?');"><span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span></button></form></td>	
+    				<td><form method="post" action="">
+    				<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
+    				<button type="submit" onclick="return confirm('Are you sure you want to terminate this lease?');">
+    					<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
+    				</button>
+    				</form>
+    				</td>	
 	        	</tr>
 	        	@endforeach
 	        </tbody>
