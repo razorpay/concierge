@@ -15,7 +15,7 @@ return array(
 	|
 	*/
 
-	'driver' => 'smtp',
+	'driver' => 'mail',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => null, 'name' => null),
+	'from' => array('address' => "root@aws-sec-manager", 'name' => "AWS Security Lease"),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -118,7 +118,7 @@ return array(
 	| you may inspect the message. This is great for local development.
 	|
 	*/
-
+    
 	'pretend' => false,
 
 );

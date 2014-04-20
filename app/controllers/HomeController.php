@@ -151,12 +151,15 @@ class HomeController extends BaseController {
             {
                 $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"22", 'port_to'=>"22", 'expiry'=>'3600');
                 $lease=Lease::create($data);
+                $lease=Lease::find($lease->id);
+                $this->NotificationMail($lease);
                 var_dump($lease);
             }
             elseif("https"==$input["rule_type"])
             {
                 $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
                 $lease=Lease::create($data);
+                $this->NotificationMail($lease);
                 var_dump($lease);
             }
             elseif("custom"==$input["rule_type"])
@@ -171,6 +174,7 @@ class HomeController extends BaseController {
 
                 $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
                 $lease=Lease::create($data);
+                $this->NotificationMail($lease);
                 var_dump($lease);
             }
             else
@@ -205,6 +209,15 @@ class HomeController extends BaseController {
         //var_dump($security_group);
         return View::make('getManage')->with('security_group', $security_group);
     */
+    }
+
+    private function NotificationMail($lease)
+    {
+        $data=array('lease'=>$lease->toArray());
+        Mail::queue('emails.notification', $data, function($message)
+        {
+            $message->to($GLOBALS['notification_emailid'], 'Security Notification' )->subject('Secure Access Lease Created');
+        });
     }
 
 }
