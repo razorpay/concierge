@@ -45,9 +45,9 @@ class leasemanager extends Command {
 			if($time_left<=0){
 				$lease->delete();
 				$count++;
+				$this->info("Lease Id: $lease->id terminated");
 			}
 		}
-		$this->info("$count leases terminated");
 	}
 
 	/**
