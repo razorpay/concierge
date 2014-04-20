@@ -152,14 +152,14 @@ class HomeController extends BaseController {
                 $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"22", 'port_to'=>"22", 'expiry'=>'3600');
                 $lease=Lease::create($data);
                 $lease=Lease::find($lease->id);
-                $this->NotificationMail($lease);
+                $this->NotificationMail($lease, TRUE);
                 var_dump($lease);
             }
             elseif("https"==$input["rule_type"])
             {
                 $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
                 $lease=Lease::create($data);
-                $this->NotificationMail($lease);
+                $this->NotificationMail($lease, TRUE);
                 var_dump($lease);
             }
             elseif("custom"==$input["rule_type"])
@@ -174,7 +174,7 @@ class HomeController extends BaseController {
 
                 $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
                 $lease=Lease::create($data);
-                $this->NotificationMail($lease);
+                $this->NotificationMail($lease, TRUE);
                 var_dump($lease);
             }
             else
@@ -193,6 +193,7 @@ class HomeController extends BaseController {
                 return Redirect::to("/manage/$group_id")->with('message', $message);
             }
             $lease->delete();
+            $this->NotificationMail($lease, FALSE);
             $message="Lease terminated successfully";
             return Redirect::to("/manage/$group_id")->with('message', $message);
         }
@@ -211,13 +212,31 @@ class HomeController extends BaseController {
     */
     }
 
-    private function NotificationMail($lease)
+    /*
+     * Handles sending of notification mail
+     * Requires two arguements $lease, $ mode. 
+     * $lease = Lease Object Containing the lease created or deleted
+     * $mode = TRUE for lease created, FALSE for lease deleted
+     */
+
+    private function NotificationMail($lease, $mode)
     {
-        $data=array('lease'=>$lease->toArray());
-        Mail::queue('emails.notification', $data, function($message)
+        $data=array('lease'=>$lease->toArray(), 'mode'=>$mode);
+
+        if($mode)
         {
-            $message->to($GLOBALS['notification_emailid'], 'Security Notification' )->subject('Secure Access Lease Created');
-        });
+            Mail::queue('emails.notification', $data, function($message)
+            {
+                $message->to($GLOBALS['notification_emailid'], 'Security Notification' )->subject('Secure Access Lease Created');
+            });
+        }
+        else
+        {
+            Mail::queue('emails.notification', $data, function($message)
+            {
+                $message->to($GLOBALS['notification_emailid'], 'Security Notification' )->subject('Secure Access Lease Terminated');
+            });
+        }
     }
 
 }
