@@ -37,17 +37,8 @@ class leasemanager extends Command {
 	 */
 	public function fire()
 	{
-		$leases=Lease::get();
-		$count=0;
-		foreach($leases as $lease)
-		{
-			$time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
-			if($time_left<=0){
-				$lease->delete();
-				$count++;
-				$this->info("Lease Id: $lease->id terminated");
-			}
-		}
+		$home_controller=new HomeController(new LaravelDuo\LaravelDuo);
+		$cleaner = $home_controller->CleanLeases();
 	}
 
 	/**

@@ -239,4 +239,23 @@ class HomeController extends BaseController {
         }
     }
 
+    /*
+     * Handles cleaning of expired lease, called via artisan command custom:leasemanager run via cron
+     * return void
+     */
+
+    public function CleanLeases()
+    {
+        $leases=Lease::get();
+        foreach($leases as $lease)
+        {
+            $time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
+            if($time_left<=0){
+                $lease->delete();
+                $this->NotificationMail($lease, FALSE);
+            }
+        }
+        return;
+    }
+
 }

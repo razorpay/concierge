@@ -74,8 +74,14 @@
                    <td>{{{$lease['group_id']}}}</td>
                    <td>{{{$lease['protocol']}}}</td>
                    <td>{{{$lease['port_from']}}}-{{{$lease['port_to']}}}</td>
-                   <td>{{{Auth::user()->username}}}</td>
-                   </tr><?php die(); ?>
+                   <td>
+                       @if(null !== Auth::user())
+                       {{{Auth::user()->username}}}
+                       @else
+                       "Self-Expiry"
+                       @endif
+                   </td>
+                   </tr>
                 </tbody>
             </table>
         @endif
