@@ -2,9 +2,9 @@
 @section('headincludes')
 	 @parent
 	 <script typpe="text/javascript">
-	 function displayform()
+	 function displayform(form_id)
 	 {
-	 	document.getElementById('custom_form').style.visibility="visible";
+	 	document.getElementById(form_id).style.visibility="visible";
 	 }
 	 </script>
 @stop
@@ -141,15 +141,44 @@
 		    </table>
 		    <br/>
 
-		    <form action="" method="POST"><input type="hidden" name="rule_type" value="ssh" /><input type="submit" value="Get SSH Access on this Group" /></form>
-		    <form action="" method="POST"><input type="hidden" name="rule_type" value="https" /><input type="submit" value="Get HTTPS Access on this Group" /></form>
-		    <button onclick="javascript: displayform()">Get Custom Access</button>
+		    <button onclick="javascript: displayform('ssh_form')">Get SSH Access on this Group</button><br/>
+		    <button onclick="javascript: displayform('https_form')">Get HTTPS Access on this Group</button><br/>
+		    <button onclick="javascript: displayform('custom_form')">Get Custom Access on this Group</button><br/>
+		    
+		    <form id="ssh_form" style="visibility:hidden" action="" method="POST">
+			    <input type="hidden" name="rule_type" value="ssh" />
+			   SSH Access Expiry: <select name="expiry" required>
+				  <option value="3600" selected>1 hour</option>
+				  <option value="14400">4 hours</option>
+				  <option value="43200">12 hours</option>
+				  <option value="86400">1 Day</option>
+				</select>
+			    <input type="submit" value="Get Access" />
+		    </form>
+
+		    <form id="https_form" style="visibility:hidden" action="" method="POST">
+			    <input type="hidden" name="rule_type" value="https" />
+			    HTTPS Access Expiry: <select name="expiry" required>
+				  <option value="3600" selected>1 hour</option>
+				  <option value="14400">4 hours</option>
+				  <option value="43200">12 hours</option>
+				  <option value="86400">1 Day</option>
+				</select>
+			    <input type="submit" value="Get Access" />
+		    </form>
+		    
 		    <form id="custom_form" style="visibility:hidden" action="" method="POST">
-		    <input type="hidden" name="rule_type" value="custom" />
-		    Protocol: <input type="text" name="protocol" value="" placeholder="tcp/udp"/><br/>
-		    From Port:<input type="text" name="port_from" placeholder="From Port:"/>
-		    To Port:<input type="text" name="port_to" placeholder="To port:"/> <br/> Keep From & To Port samefor single port access.<br/>
-		    <input type="submit" value="Get Access" />
+			    <input type="hidden" name="rule_type" value="custom" />
+			    Protocol: <input type="text" name="protocol" value="" placeholder="tcp/udp" required/><br/>
+			    From Port:<input type="text" name="port_from" placeholder="From Port:" required/>
+			    To Port:<input type="text" name="port_to" placeholder="To port:" required/> <br/> Keep From & To Port same for single port access.<br/>
+			    Custom Access Expiry: <select name="expiry" required>
+				  <option value="3600" selected>1 hour</option>
+				  <option value="14400">4 hours</option>
+				  <option value="43200">12 hours</option>
+				  <option value="86400">1 Day</option>
+				</select>
+			    <input type="submit" value="Get Access" />
 		    </form>
 		</div>    
 	</div>

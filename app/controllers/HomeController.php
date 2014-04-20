@@ -146,10 +146,12 @@ class HomeController extends BaseController {
     public function postManage($group_id)
     {
         $input=Input::all();
+        $expiry=$input['expiry'];
+        if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) die("Invalid Expiry Time");
         if(isset($input['rule_type'])){
             if("ssh"==$input["rule_type"])
             {
-                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"22", 'port_to'=>"22", 'expiry'=>'3600');
+                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"22", 'port_to'=>"22", 'expiry'=>$expiry);
                 $lease=Lease::create($data);
                 $lease=Lease::find($lease->id);
                 $this->NotificationMail($lease, TRUE);
@@ -157,7 +159,7 @@ class HomeController extends BaseController {
             }
             elseif("https"==$input["rule_type"])
             {
-                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
+                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>$expiry);
                 $lease=Lease::create($data);
                 $this->NotificationMail($lease, TRUE);
                 var_dump($lease);
@@ -172,7 +174,7 @@ class HomeController extends BaseController {
                 if(!is_numeric($port_to) || $port_to>65535 || $port_to<=0) die("Invalid To port");
                 if($port_from>$port_to) die("From port Must be less than equal to To Port");
 
-                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>'3600');
+                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>$expiry);
                 $lease=Lease::create($data);
                 $this->NotificationMail($lease, TRUE);
                 var_dump($lease);
