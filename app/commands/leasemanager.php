@@ -32,6 +32,7 @@ class leasemanager extends Command {
 
 	/**
 	 * Execute the console command.
+	 * Creates a HomeController and calls its cleanLeases function which terminates all expired leases.
 	 *
 	 * @return mixed
 	 */

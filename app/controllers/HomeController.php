@@ -128,6 +128,9 @@ class HomeController extends BaseController {
         return View::make('getGroups')->with('security_groups', $security_groups)->with('leases', $leases);
 	}
 
+    /*
+     * Displays a security groups details with active leases & security rules.
+     */
 	public function getManage($group_id)
 	{
 
@@ -143,6 +146,9 @@ class HomeController extends BaseController {
         return View::make('getManage')->with('security_group', $security_group)->with('leases', $leases);
 	}
 
+    /*
+     * Handles Lease creation & termination post requests to Group Manage page
+     */
     public function postManage($group_id)
     {
         $input=Input::all();
@@ -269,6 +275,11 @@ class HomeController extends BaseController {
         return;
     }
 
+    /*
+     * Handles lease creation by communitacting with AWS API
+     * Requires an associative array of lease row.
+     * return true if successful, false when AWS API returns error
+     */
     private function createLease($lease)
     {
         $ec2 = App::make('aws')->get('ec2');
@@ -289,6 +300,11 @@ class HomeController extends BaseController {
         }
         return TRUE;
     }
+    /*
+     * Handles lease termination by communitacting with AWS API
+     * Requires an associative array of lease row.
+     * return true if successful, false when AWS API returns error
+     */
     private function terminateLease($lease)
     {
         $ec2 = App::make('aws')->get('ec2');
