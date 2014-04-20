@@ -146,23 +146,18 @@ class HomeController extends BaseController {
     public function postManage($group_id)
     {
         $input=Input::all();
-        $expiry=$input['expiry'];
-        if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) die("Invalid Expiry Time");
         if(isset($input['rule_type'])){
             if("ssh"==$input["rule_type"])
             {
-                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"22", 'port_to'=>"22", 'expiry'=>$expiry);
-                $lease=Lease::create($data);
-                $lease=Lease::find($lease->id);
-                $this->NotificationMail($lease, TRUE);
-                var_dump($lease);
+                $protocol="tcp";
+                $port_from="22";
+                $port_to="22";
             }
             elseif("https"==$input["rule_type"])
             {
-                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>$expiry);
-                $lease=Lease::create($data);
-                $this->NotificationMail($lease, TRUE);
-                var_dump($lease);
+                $protocol="tcp";
+                $port_from="443";
+                $port_to="443";
             }
             elseif("custom"==$input["rule_type"])
             {
@@ -173,16 +168,32 @@ class HomeController extends BaseController {
                 if(!is_numeric($port_from) || $port_from>65535 || $port_from<=0) die("Invalid From port");
                 if(!is_numeric($port_to) || $port_to>65535 || $port_to<=0) die("Invalid To port");
                 if($port_from>$port_to) die("From port Must be less than equal to To Port");
-
-                $data=array('user_id'=>Auth::User()->id, 'group_id'=>$group_id, 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32", 'protocol'=>"tcp", 'port_from'=>"443", 'port_to'=>"443", 'expiry'=>$expiry);
-                $lease=Lease::create($data);
-                $this->NotificationMail($lease, TRUE);
-                var_dump($lease);
             }
             else
             {
                 App::abort(403, 'Unauthorized action.');
             }
+            $expiry=$input['expiry'];
+            if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) die("Invalid Expiry Time");
+            $lease=array(
+                'user_id'=>Auth::User()->id,
+                'group_id'=>$group_id,
+                'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
+                'protocol'=>$protocol, 
+                'port_from'=>$port_from,
+                'port_to'=>$port_to,
+                'expiry'=>$expiry
+            );
+            $result=$this->createLease($lease);
+            if(!$result)
+            {
+                return Redirect::to("/manage/$group_id")
+                                ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
+            }
+            $lease=Lease::create($lease);
+            $this->NotificationMail($lease, TRUE);
+            return Redirect::to("/manage/$group_id")
+                            ->with('message', "Lease created successfully!");
         }
         elseif(isset($input['lease_id'])){
             try
@@ -194,24 +205,21 @@ class HomeController extends BaseController {
                 $message="Lease not found";
                 return Redirect::to("/manage/$group_id")->with('message', $message);
             }
+            $result=$this->terminateLease($lease->toArray());
             $lease->delete();
             $this->NotificationMail($lease, FALSE);
-            $message="Lease terminated successfully";
-            return Redirect::to("/manage/$group_id")->with('message', $message);
+            if(!$result)
+            {
+                return Redirect::to("/manage/$group_id")
+                                ->with('message', "Lease Termination Failed! Has it been terminated already?");
+            }
+           
+            return Redirect::to("/manage/$group_id")
+                                ->with('message', "Lease terminated successfully");
         }
         else{
             App::abort(403, 'Unauthorized action.');
         }
-        
-        /*$ec2 = App::make('aws')->get('ec2');
-        $security_group=$ec2->describeSecurityGroups(array(
-            'GroupIds' => array($group_id),
-        ));
-
-        $security_group=$security_group['SecurityGroups'][0];
-        //var_dump($security_group);
-        return View::make('getManage')->with('security_group', $security_group);
-    */
     }
 
     /*
@@ -246,13 +254,14 @@ class HomeController extends BaseController {
      * return void
      */
 
-    public function CleanLeases()
+    public function cleanLeases()
     {
         $leases=Lease::get();
         foreach($leases as $lease)
         {
             $time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
             if($time_left<=0){
+                $result=$this->terminateLease($lease->toArray());
                 $lease->delete();
                 $this->NotificationMail($lease, FALSE);
             }
@@ -260,4 +269,44 @@ class HomeController extends BaseController {
         return;
     }
 
+    private function createLease($lease)
+    {
+        $ec2 = App::make('aws')->get('ec2');
+        try
+        {
+            $result = $ec2->authorizeSecurityGroupIngress(array(
+            'DryRun' => false,
+            'GroupId' =>  $lease['group_id'],
+            'IpProtocol' => $lease['protocol'],
+            'FromPort' => $lease['port_from'],
+            'ToPort' => $lease['port_to'],
+            'CidrIp' => $lease['lease_ip'],
+            ));
+        }
+        catch(Exception $e)
+        {
+            return FALSE;
+        }
+        return TRUE;
+    }
+    private function terminateLease($lease)
+    {
+        $ec2 = App::make('aws')->get('ec2');
+        try
+        {
+            $result = $ec2->revokeSecurityGroupIngress(array(
+            'DryRun' => false,
+            'GroupId' => $lease['group_id'],
+            'IpProtocol' => $lease['protocol'],
+            'FromPort' => $lease['port_from'],
+            'ToPort' => $lease['port_to'],
+            'CidrIp' => $lease['lease_ip'],
+            ));
+        }
+        catch(Exception $e)
+        {
+            return FALSE;
+        }
+        return TRUE;  
+ }
 }
