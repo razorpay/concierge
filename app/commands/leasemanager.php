@@ -11,7 +11,7 @@ class leasemanager extends Command {
 	 *
 	 * @var string
 	 */
-	protected $name = 'leasemanager';
+	protected $name = 'custom:leasemanager';
 
 	/**
 	 * The console command description.
@@ -38,9 +38,9 @@ class leasemanager extends Command {
 	public function fire()
 	{
 		$leases=Lease::get();
+		$count=0;
 		foreach($leases as $lease)
 		{
-			$count=0;
 			$time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
 			if($time_left<=0){
 				$lease->delete();
