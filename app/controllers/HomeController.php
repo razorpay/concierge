@@ -324,5 +324,10 @@ class HomeController extends BaseController {
             return FALSE;
         }
         return TRUE;  
- }
+    }
+
+    public function getPassword()
+    {
+        return View::make('getPassword');
+    }
 }

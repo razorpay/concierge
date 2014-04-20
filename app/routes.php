@@ -20,6 +20,10 @@ Route::get('/manage/{group_id}', 'HomeController@getManage');
 Route::post('/manage/{group_id}', 'HomeController@postManage');
 
 Route::get('/logout', 'HomeController@getLogout');
+
+Route::get('/password', 'HomeController@getPassword');
+
+Route::post('/password', 'HomeController@postPassword');
 });
 
 Route::group(array('before' => 'guest'), function()

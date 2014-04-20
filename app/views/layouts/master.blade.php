@@ -32,7 +32,10 @@
         @if(Auth::check())
             <div class="container">
                 <p class="center">
+                    <a href="{{ URL::to('/')}}"> Home</a>
+                    <a href="{{ URL::to('/password')}}"> Change Password</a>
                     <a href="{{ URL::to('/logout') }}">Logout</a>
+
                 </p>
             </div>
             <div class="container">
