@@ -119,7 +119,7 @@ class HomeController extends BaseController {
 	 */
 	public function getGroups()
 	{
-
+        $leases= Lease::get();
 		$ec2 = App::make('aws')->get('ec2');
 		$security_groups=$ec2->describeSecurityGroups(array(
 			'Filters' => array(
@@ -132,7 +132,7 @@ class HomeController extends BaseController {
 
 		$security_groups=$security_groups['SecurityGroups'];
 
-        return View::make('getGroups')->with('security_groups', $security_groups);
+        return View::make('getGroups')->with('security_groups', $security_groups)->with('leases', $leases);
 	}
 
 	public function getManage($group_id)
