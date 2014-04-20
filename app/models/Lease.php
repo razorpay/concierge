@@ -3,6 +3,7 @@
 class Lease extends Eloquent
 {
 	protected $guarded = array('id');
+	protected $softDelete = true;
     // Lease __belongs_to__ User
     public function user()
     {
