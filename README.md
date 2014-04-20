@@ -28,3 +28,4 @@ return array(
 * Give permissions on storage folder `chmod -R o+wx app/storage/`
 * Copy the `app/custom_config.sample.php` to `app/custom_config.php` and modify appropriately.
 * Create the crontab for correcting leasing by running `php artisan custom:croncreator`. You can check if the crontab can run smoothly by running `php artisan custom:leasemanger` to check it returns no errors.
+* Change the pretend option to true in `app/config/mail.php` when using this in development.
