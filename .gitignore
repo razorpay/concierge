@@ -9,3 +9,4 @@ Thumbs.db
 app/config/packages/aws/*
 app/LaravelDuo/LaravelDuo.php
 app/config/database.php
+app/custom_config.php
