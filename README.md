@@ -25,3 +25,6 @@ return array(
 * Copy `app/LaravelDuo/LaravelDuo.sample.php` to `app/LaravelDuo/LaravelDuo.php` and update it with necessary values. 
 * Copy `app/config/database.sample.php` to `app/config/database.php` and update the password
 * Migrate the db with `php artisan migrate` &  seed with `php artisan db:seed`
+* Give permissions on storage folder `chmod -R o+wx app/storage/`
+* Copy the `app/custom_config.sample.php` to `app/custom_config.php` and modify appropriately.
+* Create the crontab for correcting leasing by running `php artisan custom:croncreator`. You can check if the crontab can run smoothly by running `php artisan custom:leasemanger` to check it returns no errors.
