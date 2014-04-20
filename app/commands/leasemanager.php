@@ -38,7 +38,7 @@ class leasemanager extends Command {
 	public function fire()
 	{
 		$home_controller=new HomeController(new LaravelDuo\LaravelDuo);
-		$cleaner = $home_controller->CleanLeases();
+		$cleaner = $home_controller->cleanLeases();
 	}
 
 	/**
