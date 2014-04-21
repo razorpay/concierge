@@ -80,5 +80,4 @@ App::down(function()
 
 require app_path().'/filters.php';
 
-/* custom configuration variables */
-require app_path().'/custom_config.php';
+

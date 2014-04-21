@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => "root@aws-sec-manager", 'name' => "AWS Security Lease"),
+	'from' => array('address' => Config::get('custom_config.mail_from_email'), 'name' => Config::get('custom_config.mail_from_name')),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -119,6 +119,6 @@ return array(
 	|
 	*/
     
-	'pretend' => false,
+	'pretend' => Config::get('custom_config.mail_pretend'),
 
 );

@@ -6,7 +6,5 @@ composer.lock
 .env.php
 .DS_Store
 Thumbs.db
-app/config/packages/aws/*
-app/LaravelDuo/LaravelDuo.php
 app/config/database.php
-app/custom_config.php
+app/config/custom_config.php

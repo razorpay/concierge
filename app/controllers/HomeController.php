@@ -256,7 +256,7 @@ class HomeController extends BaseController {
             {   
                 //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
                 return Redirect::to("/manage/$group_id")
-                                ->with('message', "Lease Termination Failed! The lease was probably already deleted");
+                                ->with('message', "Lease Termination returned error. Assumed the lease was already deleted");
             }
             
             return Redirect::to("/manage/$group_id")
@@ -283,7 +283,7 @@ class HomeController extends BaseController {
             //In case of Lease Creation
             Mail::queue('emails.notification', $data, function($message)
             {
-                $message->to($GLOBALS['notification_emailid'], 'Security Notification' )->subject('Secure Access Lease Created');
+                $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Created');
             });
         }
         else
@@ -291,7 +291,7 @@ class HomeController extends BaseController {
             //In Case of Lease Termination
             Mail::queue('emails.notification', $data, function($message)
             {
-                $message->to($GLOBALS['notification_emailid'], 'Security Notification' )->subject('Secure Access Lease Terminated');
+                $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Terminated');
             });
         }
     }

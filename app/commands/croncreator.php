@@ -41,7 +41,7 @@ class croncreator extends Command {
 		$output = shell_exec('crontab -l');
 
 		//The cron needed for this repo
-		$cron="* * * * *  ".$GLOBALS['php_path']." ".$GLOBALS['artisan_path']." custom:leasemanager";
+		$cron="* * * * *  ".Config::get('custom_config.php_path')." ".Config::get('custom_config.artisan_path')." custom:leasemanager";
 
 		//Check if Cron Already exists
 		if(strpos($output,$cron)===FALSE)
