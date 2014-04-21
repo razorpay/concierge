@@ -72,21 +72,35 @@
 	        </tbody>
 	        </table>
 	        
-	        <h2>Get Access On this Group</h2>
+	        <h2>Create Access On this Group</h2>
 		    <div>
-		    <button type="button" class="btn btn-primary" onclick="javascript: document.getElementById('ssh_form').style.display='inline';">SSH</button>
-		    <button type="button" class="btn btn-primary" onclick="javascript: document.getElementById('https_form').style.display='inline';">HTTPS</button>
-		    <button type="button" class="btn btn-primary" onclick="javascript: document.getElementById('custom_form').style.display='inline';">Custom</button>
+		    <button type="button" class="btn btn-primary" onclick="javascript: $('#ssh_form').show();">SSH</button>
+		    <button type="button" class="btn btn-primary" onclick="javascript: $('#https_form').show();">HTTPS</button>
+		    <button type="button" class="btn btn-primary" onclick="javascript: $('#custom_form').show();">Custom</button>
 		    </div>
 		    <br/>
 
 
 			<form id="ssh_form" class="form-horizontal" role="form" style="display:none" action="" method="POST">
+			  <h4>Get SSH Access:</h4>
 			  <input type="hidden" name="rule_type" value="ssh" />
 			  <input type="hidden" name="_token" value="{{{csrf_token()}}}" />
-			  
 			  <div class="row">
-			    <label for="expiry" class="col-sm-4 control-label">SSH Access Expiry:</label>
+			  	<label for="access" class="col-sm-4 control-label">Access For:</label>
+			    <div class="col-sm-8">
+				    <input type="radio" name="access" onChange="if(this.checked) $('#ssh_email').hide();" checked="checked" value="1"  /> Self
+				    <input type="radio" name="access" onChange="if(this.checked) $('#ssh_email').show();" value="2"  /> Invite By Email
+				    <input type="radio" name="access" onChange="if(this.checked) $('#ssh_email').hide();" value="3"  /> Invite By Link
+				</div>
+			  </div>
+			  <div id="ssh_email" class="row" style="display:none">
+			  	<label for="email" class="col-sm-4 control-label">Email:</label>
+			    <div class="col-sm-8">
+				    <input type="email" class="form-control" name="email" placeholder="some@someone.com"  /> 
+				</div>
+			  </div>
+			  <div class="row">
+			    <label for="expiry" class="col-sm-4 control-label">Expiry:</label>
 			    <div class="col-sm-4">
 				    <select name="expiry" class="form-control" required>
 					  <option value="3600" selected>1 hour</option>
@@ -102,10 +116,25 @@
 			</form>
 
 		    <form id="https_form" class="form-horizontal" role="form" style="display:none"  action="" method="POST">
+		    	<h4>Get HTTPS Access:</h4>
 			    <input type="hidden" name="rule_type" value="https" />
 			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
 			    <div class="row">
-			    	<label for="expiry" class="col-sm-4 control-label">HTTPS Access Expiry:</label>
+				  	<label for="access" class="col-sm-4 control-label">Access For:</label>
+				    <div class="col-sm-8">
+					    <input type="radio" name="access" onChange="if(this.checked) $('#https_email').hide();" checked="checked" value="1"  /> Self
+					    <input type="radio" name="access" onChange="if(this.checked) $('#https_email').show();" value="2"  /> Invite By Email
+					    <input type="radio" name="access" onChange="if(this.checked) $('#https_email').hide();" value="3"  /> Invite By Link
+					</div>
+				</div>
+				<div id="https_email" class="row" style="display:none">
+				  	<label for="email" class="col-sm-4 control-label">Email:</label>
+				    <div class="col-sm-8">
+					    <input type="email" class="form-control" name="email" placeholder="some@someone.com"  /> 
+					</div>
+			    </div>
+			    <div class="row">
+			    	<label for="expiry" class="col-sm-4 control-label">Expiry:</label>
 			    	<div class="col-sm-4">
 			    		<select name="expiry" class="form-control" required>
 						  <option value="3600" selected>1 hour</option>
@@ -125,7 +154,20 @@
 			    <h4>Define Custom Rule:</h4>
 			    <input type="hidden" name="rule_type" value="custom" />
 			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
-			    
+			    <div class="row">
+				  	<label for="access" class="col-sm-4 control-label">Access For:</label>
+				    <div class="col-sm-8">
+					    <input type="radio" name="access" onChange="if(this.checked) $('#custom_email').hide();" checked="checked" value="1"  /> Self
+					    <input type="radio" name="access" onChange="if(this.checked) $('#custom_email').show();" value="2"  /> Invite By Email
+					    <input type="radio" name="access" onChange="if(this.checked) $('#custom_email').hide();" value="3"  /> Invite By Link
+					</div>
+				</div>
+				<div id="custom_email" class="row" style="display:none">
+				  	<label for="email" class="col-sm-4 control-label">Email:</label>
+				    <div class="col-sm-8">
+					    <input type="email" class="form-control" name="email" placeholder="some@someone.com"  /> 
+					</div>
+			    </div>
 			    <div class="row">
 			    	<label for="protocol" class="col-sm-4 control-label">Protocol</label>
 			    	<div class="col-sm-8">

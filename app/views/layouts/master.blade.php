@@ -63,7 +63,7 @@
         @endif
 
         @section('footer_scripts')
-            {{ HTML::script('//code.jquery.com/jquery-1.10.2.min.js') }}
+            {{ HTML::script('//code.jquery.com/jquery-2.1.0.min.js') }}
             {{ HTML::script('//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js') }}
             <script type="text/javascript">
             setTimeout(function() {
