@@ -44,6 +44,7 @@
                    <td>{{{$lease['port_from']}}}-{{{$lease['port_to']}}}</td>
                    <td>
                    <?php
+                    //Calculating time to expiry in hours & minutes
                    	$time_left=strtotime($lease['created_at'])+$lease['expiry']-time(); 
             	    $hours=intval(floor($time_left/3600)); 
             	    $minutes=intval(floor(($time_left-$hours*3600)/60));
@@ -75,6 +76,7 @@
                    <td>{{{$lease['protocol']}}}</td>
                    <td>{{{$lease['port_from']}}}-{{{$lease['port_to']}}}</td>
                    <td>
+                       {{-- Checking if Called by a User action or command --}}
                        @if(null !== Auth::user())
                        {{{Auth::user()->username}}}
                        @else

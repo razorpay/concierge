@@ -26,6 +26,7 @@
 		       		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
 		       		<td>
 		       		<?php
+		       			//Calculating Time to expiry in hours & minutes
 		       			$time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
 	    				$hours=intval(floor($time_left/3600)); 
 	    				$minutes=intval(floor(($time_left-$hours*3600)/60));
@@ -42,9 +43,11 @@
 	    			</td>
 		       	</tr>
 		       	@endforeach
+
 		       	@if(!$leases->count())
 		       	<tr><td colspan="7">No Active Leases</td></tr>
 		       	@endif
+
 		    </tbody>
    		    </table>
    		    <br/>
@@ -67,6 +70,7 @@
 			<td>{{{$security_group['Description']}}}</td>
 			<td>{{{$security_group['VpcId']}}}</td>
 			<td>
+			{{-- Display The Name Tag if it exists --}}
 			@if(isset($security_group['Tags']['0']['Value']))
 			{{{$security_group['Tags']['0']['Value']}}}
 			@endif

@@ -41,6 +41,7 @@
 	        		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
 	        		<td>
 	        		<?php
+	        		    //Calculating Time to Expiry in Hours and minutes
 	        			$time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
     					$hours=intval(floor($time_left/3600)); 
     					$minutes=intval(floor(($time_left-$hours*3600)/60));
@@ -76,6 +77,7 @@
 			@foreach($security_group['IpPermissions'] as $rule)
 			   @foreach($rule['UserIdGroupPairs'] as $rule_group)
 			    <tr>
+			     	{{-- Checking for all traffic rule --}}
 					@if("-1"!=$rule['IpProtocol'])
 					<td>{{$rule['IpProtocol']}}</td>
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
@@ -88,6 +90,7 @@
 				@endforeach
 			    @foreach($rule['IpRanges'] as $rule_ip)
 			    <tr>
+			    	{{-- Checking for all traffic rule --}}
 			    	@if("-1"!=$rule['IpProtocol'])
 					<td>{{$rule['IpProtocol']}}</td>
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
@@ -114,6 +117,7 @@
 			@foreach($security_group['IpPermissionsEgress'] as $rule)
 			    @foreach($rule['UserIdGroupPairs'] as $rule_group)
 			    <tr>
+			    	{{-- Checking for all traffic rule --}}
 					@if("-1"!=$rule['IpProtocol'])
 					<td>{{$rule['IpProtocol']}}</td>
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
@@ -126,6 +130,7 @@
 				@endforeach
 			    @foreach($rule['IpRanges'] as $rule_ip)
 			    <tr>
+			    	{{-- Checking for all traffic rule --}}
 					@if("-1"!=$rule['IpProtocol'])
 					<td>{{$rule['IpProtocol']}}</td>
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
