@@ -46,13 +46,13 @@
 	    			@endif
 	    			</td>
 	    			<td>
-	    			<form method="post" action="/manage/{{{$lease->group_id}}}">
-	    			<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
-	    			<input type="hidden" name="_token" value="{{{csrf_token()}}}">
-	    			<a href="" onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
-	    			<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
-	    			</a>
-	    			</form>
+		    			<form method="post" action="/manage/{{{$lease->group_id}}}">
+		    			<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
+		    			<input type="hidden" name="_token" value="{{{csrf_token()}}}">
+		    			<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
+		    			<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
+		    			</a>
+		    			</form>
 	    			</td>
 		       	</tr>
 		       	@endforeach
