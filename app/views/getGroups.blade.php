@@ -4,12 +4,12 @@
      <div class="row">
         <div class="col-md-6 col-md-offset-3 modal-outer noPad">
 	        <h1>Active Leases</h1>
-	        <table class="table-bordered table-striped">
+	        <table class="table table-hover table-bordered">
 		    <thead>
 		        <tr>
-		        <th>Created By:</th>
-		        <th>Leased Ip:</th>
-		        <th>On Group:</th>
+		        <th>Creator</th>
+		        <th>Leased IP</th>
+		        <th>Security Group</th>
 		        <th>Protocol</th>
 		        <th>Port(s)</th>
 		        <th>Time Left</th>
@@ -37,30 +37,30 @@
 	    			<form method="post" action="/manage/{{{$lease->group_id}}}">
 	    			<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
 	    			<input type="hidden" name="_token" value="{{{csrf_token()}}}">
-	    			<button type="submit" onclick="return confirm('Are you sure you want to terminate this lease?');">
+	    			<a href="" onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
 	    			<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
-	    			</button>
+	    			</a>
 	    			</form>
 	    			</td>
 		       	</tr>
 		       	@endforeach
 
 		       	@if(!$leases->count())
-		       	<tr><td colspan="7">No Active Leases</td></tr>
+		       	<tr><td colspan="7" style="text-align:center">No Active Leases</td></tr>
 		       	@endif
 
 		    </tbody>
    		    </table>
    		    <br/>
  			<h1>Security Groups</h1>
- 			<table class="table-bordered table-striped">
+ 			<table class="table table-hover table-bordered">
 		    <thead>
 		        <tr>
-		        <th>Group Name:</th>
-		        <th>Group Id:</th>
-		        <th>Group Description:</th>
-		        <th>VPC:</th>
-		        <th>Name Tag:</th>
+		        <th>Name</th>
+		        <th>ID</th>
+		        <th>Description</th>
+		        <th>VPC</th>
+		        <th>Name Tag</th>
 		        </tr>
 		    </thead>
 		    <tbody>

@@ -21,11 +21,11 @@
 			@endif
 			<br/>
 			<h2>Active Leases:</h2>
-			<table class="table-bordered table-striped">
+			<table class="table table-hover table-bordered">
 	        <thead>
 	          <tr>
-	            <th>Created By:</th>
-	            <th>Leased Ip:</th>
+	            <th>Creator</th>
+	            <th>Leased IP</th>
 	            <th>Protocol</th>
 	            <th>Port(s)</th>
 	            <th>Time Left</th>
@@ -51,27 +51,27 @@
     				<td><form method="post" action="">
     				<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
     				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
-    				<button type="submit" onclick="return confirm('Are you sure you want to terminate this lease?');">
+    				<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
     					<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
-    				</button>
+    				</a>
     				</form>
     				</td>	
 	        	</tr>
 	        	@endforeach
 	        	@if(!$leases->count())
-		       	<tr><td colspan="6">No Active Leases</td></tr>
+		       	<tr><td colspan="6" style="text-align:center">No Active Leases</td></tr>
 		       	@endif
 	        </tbody>
 	        </table>
 
 			<h2>Security Group Rules:</h2>
             Inbound Rules: 
-	        <table class="table-bordered table-striped">
+	        <table class="table table-hover table-bordered">
 	        <thead>
 	          <tr>
 	            <th>Protocol</th>
 	            <th>Port</th>
-	            <th>Source:</th>
+	            <th>Source</th>
 	          </tr>
 	        </thead>
 	        <tbody>
@@ -106,12 +106,12 @@
 		    </tbody>
 		    </table>
 		    Outbound Rules: <br/>
-		    <table class="table-bordered table-striped">
+		    <table class="table table-hover table-bordered">
 	        <thead>
 	          <tr>
 	            <th>Protocol</th>
 	            <th>Port</th>
-	            <th>Destination:</th>
+	            <th>Destination</th>
 	          </tr>
 	        </thead>
 	        <tbody>

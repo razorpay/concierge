@@ -24,12 +24,12 @@
         @if($mode)
             <h3>Secure Access Lease Created</h3>
             <p>A new lease has been created as follows:</p>
-            <table class="table-bordered table-striped">
+            <table class="table table-hover table-bordered">
                 <thead>
                     <tr>
-                    <th>Created By:</th>
-                    <th>Leased Ip:</th>
-                    <th>On Group:</th>
+                    <th>Creator</th>
+                    <th>Leased IP</th>
+                    <th>Security Group</th>
                     <th>Protocol</th>
                     <th>Port(s)</th>
                     <th>Time Left</th>
@@ -57,12 +57,12 @@
         @else
             <h3>Secure Access Lease terminated</h3>
             <p>A lease has been terminated as follows:</p>
-            <table class="table-bordered table-striped">
+            <table class="table table-hover table-bordered">
                 <thead>
                     <tr>
-                    <th>Created By:</th>
-                    <th>Leased Ip:</th>
-                    <th>On Group:</th>
+                    <th>Creator</th>
+                    <th>Leased IP</th>
+                    <th>Security Group</th>
                     <th>Protocol</th>
                     <th>Port(s)</th>
                     <th>Terminated By:</th>
