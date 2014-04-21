@@ -12,7 +12,7 @@ class Lease extends Eloquent
     }
 
     /*
-     *Returns active leases
+     *Returns active leases by groupId
      */
     public static function getByGroupId($group_id)
 	{

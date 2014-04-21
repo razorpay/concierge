@@ -12,7 +12,7 @@ class Invite extends Eloquent
     }
 
     /*
-     *Returns invite from token 
+     *Returns active invite by token 
      */
     public static function getByToken($token)
 	{
@@ -25,4 +25,13 @@ class Invite extends Eloquent
         }
 		return $invite;
 	}
+
+    /*
+     *Returns active invites by groupid
+     */
+    public static function getByGroupId($group_id)
+    {
+        $invites = self::where('group_id', $group_id)->get();
+        return $invites;
+    }
 }

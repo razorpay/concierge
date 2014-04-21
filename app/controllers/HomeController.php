@@ -125,12 +125,21 @@ class HomeController extends BaseController {
 	 */
 	public function getGroups()
 	{
-        $leases= Lease::get();
+        //Get All security groups
 		$ec2 = App::make('aws')->get('ec2');
 		$security_groups=$ec2->describeSecurityGroups();
 		$security_groups=$security_groups['SecurityGroups'];
 
-        return View::make('getGroups')->with('security_groups', $security_groups)->with('leases', $leases);
+        //Get all active leases
+        $leases= Lease::get();
+
+        //get all active Invites
+        $invites= Invite::get();
+
+        return View::make('getGroups')
+                    ->with('security_groups', $security_groups)
+                    ->with('leases', $leases)
+                    ->with('invites', $invites);
 	}
 
     /*
@@ -150,7 +159,13 @@ class HomeController extends BaseController {
         //get Active Leases
         $leases= Lease::getByGroupId($group_id);
 
-        return View::make('getManage')->with('security_group', $security_group)->with('leases', $leases);
+        //get Active Invites
+        $invites= Invite::getByGroupId($group_id);
+
+        return View::make('getManage')
+                    ->with('security_group', $security_group)
+                    ->with('leases', $leases)
+                    ->with('invites', $invites);
 	}
 
     /*
