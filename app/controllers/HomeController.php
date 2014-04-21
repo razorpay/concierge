@@ -161,6 +161,7 @@ class HomeController extends BaseController {
     {
         $input=Input::all();
         $messages=array();
+        $email=NULL;
         /*
          For Lease Creation
         */
@@ -195,10 +196,16 @@ class HomeController extends BaseController {
                 App::abort(403, 'Unauthorized action.');
             }
 
-            //Expiry Time validation
+            //Other validations
             $expiry=$input['expiry'];
             if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) array_push($messages, "Invalid Expiry Time");
-            
+            if(!in_array($input['access'], array(1, 2, 3))) array_push($messages, "Invalid invite Email");
+            if(2==$input['access']){
+                if(!isset($input['email']) || !filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
+                    array_push($messages, "Invalid invite Email");
+                }
+            }
+
             //Validation fails
             if(!empty($messages)) 
             {
@@ -207,28 +214,66 @@ class HomeController extends BaseController {
 
             }
 
-            //Creating the lease
-            $lease=array(
+            if(1==$input['access'])
+            {
+                //Creating the lease
+                $lease=array(
+                    'user_id'=>Auth::User()->id,
+                    'group_id'=>$group_id,
+                    'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
+                    'protocol'=>$protocol, 
+                    'port_from'=>$port_from,
+                    'port_to'=>$port_to,
+                    'expiry'=>$expiry
+                );
+                $result=$this->createLease($lease);
+
+                if(!$result)
+                {   
+                    //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
+                    return Redirect::to("/manage/$group_id")
+                                    ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
+                }
+                $lease=Lease::create($lease);
+                $this->NotificationMail($lease, TRUE);
+                return Redirect::to("/manage/$group_id")
+                                ->with('message', "Lease created successfully!");
+            }
+            elseif(2==$input['access'])
+            {
+                $email=$input['email'];
+            }
+
+            $token=md5(time()+rand());
+            $invite=array(
                 'user_id'=>Auth::User()->id,
                 'group_id'=>$group_id,
-                'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
                 'protocol'=>$protocol, 
                 'port_from'=>$port_from,
                 'port_to'=>$port_to,
-                'expiry'=>$expiry
+                'expiry'=>$expiry,
+                'email'=>$email,
+                'token'=>$token
             );
-            $result=$this->createLease($lease);
-
-            if(!$result)
-            {   
-                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
+            $invite=Invite::create($invite);
+            if($email)
+            {
+                $data=array('invite'=>$invite->toArray());
+                //Send Invite Mail
+                Mail::queue('emails.invite', $data, function($message) use($email)
+                {
+                    $message->to($email, 'Invite' )->subject('Access Lease Invite');
+                });
                 return Redirect::to("/manage/$group_id")
-                                ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
+                                ->with('message', "Invite Sent successfully!");
+
             }
-            $lease=Lease::create($lease);
-            $this->NotificationMail($lease, TRUE);
-            return Redirect::to("/manage/$group_id")
-                            ->with('message', "Lease created successfully!");
+            else
+            {
+                return View::make('pages.invited')->with('invite', $invite);
+            }
+
+
         }
         /* 
          * Lease termination Call
@@ -268,35 +313,6 @@ class HomeController extends BaseController {
     }
 
     /*
-     * Handles sending of notification mail
-     * Requires two arguements $lease, $ mode. 
-     * $lease = Lease Object Containing the lease created or deleted
-     * $mode = TRUE for lease created, FALSE for lease deleted
-     */
-
-    private function NotificationMail($lease, $mode)
-    {
-        $data=array('lease'=>$lease->toArray(), 'mode'=>$mode);
-
-        if($mode)
-        {
-            //In case of Lease Creation
-            Mail::queue('emails.notification', $data, function($message)
-            {
-                $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Created');
-            });
-        }
-        else
-        {
-            //In Case of Lease Termination
-            Mail::queue('emails.notification', $data, function($message)
-            {
-                $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Terminated');
-            });
-        }
-    }
-
-    /*
      * Handles cleaning of expired lease, called via artisan command custom:leasemanager run via cron
      * return void
      */
@@ -320,57 +336,6 @@ class HomeController extends BaseController {
         }
         if(!empty($messages)) return implode("\n", $messages);
         return;
-    }
-
-    /*
-     * Handles lease creation by communitacting with AWS API
-     * Requires an associative array of lease row.
-     * return true if successful, false when AWS API returns error
-     */
-    private function createLease($lease)
-    {
-        $ec2 = App::make('aws')->get('ec2');
-        try
-        {
-            $result = $ec2->authorizeSecurityGroupIngress(array(
-            'DryRun' => false,
-            'GroupId' =>  $lease['group_id'],
-            'IpProtocol' => $lease['protocol'],
-            'FromPort' => $lease['port_from'],
-            'ToPort' => $lease['port_to'],
-            'CidrIp' => $lease['lease_ip'],
-            ));
-        }
-        catch(Exception $e)
-        {
-            return FALSE;
-        }
-        return TRUE;
-    }
-    /*
-     * Handles lease termination by communitacting with AWS API
-     * Requires an associative array of lease row.
-     * return true if successful, false when AWS API returns error
-     */
-    private function terminateLease($lease)
-    {
-        $ec2 = App::make('aws')->get('ec2');
-        try
-        {
-            $result = $ec2->revokeSecurityGroupIngress(array(
-            'DryRun' => false,
-            'GroupId' => $lease['group_id'],
-            'IpProtocol' => $lease['protocol'],
-            'FromPort' => $lease['port_from'],
-            'ToPort' => $lease['port_to'],
-            'CidrIp' => $lease['lease_ip'],
-            ));
-        }
-        catch(Exception $e)
-        {
-            return FALSE;
-        }
-        return TRUE;  
     }
 
     /*
@@ -426,4 +391,115 @@ class HomeController extends BaseController {
 
 
     }
+
+    /*
+     * Handles Guest Access for lease invites
+     */ 
+    public function getInvite($token)
+    {
+        $invite=Invite::getByToken($token);
+        if(!$invite) return View::make('pages.guest')->with('failure', "Invalid Token.");
+        //Creating the lease
+            $lease=array(
+                'user_id'=>$invite->user_id,
+                'group_id'=>$invite->group_id,
+                'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
+                'protocol'=>$invite->protocol, 
+                'port_from'=>$invite->port_from,
+                'port_to'=>$invite->port_to,
+                'expiry'=>$invite->expiry
+            );
+            $result=$this->createLease($lease);
+            if(!$result)
+            {   
+                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
+                return View::make('pages.guest')->with('failure', "Error encountered while creating lease. Please try again.");
+            }
+            $lease=Lease::create($lease);
+            $invite=$invite->delete();
+            $this->NotificationMail($lease, TRUE);
+            return View::make('pages.guest')->with('lease', $lease); 
+    }
+
+    /*
+     * Handles sending of notification mail
+     * Requires two arguements $lease, $ mode. 
+     * $lease = Lease Object Containing the lease created or deleted
+     * $mode = TRUE for lease created, FALSE for lease deleted
+     */
+
+    private function NotificationMail($lease, $mode)
+    {
+        $data=array('lease'=>$lease->toArray(), 'mode'=>$mode);
+
+        if($mode)
+        {
+            //In case of Lease Creation
+            Mail::queue('emails.notification', $data, function($message)
+            {
+                $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Created');
+            });
+        }
+        else
+        {
+            //In Case of Lease Termination
+            Mail::queue('emails.notification', $data, function($message)
+            {
+                $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Terminated');
+            });
+        }
+    }
+
+    /*
+     * Handles lease creation by communitacting with AWS API
+     * Requires an associative array of lease row.
+     * return true if successful, false when AWS API returns error
+     */
+    private function createLease($lease)
+    {
+        $ec2 = App::make('aws')->get('ec2');
+        try
+        {
+            $result = $ec2->authorizeSecurityGroupIngress(array(
+            'DryRun' => false,
+            'GroupId' =>  $lease['group_id'],
+            'IpProtocol' => $lease['protocol'],
+            'FromPort' => $lease['port_from'],
+            'ToPort' => $lease['port_to'],
+            'CidrIp' => $lease['lease_ip'],
+            ));
+        }
+        catch(Exception $e)
+        {
+            return FALSE;
+        }
+        return TRUE;
+    }
+    /*
+     * Handles lease termination by communitacting with AWS API
+     * Requires an associative array of lease row.
+     * return true if successful, false when AWS API returns error
+     */
+    private function terminateLease($lease)
+    {
+        $ec2 = App::make('aws')->get('ec2');
+        try
+        {
+            $result = $ec2->revokeSecurityGroupIngress(array(
+            'DryRun' => false,
+            'GroupId' => $lease['group_id'],
+            'IpProtocol' => $lease['protocol'],
+            'FromPort' => $lease['port_from'],
+            'ToPort' => $lease['port_to'],
+            'CidrIp' => $lease['lease_ip'],
+            ));
+        }
+        catch(Exception $e)
+        {
+            return FALSE;
+        }
+        return TRUE;  
+    }
+
+
 }

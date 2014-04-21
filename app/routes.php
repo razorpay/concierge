@@ -33,4 +33,7 @@ Route::get('/', 'HomeController@getIndex');
 Route::post('/signin', array('before'=>'csrf', 'uses'=>'HomeController@postSignin'));
 
 Route::post('/duologin', 'HomeController@postDuologin');
+
 });
+
+Route::get('/invite/{token}', 'HomeController@getInvite');
