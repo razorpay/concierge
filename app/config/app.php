@@ -120,6 +120,7 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		'Aws\Laravel\AwsServiceProvider',
+		'Schuppo\PasswordStrength\PasswordStrengthServiceProvider',
 
 	),
 
