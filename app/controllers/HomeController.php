@@ -448,7 +448,7 @@ class HomeController extends BaseController {
     public function getInvite($token)
     {
         $invite=Invite::getByToken($token);
-        if(!$invite) return View::make('pages.guest')->with('failure', "Invalid Token.");
+        if(!$invite) return View::make('pages.guest')->with('failure', "Invalid Token. It was already used or has been terminated by the admins");
         $email=$invite->email;
         if(!$invite->email) $email="NoEmail";
         //Creating the lease
@@ -466,7 +466,7 @@ class HomeController extends BaseController {
             if(!$result)
             {   
                 //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
-                return View::make('pages.guest')->with('failure', "Error encountered while creating lease. Please try again.");
+                return View::make('pages.guest')->with('failure', "Error encountered while creating lease. Please try again. If doesn't help contact the admin.");
             }
             $lease=Lease::create($lease);
             $invite=$invite->delete();
