@@ -85,6 +85,56 @@
 	        </tbody>
 	        </table>
 	        
+	        <h2>Active Invites:</h2>
+			<table class="table table-hover table-bordered">
+	        <thead>
+	          <tr>
+	            <th>Creator</th>
+	            <th>Protocol</th>
+	            <th>Port(s)</th>
+	            <th>Expiry</th>
+	            <th>Type</th>
+	            <th>Terminate?</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	        	@foreach($invites as $invite)
+	        	<tr>
+	        		<td>{{{$invite->user->username}}}</td>
+	        		<td>{{{$invite->protocol}}}</td>
+	        		<td>{{{$invite->port_from}}}-{{{$invite->port_to}}}</td>
+	        		<td>
+	        		<?php
+	        		    //Calculating Time to Expiry in Hours and minutes
+    					$hours=intval(floor($invite->expiry/3600)); 
+    					$minutes=intval(floor(($invite->expiry-$hours*3600)/60));
+    					echo "$hours hours $minutes minutes";
+    				?>
+    				</td>
+    				<td>
+    				@if($invite->email)
+    					Email: {{{$invite->email}}}
+    				@else
+    					URL Invite
+    				@endif
+    				</td>
+    				<td>
+	    				<form method="post" action="">
+	    				<input type="hidden" name="invite_id" value="{{{$invite->id}}}" />
+	    				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
+	    				<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this invite?')) {parentNode.submit();} return false;">
+	    					<span title="Terminate Invite" class="glyphicon glyphicon-minus-sign"></span>
+	    				</a>
+	    				</form>
+    				</td>	
+	        	</tr>
+	        	@endforeach
+	        	@if(!$invites->count())
+		       	<tr><td colspan="6" style="text-align:center">No Active Invites</td></tr>
+		       	@endif
+	        </tbody>
+	        </table>
+
 	        <h2>Create Access On this Group</h2>
 		    <div>
 		    <button type="button" class="btn btn-primary" onclick="javascript: $('#ssh_form').show();">SSH</button>
