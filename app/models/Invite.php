@@ -12,11 +12,17 @@ class Invite extends Eloquent
     }
 
     /*
-     *Returns active leases
+     *Returns invite from token 
      */
     public static function getByToken($token)
 	{
-		$leases = self::where('token', $token)->get();
-		return $leases;
+		try{
+            $invite = self::where('token', $token)->firstOrFail();
+        }
+        catch(Exception $e)
+        {
+            $invite = FALSE;
+        }
+		return $invite;
 	}
 }
