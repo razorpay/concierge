@@ -50,6 +50,7 @@
     				</td>
     				<td><form method="post" action="">
     				<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
+    				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
     				<button type="submit" onclick="return confirm('Are you sure you want to terminate this lease?');">
     					<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
     				</button>
@@ -152,6 +153,7 @@
 		    
 		    <form id="ssh_form" style="visibility:hidden" action="" method="POST">
 			    <input type="hidden" name="rule_type" value="ssh" />
+			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
 			   SSH Access Expiry: <select name="expiry" required>
 				  <option value="3600" selected>1 hour</option>
 				  <option value="14400">4 hours</option>
@@ -163,6 +165,7 @@
 
 		    <form id="https_form" style="visibility:hidden" action="" method="POST">
 			    <input type="hidden" name="rule_type" value="https" />
+			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
 			    HTTPS Access Expiry: <select name="expiry" required>
 				  <option value="3600" selected>1 hour</option>
 				  <option value="14400">4 hours</option>
@@ -174,6 +177,7 @@
 		    
 		    <form id="custom_form" style="visibility:hidden" action="" method="POST">
 			    <input type="hidden" name="rule_type" value="custom" />
+			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
 			    Protocol: <input type="text" name="protocol" value="" placeholder="tcp/udp" required/><br/>
 			    From Port:<input type="text" name="port_from" placeholder="From Port:" required/>
 			    To Port:<input type="text" name="port_to" placeholder="To port:" required/> <br/> Keep From & To Port same for single port access.<br/>

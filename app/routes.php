@@ -17,20 +17,20 @@ Route::get('/groups', 'HomeController@getGroups');
 
 Route::get('/manage/{group_id}', 'HomeController@getManage');
 
-Route::post('/manage/{group_id}', 'HomeController@postManage');
+Route::post('/manage/{group_id}', array('before'=>'csrf', 'uses'=>'HomeController@postManage'));
 
 Route::get('/logout', 'HomeController@getLogout');
 
 Route::get('/password', 'HomeController@getPassword');
 
-Route::post('/password', 'HomeController@postPassword');
+Route::post('/password', array('before'=>'csrf', 'uses'=>'HomeController@postPassword'));
 });
 
 Route::group(array('before' => 'guest'), function()
 {
 Route::get('/', 'HomeController@getIndex');
 
-Route::post('/signin', 'HomeController@postSignin');
+Route::post('/signin', array('before'=>'csrf', 'uses'=>'HomeController@postSignin'));
 
 Route::post('/duologin', 'HomeController@postDuologin');
 });

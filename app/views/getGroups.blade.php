@@ -36,6 +36,7 @@
 	    			<td>
 	    			<form method="post" action="/manage/{{{$lease->group_id}}}">
 	    			<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
+	    			<input type="hidden" name="_token" value="{{{csrf_token()}}}">
 	    			<button type="submit" onclick="return confirm('Are you sure you want to terminate this lease?');">
 	    			<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
 	    			</button>
