@@ -45,11 +45,11 @@
                    <td>
                    <?php
                     //Calculating time to expiry in hours & minutes
-                   	$time_left=strtotime($lease['created_at'])+$lease['expiry']-time(); 
-            	    $hours=intval(floor($time_left/3600)); 
-            	    $minutes=intval(floor(($time_left-$hours*3600)/60));
-            	    echo "$hours hours $minutes minutes";
-            	   ?>
+                    $time_left=strtotime($lease['created_at'])+$lease['expiry']-time(); 
+              	    $hours=intval(floor($time_left/3600)); 
+              	    $minutes=intval(floor(($time_left-$hours*3600)/60));
+              	    echo "$hours hours $minutes minutes";
+            	     ?>
             	   </td>
                    </tr>
                 </tbody>
