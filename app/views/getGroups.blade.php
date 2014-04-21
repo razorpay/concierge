@@ -3,7 +3,7 @@
 @section('content')
      <div class="row">
         <div class="col-md-6 col-md-offset-3 modal-outer noPad">
-	        <h1>Active Leases</h1>
+	        <h2>Active Leases</h2>
 	        <table class="table table-hover table-bordered">
 		    <thead>
 		        <tr>
@@ -63,7 +63,7 @@
 		    </tbody>
    		    </table>
 
-   		    <h2>Active Invites:</h2>
+   		    <h2>Active Invites</h2>
 			<table class="table table-hover table-bordered">
 	        <thead>
 	          <tr>
@@ -115,7 +115,7 @@
 	        </tbody>
 	        </table>
 
- 			<h1>Security Groups</h1>
+ 			<h2>Security Groups</h2>
  			<table class="table table-hover table-bordered">
 		    <thead>
 		        <tr>

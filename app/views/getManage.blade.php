@@ -28,7 +28,7 @@
 			  @endif
 			  </div>
 			</div>	
-			<h2>Active Leases:</h2>
+			<h2>Active Leases</h2>
 			<table class="table table-hover table-bordered">
 	        <thead>
 	          <tr>
@@ -85,7 +85,7 @@
 	        </tbody>
 	        </table>
 	        
-	        <h2>Active Invites:</h2>
+	        <h2>Active Invites</h2>
 			<table class="table table-hover table-bordered">
 	        <thead>
 	          <tr>
@@ -268,7 +268,7 @@
 			  	</div>
 		    </form>
 
-			<h2>Security Group Rules:</h2>
+			<h2>Security Group Rules</h2>
             Inbound Rules: 
 	        <table class="table table-hover table-bordered">
 	        <thead>
