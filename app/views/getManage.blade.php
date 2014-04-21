@@ -147,48 +147,80 @@
 		    </table>
 		    <br/>
 
-		    <button onclick="javascript: displayform('ssh_form')">Get SSH Access on this Group</button><br/>
-		    <button onclick="javascript: displayform('https_form')">Get HTTPS Access on this Group</button><br/>
-		    <button onclick="javascript: displayform('custom_form')">Get Custom Access on this Group</button><br/>
-		    
-		    <form id="ssh_form" style="visibility:hidden" action="" method="POST">
-			    <input type="hidden" name="rule_type" value="ssh" />
-			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
-			   SSH Access Expiry: <select name="expiry" required>
+		    <h2>Get Access On this Group</h2>
+		    <div>
+		    <button type="button" class="btn btn-primary" onclick="javascript: displayform('ssh_form')">SSH</button>
+		    <button type="button" class="btn btn-primary" onclick="javascript: displayform('https_form')">HTTPS</button>
+		    <button type="button" class="btn btn-primary" onclick="javascript: displayform('custom_form')">Custom</button>
+		    </div>
+		    <br/>
+
+		    <form id="ssh_form" class="form-inline" role="form" style="visibility:hidden" action="" method="POST">
+			  <input type="hidden" name="rule_type" value="ssh" />
+			  <input type="hidden" name="_token" value="{{{csrf_token()}}}" />
+			  
+			  <div class="form-group">
+			    <label for="expiry">SSH Access Expiry:</label>
+			    <select name="expiry" class="form-control" required>
 				  <option value="3600" selected>1 hour</option>
 				  <option value="14400">4 hours</option>
 				  <option value="43200">12 hours</option>
 				  <option value="86400">1 Day</option>
 				</select>
-			    <input type="submit" value="Get Access" />
-		    </form>
+			  </div>
 
-		    <form id="https_form" style="visibility:hidden" action="" method="POST">
+			  <button type="submit" class="btn btn-default">Get Access</button>
+			</form>
+
+		    <form id="https_form" class="form-inline" role="form" style="visibility:hidden"  action="" method="POST">
 			    <input type="hidden" name="rule_type" value="https" />
 			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
-			    HTTPS Access Expiry: <select name="expiry" required>
+			    
+			    <div class="form-group">
+			    <label for="expiry">HTTPS Access Expiry:</label>
+			    <select name="expiry" class="form-control" required>
 				  <option value="3600" selected>1 hour</option>
 				  <option value="14400">4 hours</option>
 				  <option value="43200">12 hours</option>
 				  <option value="86400">1 Day</option>
 				</select>
-			    <input type="submit" value="Get Access" />
+				</div>
+
+			    <input type="submit" class="btn btn-default" value="Get Access" />
 		    </form>
 		    
-		    <form id="custom_form" style="visibility:hidden" action="" method="POST">
+		    <form id="custom_form" class="form-inline" role="form" style="visibility:hidden" action="" method="POST">
 			    <input type="hidden" name="rule_type" value="custom" />
 			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
-			    Protocol: <input type="text" name="protocol" value="" placeholder="tcp/udp" required/><br/>
-			    From Port:<input type="text" name="port_from" placeholder="From Port:" required/>
-			    To Port:<input type="text" name="port_to" placeholder="To port:" required/> <br/> Keep From & To Port same for single port access.<br/>
-			    Custom Access Expiry: <select name="expiry" required>
+
+			    <div class="form-group">
+			    <label for="protocol">Protocol:</label>
+			    <input type="text" name="protocol" value="" placeholder="tcp/udp" class="form-control" required />
+			    </div>
+			    <br/>
+
+			    <div class="form-group">
+			    <label for="port_from">Port Range:</label><br/>
+			    <input type="text" name="port_from" placeholder="From Port" class="form-control" style="width:25%" required/>
+			    <input type="text" name="port_to" placeholder="To port" class="form-control" style="width:25%" required/>
+			    <br/>
+			    Keep From & To Port same for single port access.
+			    </div>
+			    <br/>
+			    
+			    <div class="form-group">
+			    <label for="expiry">Custom Access Expiry:</label>
+			    <select name="expiry" class="form-control" required>
 				  <option value="3600" selected>1 hour</option>
 				  <option value="14400">4 hours</option>
 				  <option value="43200">12 hours</option>
 				  <option value="86400">1 Day</option>
 				</select>
-			    <input type="submit" value="Get Access" />
+				</div>
+
+			    <input type="submit" class="btn btn-default" value="Get Access" />
 		    </form>
 		</div>    
 	</div>
+	<br/>
 @stop
