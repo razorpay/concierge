@@ -180,120 +180,139 @@ class HomeController extends BaseController {
         /*
          For Lease Creation
         */
-        if(isset($input['rule_type'])){
+        if("ssh"==$input["rule_type"])
+        {
+            $protocol="tcp";
+            $port_from="22";
+            $port_to="22";
+        }
+        elseif("https"==$input["rule_type"])
+        {
+            $protocol="tcp";
+            $port_from="443";
+            $port_to="443";
+        }
+        elseif("custom"==$input["rule_type"])
+        {
+            $protocol=$input['protocol'];
+            $port_from=$input['port_from'];
+            $port_to=$input['port_to'];
 
-            if("ssh"==$input["rule_type"])
-            {
-                $protocol="tcp";
-                $port_from="22";
-                $port_to="22";
-            }
-            elseif("https"==$input["rule_type"])
-            {
-                $protocol="tcp";
-                $port_from="443";
-                $port_to="443";
-            }
-            elseif("custom"==$input["rule_type"])
-            {
-                $protocol=$input['protocol'];
-                $port_from=$input['port_from'];
-                $port_to=$input['port_to'];
+            //Validations
+            if($protocol != "tcp" && $protocol!="udp") array_push($messages, "Invalid Protocol");
+            if(!is_numeric($port_from) || $port_from>65535 || $port_from<=0) array_push($messages, "Invalid From port");
+            if(!is_numeric($port_to) || $port_to>65535 || $port_to<=0) array_push($messages, "Invalid To port");
+            if($port_from>$port_to) array_push($messages, "From port Must be less than equal to To Port");
+        }
+        else
+        {
+            App::abort(403, 'Unauthorized action.');
+        }
 
-                //Validations
-                if($protocol != "tcp" && $protocol!="udp") array_push($messages, "Invalid Protocol");
-                if(!is_numeric($port_from) || $port_from>65535 || $port_from<=0) array_push($messages, "Invalid From port");
-                if(!is_numeric($port_to) || $port_to>65535 || $port_to<=0) array_push($messages, "Invalid To port");
-                if($port_from>$port_to) array_push($messages, "From port Must be less than equal to To Port");
+        //Other validations
+        $expiry=$input['expiry'];
+        if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) array_push($messages, "Invalid Expiry Time");
+        if(!in_array($input['access'], array(1, 2, 3))) array_push($messages, "Invalid invite Email");
+        if(2==$input['access']){
+            if(!isset($input['email']) || !filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
+                array_push($messages, "Invalid invite Email");
             }
-            else
-            {
-                App::abort(403, 'Unauthorized action.');
-            }
+        }
 
-            //Other validations
-            $expiry=$input['expiry'];
-            if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) array_push($messages, "Invalid Expiry Time");
-            if(!in_array($input['access'], array(1, 2, 3))) array_push($messages, "Invalid invite Email");
-            if(2==$input['access']){
-                if(!isset($input['email']) || !filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
-                    array_push($messages, "Invalid invite Email");
-                }
-            }
+        //Validation fails
+        if(!empty($messages)) 
+        {
+            return Redirect::to("/manage/$group_id")
+                            ->with('message', implode("<br/>", $messages));
+        }
 
-            //Validation fails
-            if(!empty($messages)) 
-            {
-                return Redirect::to("/manage/$group_id")
-                                ->with('message', implode("<br/>", $messages));
-
-            }
-
-            if(1==$input['access'])
-            {
-                //Creating the lease
-                $lease=array(
-                    'user_id'=>Auth::User()->id,
-                    'group_id'=>$group_id,
-                    'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
-                    'protocol'=>$protocol, 
-                    'port_from'=>$port_from,
-                    'port_to'=>$port_to,
-                    'expiry'=>$expiry,
-                );
-                $result=$this->createLease($lease);
-
-                if(!$result)
-                {   
-                    //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
-                    return Redirect::to("/manage/$group_id")
-                                    ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
-                }
-                $lease=Lease::create($lease);
-                $this->NotificationMail($lease, TRUE);
-                return Redirect::to("/manage/$group_id")
-                                ->with('message', "Lease created successfully!");
-            }
-            elseif(2==$input['access'])
-            {
-                $email=$input['email'];
-            }
-
-            $token=md5(time()+rand());
-            $invite=array(
+        if(1==$input['access'])
+        {
+            //Creating the lease
+            $lease=array(
                 'user_id'=>Auth::User()->id,
                 'group_id'=>$group_id,
+                'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
                 'protocol'=>$protocol, 
                 'port_from'=>$port_from,
                 'port_to'=>$port_to,
                 'expiry'=>$expiry,
-                'email'=>$email,
-                'token'=>$token
             );
-            $invite=Invite::create($invite);
-            if($email)
-            {
-                $data=array('invite'=>$invite->toArray());
-                //Send Invite Mail
-                Mail::queue('emails.invite', $data, function($message) use($email)
-                {
-                    $message->to($email, 'Invite' )->subject('Access Lease Invite');
-                });
+            
+            $result=$this->createLease($lease);
+            if(!$result)
+            {   
+                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
                 return Redirect::to("/manage/$group_id")
-                                ->with('message', "Invite Sent successfully!");
-
+                                ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
             }
-            else
+            $lease=Lease::create($lease);
+            $this->NotificationMail($lease, TRUE);
+            return Redirect::to("/manage/$group_id")
+                        ->with('message', "Lease created successfully!");
+        }
+        elseif(2==$input['access'])
+        {
+            $email=$input['email'];
+        }
+
+        $token=md5(time()+rand());
+        $invite=array(
+            'user_id'=>Auth::User()->id,
+            'group_id'=>$group_id,
+            'protocol'=>$protocol, 
+            'port_from'=>$port_from,
+            'port_to'=>$port_to,
+            'expiry'=>$expiry,
+            'email'=>$email,
+            'token'=>$token
+        );
+        $invite=Invite::create($invite);
+        if($email)
+        {
+            $data=array('invite'=>$invite->toArray());
+            //Send Invite Mail
+            Mail::queue('emails.invite', $data, function($message) use($email)
             {
-                return View::make('pages.invited')->with('invite', $invite);
-            }
-
+                $message->to($email, 'Invite' )->subject('Access Lease Invite');
+            });
+            return Redirect::to("/manage/$group_id")
+                           ->with('message', "Invite Sent successfully!");
 
         }
-        /* 
-         * Lease termination Call
-         */
-        elseif(isset($input['lease_id'])){
+        else
+        {
+            return View::make('pages.invited')->with('invite', $invite);
+        }
+    }
+
+     /*
+     * Terminates the active leases & invites
+     * @return getManage View
+     */
+    public function postTerminate($group_id)
+    {   
+        $input=Input::all();
+        if(isset($input['invite_id']))
+        {
+            //Terminate Invite
+            // Check for existence of invite
+            try
+            {
+                $invite=Invite::findorFail($input['invite_id']);
+            }
+            catch(Exception $e)
+            {
+                $message="Invite not found";
+                return Redirect::to("/manage/$group_id")->with('message', $message);
+            }
+            $invite->delete();
+            return Redirect::to("/manage/$group_id")
+                                ->with('message', "Invite terminated successfully");
+        }
+        elseif(isset($input['lease_id']))
+        {
+            //Terminate Lease
             // Check for existence of lease
             try
             {
@@ -304,10 +323,8 @@ class HomeController extends BaseController {
                 $message="Lease not found";
                 return Redirect::to("/manage/$group_id")->with('message', $message);
             }
-
             // Terminate the lease on AWS
             $result=$this->terminateLease($lease->toArray());
-
             //Delete from DB
             $lease->delete();
             $this->NotificationMail($lease, FALSE);
@@ -318,13 +335,31 @@ class HomeController extends BaseController {
                 return Redirect::to("/manage/$group_id")
                                 ->with('message', "Lease Termination returned error. Assumed the lease was already deleted");
             }
-            
             return Redirect::to("/manage/$group_id")
                                 ->with('message', "Lease terminated successfully");
         }
-        else{
+        else
+        {
             App::abort(403, 'Unauthorized action.');
         }
+
+        //get security group details
+        $ec2 = App::make('aws')->get('ec2');
+        $security_group=$ec2->describeSecurityGroups(array(
+            'GroupIds' => array($group_id),
+        ));
+        $security_group=$security_group['SecurityGroups'][0];
+
+        //get Active Leases
+        $leases= Lease::getByGroupId($group_id);
+
+        //get Active Invites
+        $invites= Invite::getByGroupId($group_id);
+
+        return View::make('getManage')
+                    ->with('security_group', $security_group)
+                    ->with('leases', $leases)
+                    ->with('invites', $invites);
     }
 
     /*

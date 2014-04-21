@@ -19,6 +19,8 @@ Route::get('/manage/{group_id}', 'HomeController@getManage');
 
 Route::post('/manage/{group_id}', array('before'=>'csrf', 'uses'=>'HomeController@postManage'));
 
+Route::post('/manage/{group_id}/terminate', array('before'=>'csrf', 'uses'=>'HomeController@postTerminate'));
+
 Route::get('/logout', 'HomeController@getLogout');
 
 Route::get('/password', 'HomeController@getPassword');

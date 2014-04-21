@@ -46,7 +46,7 @@
 	    			@endif
 	    			</td>
 	    			<td>
-		    			<form method="post" action="/manage/{{{$lease->group_id}}}">
+		    			<form method="post" action="/manage/{{{$lease->group_id}}}/terminate">
 		    			<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
 		    			<input type="hidden" name="_token" value="{{{csrf_token()}}}">
 		    			<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
@@ -99,7 +99,7 @@
     				@endif
     				</td>
     				<td>
-	    				<form method="post" action="/manage/{{{$invite->group_id}}}">
+	    				<form method="post" action="/manage/{{{$invite->group_id}}}/terminate">
 	    				<input type="hidden" name="invite_id" value="{{{$invite->id}}}" />
 	    				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
 	    				<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this invite?')) {parentNode.submit();} return false;">
