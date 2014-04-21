@@ -21,6 +21,7 @@ class CreateLeasesTable extends Migration {
             $table->string('port_from');
             $table->string('port_to');
             $table->integer('expiry')->unsigned();
+            $table->string('invite_email')->nullable();
             $table->softDeletes();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users');

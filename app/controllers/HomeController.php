@@ -224,7 +224,7 @@ class HomeController extends BaseController {
                     'protocol'=>$protocol, 
                     'port_from'=>$port_from,
                     'port_to'=>$port_to,
-                    'expiry'=>$expiry
+                    'expiry'=>$expiry,
                 );
                 $result=$this->createLease($lease);
 
@@ -399,6 +399,8 @@ class HomeController extends BaseController {
     {
         $invite=Invite::getByToken($token);
         if(!$invite) return View::make('pages.guest')->with('failure', "Invalid Token.");
+        $email=$invite->email;
+        if(!$invite->email) $email="NoEmail";
         //Creating the lease
             $lease=array(
                 'user_id'=>$invite->user_id,
@@ -407,7 +409,8 @@ class HomeController extends BaseController {
                 'protocol'=>$invite->protocol, 
                 'port_from'=>$invite->port_from,
                 'port_to'=>$invite->port_to,
-                'expiry'=>$invite->expiry
+                'expiry'=>$invite->expiry,
+                'invite_email'=>$email
             );
             $result=$this->createLease($lease);
             if(!$result)

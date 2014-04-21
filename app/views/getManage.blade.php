@@ -37,6 +37,7 @@
 	            <th>Protocol</th>
 	            <th>Port(s)</th>
 	            <th>Time Left</th>
+	            <th>Type</th>
 	            <th>Terminate?</th>
 	          </tr>
 	        </thead>
@@ -56,6 +57,17 @@
     					echo "$hours hours $minutes minutes";
     				?>
     				</td>
+    				<td>
+	    			@if($lease->invite_email)
+	    			 	@if("NoEmail"==$lease->invite_email)
+	    			 		URL Invite
+	    			 	@else
+	    			 		Email Invite: {{{$lease->invite_email}}}
+	    			 	@endif
+	    			@else
+	    					Self Access
+	    			@endif
+	    			</td>
     				<td><form method="post" action="">
     				<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
     				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
@@ -67,7 +79,7 @@
 	        	</tr>
 	        	@endforeach
 	        	@if(!$leases->count())
-		       	<tr><td colspan="6" style="text-align:center">No Active Leases</td></tr>
+		       	<tr><td colspan="7" style="text-align:center">No Active Leases</td></tr>
 		       	@endif
 	        </tbody>
 	        </table>
