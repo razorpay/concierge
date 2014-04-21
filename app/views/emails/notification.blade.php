@@ -32,6 +32,7 @@
                     <th>Security Group</th>
                     <th>Protocol</th>
                     <th>Port(s)</th>
+                    <th>Type</th>
                     <th>Time Left</th>
                     </tr>
                 </thead>
@@ -42,6 +43,17 @@
                    <td>{{{$lease['group_id']}}}</td>
                    <td>{{{$lease['protocol']}}}</td>
                    <td>{{{$lease['port_from']}}}-{{{$lease['port_to']}}}</td>
+                   <td>
+                   @if($lease['invite_email'])
+                      @if("NoEmail"==$lease['invite_email'])
+                        URL Invite
+                      @else
+                        Email Invite: {{{$lease['invite_email']}}}
+                      @endif
+                   @else
+                        Self Access
+                   @endif
+                   </td>
                    <td>
                    <?php
                     //Calculating time to expiry in hours & minutes
@@ -65,6 +77,7 @@
                     <th>Security Group</th>
                     <th>Protocol</th>
                     <th>Port(s)</th>
+                    <th>Type</th>
                     <th>Terminated By:</th>
                     </tr>
                 </thead>
@@ -75,6 +88,17 @@
                    <td>{{{$lease['group_id']}}}</td>
                    <td>{{{$lease['protocol']}}}</td>
                    <td>{{{$lease['port_from']}}}-{{{$lease['port_to']}}}</td>
+                   <td>
+                   @if($lease['invite_email'])
+                      @if("NoEmail"==$lease['invite_email'])
+                        URL Invite
+                      @else
+                        Email Invite: {{{$lease['invite_email']}}}
+                      @endif
+                   @else
+                        Self Access
+                   @endif
+                   </td>
                    <td>
                        {{-- Checking if Called by a User action or command --}}
                        @if(null !== Auth::user())
