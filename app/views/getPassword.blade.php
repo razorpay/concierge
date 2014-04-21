@@ -7,7 +7,7 @@
 	        <form action="" method="POST">
 		     	Old Password: <input type="password" name="old_password" placeholder="Old Password" required /><br/>
 		     	New Password: <input type="password" name="password" placeholder="New Password" required /><br/>
-		     	Confirm New Password: <input type="password" name="password_conmfirmation" placeholder="New Password" required /><br/>
+		     	Confirm New Password: <input type="password" name="password_confirmation" placeholder="New Password" required /><br/>
 		     	<input type="submit" value="Change Password" />
 		    </form>
 	     </div>
