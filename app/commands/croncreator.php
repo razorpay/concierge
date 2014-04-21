@@ -37,10 +37,16 @@ class croncreator extends Command {
 	 */
 	public function fire()
 	{
+		//Get the current crontabs
 		$output = shell_exec('crontab -l');
+
+		//The cron needed for this repo
 		$cron="* * * * *  ".$GLOBALS['php_path']." ".$GLOBALS['artisan_path']." custom:leasemanager";
+
+		//Check if Cron Already exists
 		if(strpos($output,$cron)===FALSE)
 		{ 
+			//setup Old Cron with the new cron included
 			file_put_contents('/tmp/crontab.txt', $output.$cron.PHP_EOL);
 			exec('crontab /tmp/crontab.txt');
 			$this->info("Cron Added for running every minute");

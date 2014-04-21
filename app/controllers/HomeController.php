@@ -26,6 +26,7 @@ class HomeController extends BaseController {
 
     /**
      * Stage One - The Login form
+     * @return  Login View
      */
     public function getIndex()
     {
@@ -34,6 +35,7 @@ class HomeController extends BaseController {
 
     /**
      * Stage Two - The Duo Auth form
+     * @return Duo Login View or Redirect on error 
      */
     public function postSignin()
     {
@@ -67,6 +69,7 @@ class HomeController extends BaseController {
 
     /**
      * Stage Three - After Duo Auth Form
+     * @return Redirect to home
      */
     public function postDuologin()
     {
@@ -110,6 +113,7 @@ class HomeController extends BaseController {
 
     /**
      * Log user out
+     * @return Redirect to Home
      */
     public function getLogout()
     {
@@ -119,13 +123,13 @@ class HomeController extends BaseController {
 
 	/**
 	 * Get the list of all security groups
+     * @return getGroups view
 	 */
 	public function getGroups()
 	{
         $leases= Lease::get();
 		$ec2 = App::make('aws')->get('ec2');
 		$security_groups=$ec2->describeSecurityGroups();
-
 		$security_groups=$security_groups['SecurityGroups'];
 
         return View::make('getGroups')->with('security_groups', $security_groups)->with('leases', $leases);
@@ -133,29 +137,37 @@ class HomeController extends BaseController {
 
     /*
      * Displays a security groups details with active leases & security rules.
+     * @return getManage View
      */
 	public function getManage($group_id)
 	{
 
+        //get security group details
 		$ec2 = App::make('aws')->get('ec2');
 		$security_group=$ec2->describeSecurityGroups(array(
 			'GroupIds' => array($group_id),
         ));
-
 		$security_group=$security_group['SecurityGroups'][0];
-		//var_dump($security_group);
 
+        //get Active Leases
         $leases= Lease::getByGroupId($group_id);
+
         return View::make('getManage')->with('security_group', $security_group)->with('leases', $leases);
 	}
 
     /*
      * Handles Lease creation & termination post requests to Group Manage page
+     * @return Redirect to getManage View with error/success
      */
     public function postManage($group_id)
     {
         $input=Input::all();
+        $messages=array();
+        /*
+         For Lease Creation
+        */
         if(isset($input['rule_type'])){
+
             if("ssh"==$input["rule_type"])
             {
                 $protocol="tcp";
@@ -173,17 +185,31 @@ class HomeController extends BaseController {
                 $protocol=$input['protocol'];
                 $port_from=$input['port_from'];
                 $port_to=$input['port_to'];
-                if($protocol != "tcp" && $protocol!="udp") die("Invalid Protocol");
-                if(!is_numeric($port_from) || $port_from>65535 || $port_from<=0) die("Invalid From port");
-                if(!is_numeric($port_to) || $port_to>65535 || $port_to<=0) die("Invalid To port");
-                if($port_from>$port_to) die("From port Must be less than equal to To Port");
+
+                //Validations
+                if($protocol != "tcp" && $protocol!="udp") array_push($messages, "Invalid Protocol");
+                if(!is_numeric($port_from) || $port_from>65535 || $port_from<=0) array_push($messages, "Invalid From port");
+                if(!is_numeric($port_to) || $port_to>65535 || $port_to<=0) array_push($messages, "Invalid To port");
+                if($port_from>$port_to) array_push($messages, "From port Must be less than equal to To Port");
             }
             else
             {
                 App::abort(403, 'Unauthorized action.');
             }
+
+            //Expiry Time validation
             $expiry=$input['expiry'];
-            if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) die("Invalid Expiry Time");
+            if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) array_push($messages, "Invalid Expiry Time");
+            
+            //Validation fails
+            if(!empty($messages)) 
+            {
+                return Redirect::to("/manage/$group_id")
+                                ->with('message', implode("<br/>", $messages));
+
+            }
+
+            //Creating the lease
             $lease=array(
                 'user_id'=>Auth::User()->id,
                 'group_id'=>$group_id,
@@ -194,8 +220,10 @@ class HomeController extends BaseController {
                 'expiry'=>$expiry
             );
             $result=$this->createLease($lease);
+            
             if(!$result)
-            {
+            {   
+                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
                 return Redirect::to("/manage/$group_id")
                                 ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
             }
@@ -204,7 +232,11 @@ class HomeController extends BaseController {
             return Redirect::to("/manage/$group_id")
                             ->with('message', "Lease created successfully!");
         }
+        /* 
+         * Lease termination Call
+         */
         elseif(isset($input['lease_id'])){
+            // Check for existence of lease
             try
             {
                 $lease=Lease::findorFail($input['lease_id']);
@@ -214,15 +246,19 @@ class HomeController extends BaseController {
                 $message="Lease not found";
                 return Redirect::to("/manage/$group_id")->with('message', $message);
             }
+
+            // Terminate the lease on AWS
             $result=$this->terminateLease($lease->toArray());
+            if(!$result)
+            {   
+                //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
+                return Redirect::to("/manage/$group_id")
+                                ->with('message', "Lease Termination Failed! AWS API reported error");
+            }
+            
+            //Delete from DB
             $lease->delete();
             $this->NotificationMail($lease, FALSE);
-            if(!$result)
-            {
-                return Redirect::to("/manage/$group_id")
-                                ->with('message', "Lease Termination Failed! Has it been terminated already?");
-            }
-           
             return Redirect::to("/manage/$group_id")
                                 ->with('message', "Lease terminated successfully");
         }
@@ -244,6 +280,7 @@ class HomeController extends BaseController {
 
         if($mode)
         {
+            //In case of Lease Creation
             Mail::queue('emails.notification', $data, function($message)
             {
                 $message->to($GLOBALS['notification_emailid'], 'Security Notification' )->subject('Secure Access Lease Created');
@@ -251,6 +288,7 @@ class HomeController extends BaseController {
         }
         else
         {
+            //In Case of Lease Termination
             Mail::queue('emails.notification', $data, function($message)
             {
                 $message->to($GLOBALS['notification_emailid'], 'Security Notification' )->subject('Secure Access Lease Terminated');
@@ -271,6 +309,12 @@ class HomeController extends BaseController {
             $time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
             if($time_left<=0){
                 $result=$this->terminateLease($lease->toArray());
+                if(!$result)
+                {   
+                    //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
+                    echo "AWS API reported error";
+                    return;
+                }
                 $lease->delete();
                 $this->NotificationMail($lease, FALSE);
             }
@@ -329,11 +373,17 @@ class HomeController extends BaseController {
         return TRUE;  
     }
 
+    /*
+     * Returns the form for changing Password
+     */ 
     public function getPassword()
     {
         return View::make('getPassword');
     }
-
+    
+    /*
+     * Handles the form submission for changing Password
+     */ 
     public function postPassword()
     {
         $input=Input::all();
@@ -343,7 +393,7 @@ class HomeController extends BaseController {
         );
 
         /**
-         * Validate the user details
+         * Validate the user details to check old password
          */
         if(! Auth::validate($user))
         {
@@ -351,6 +401,7 @@ class HomeController extends BaseController {
                             ->with('message', "Incorrect Password");
         }
 
+        //Validation Rules
         $password_rules = array(
         'password'              => 'required|between:7,50|confirmed|case_diff|numbers|letters',
         'password_confirmation' => 'required|between:7,50');
@@ -363,6 +414,7 @@ class HomeController extends BaseController {
                             ->with('message', implode("<br/>", $validator->messages()->get('password')));
         }
 
+        //Everything Good. Change the password
         $password = array(
             'password' => Hash::make($input['password'])
         );
