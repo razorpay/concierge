@@ -8,11 +8,11 @@ class LaravelDuo extends Duo
     private $_SKEY;
     private $_HOST;
 
-    public function __construct() { 
-        $_AKEY = \Config::get('custom_config.duo_akey');
-        $_IKEY = \Config::get('custom_config.duo_ikey');
-        $_SKEY = \Config::get('custom_config.duo_skey');
-        $_HOST = \Config::get('custom_config.duo_host');
+    public function __construct() {
+        $this->_AKEY = \Config::get('custom_config.duo_akey');
+        $this->_IKEY = \Config::get('custom_config.duo_ikey');
+        $this->_SKEY = \Config::get('custom_config.duo_skey');
+        $this->_HOST = \Config::get('custom_config.duo_host');
     }
 
     public function get_akey()
