@@ -1,5 +1,8 @@
 <?php
 use LaravelDuo\LaravelDuo;
+use Validator;
+use Status;
+
 class HomeController extends BaseController {
 
 	/*
@@ -329,5 +332,46 @@ class HomeController extends BaseController {
     public function getPassword()
     {
         return View::make('getPassword');
+    }
+
+    public function postPassword()
+    {
+        $input=Input::all();
+        $user = array(
+            'username' => Auth::user()->username,
+            'password' => $input['old_password']
+        );
+
+        /**
+         * Validate the user details
+         */
+        if(! Auth::validate($user))
+        {
+            return Redirect::to('/password')
+                            ->with('message', "Incorrect Password");
+        }
+
+        $password_rules = array(
+        'password'              => 'required|between:7,50|confirmed|case_diff|numbers|letters',
+        'password_confirmation' => 'required|between:7,50');
+        
+        $validator = Validator::make($input,$password_rules);
+
+        if ($validator->fails())
+        {
+             return Redirect::to('/password')
+                            ->with('message', implode("<br/>", $validator->messages()->get('password')));
+        }
+
+        $password = array(
+            'password' => Hash::make($input['password'])
+        );
+        
+        $result = Auth::user()->update($password);
+
+        return Redirect::to('/password')
+                            ->with('message', "Password Changed Successfully");
+
+
     }
 }
