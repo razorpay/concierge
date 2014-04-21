@@ -71,8 +71,8 @@
 		       	@endif
 	        </tbody>
 	        </table>
-
-	        		    <h2>Get Access On this Group</h2>
+	        
+	        <h2>Get Access On this Group</h2>
 		    <div>
 		    <button type="button" class="btn btn-primary" onclick="javascript: document.getElementById('ssh_form').style.display='inline';">SSH</button>
 		    <button type="button" class="btn btn-primary" onclick="javascript: document.getElementById('https_form').style.display='inline';">HTTPS</button>
@@ -93,14 +93,13 @@
 				  <option value="86400">1 Day</option>
 				</select>
 			  </div>
-
 			  <button type="submit" class="btn btn-default">Get Access</button>
+			  <br/>
 			</form>
 
 		    <form id="https_form" class="form-inline" role="form" style="display:none"  action="" method="POST">
 			    <input type="hidden" name="rule_type" value="https" />
 			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
-			    
 			    <div class="form-group">
 			    <label for="expiry">HTTPS Access Expiry:</label>
 			    <select name="expiry" class="form-control" required>
@@ -110,12 +109,12 @@
 				  <option value="86400">1 Day</option>
 				</select>
 				</div>
-
 			    <input type="submit" class="btn btn-default" value="Get Access" />
+			    <br/>
 		    </form>
 		    
 		    <form id="custom_form" class="form-inline" role="form" style="display:none" action="" method="POST">
-			    <label>Define Custome Rule:<br/>
+			    <label>Define Custom Rule:</label><br/>
 			    <input type="hidden" name="rule_type" value="custom" />
 			    <input type="hidden" name="_token" value="{{{csrf_token()}}}">
 
@@ -143,8 +142,8 @@
 				  <option value="86400">1 Day</option>
 				</select>
 				</div>
-
 			    <input type="submit" class="btn btn-default" value="Get Access" />
+			    <br/>
 		    </form>
 
 			<h2>Security Group Rules:</h2>
