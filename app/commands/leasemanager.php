@@ -40,6 +40,7 @@ class leasemanager extends Command {
 	{
 		$home_controller=new HomeController(new LaravelDuo\LaravelDuo);
 		$cleaner = $home_controller->cleanLeases();
+		if($cleaner) $this->info($cleaner);
 	}
 
 	/**

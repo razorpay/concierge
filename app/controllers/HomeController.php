@@ -1,7 +1,5 @@
 <?php
 use LaravelDuo\LaravelDuo;
-use Validator;
-use Status;
 
 class HomeController extends BaseController {
 
@@ -220,7 +218,7 @@ class HomeController extends BaseController {
                 'expiry'=>$expiry
             );
             $result=$this->createLease($lease);
-            
+
             if(!$result)
             {   
                 //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
@@ -249,16 +247,18 @@ class HomeController extends BaseController {
 
             // Terminate the lease on AWS
             $result=$this->terminateLease($lease->toArray());
+
+            //Delete from DB
+            $lease->delete();
+            $this->NotificationMail($lease, FALSE);
+
             if(!$result)
             {   
                 //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
                 return Redirect::to("/manage/$group_id")
-                                ->with('message', "Lease Termination Failed! AWS API reported error");
+                                ->with('message', "Lease Termination Failed! The lease was probably already deleted");
             }
             
-            //Delete from DB
-            $lease->delete();
-            $this->NotificationMail($lease, FALSE);
             return Redirect::to("/manage/$group_id")
                                 ->with('message', "Lease terminated successfully");
         }
@@ -303,22 +303,22 @@ class HomeController extends BaseController {
 
     public function cleanLeases()
     {
+        $messages=array();
         $leases=Lease::get();
         foreach($leases as $lease)
         {
             $time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
             if($time_left<=0){
                 $result=$this->terminateLease($lease->toArray());
-                if(!$result)
-                {   
-                    //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
-                    echo "AWS API reported error";
-                    return;
-                }
                 $lease->delete();
                 $this->NotificationMail($lease, FALSE);
+                if(!$result)
+                {
+                    array_push($messages,"Lease Termination of Lease ID $lease->id reported error on AWS API Call. Assumed already deleted.");
+                }
             }
         }
+        if(!empty($messages)) return implode("\n", $messages);
         return;
     }
 
