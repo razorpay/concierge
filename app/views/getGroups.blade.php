@@ -110,7 +110,7 @@
 	        	</tr>
 	        	@endforeach
 	        	@if(!$invites->count())
-		       	<tr><td colspan="6" style="text-align:center">No Active Invites</td></tr>
+		       	<tr><td colspan="7" style="text-align:center">No Active Invites</td></tr>
 		       	@endif
 	        </tbody>
 	        </table>
