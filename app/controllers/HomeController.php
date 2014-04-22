@@ -475,6 +475,15 @@ class HomeController extends BaseController {
     }
 
     /*
+     * Handles Display of details of site users only to site admin
+     */ 
+    public function getUsers()
+    {
+        $users=User::get();
+        return View::make('getUsers')
+                    ->with('users', $users);
+    }
+    /*
      * Handles sending of notification mail
      * Requires two arguements $lease, $ mode. 
      * $lease = Lease Object Containing the lease created or deleted
