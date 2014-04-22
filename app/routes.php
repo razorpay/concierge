@@ -26,6 +26,8 @@ Route::get('/logout', 'HomeController@getLogout');
 Route::get('/password', 'HomeController@getPassword');
 
 Route::post('/password', array('before'=>'csrf', 'uses'=>'HomeController@postPassword'));
+
+Route::get('/users', array('before'=>'admin', 'uses'=>'HomeController@getUsers'));
 });
 
 Route::group(array('before' => 'guest'), function()

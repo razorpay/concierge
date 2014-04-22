@@ -78,3 +78,18 @@ Route::filter('csrf', function()
 		throw new Illuminate\Session\TokenMismatchException;
 	}
 });
+
+/*
+|--------------------------------------------------------------------------
+| Custom Filter - Admin Check
+|--------------------------------------------------------------------------
+|
+| Check if the user is site wide admin for special priveleges
+| like adding/deleting users
+|
+*/
+
+Route::filter('admin', function()
+{
+	if (! Auth::user()->admin) return App::abort(403, 'Unauthorized action.');
+});
