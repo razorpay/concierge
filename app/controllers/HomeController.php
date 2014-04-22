@@ -483,6 +483,34 @@ class HomeController extends BaseController {
         return View::make('getUsers')
                     ->with('users', $users);
     }
+
+    /*
+     * Handles creatin & deletion of users (only for site admin)
+     */ 
+    public function postUsers()
+    {
+        $input=Input::all();
+        if(!isset($input['user_id'])) App::abort(403, 'Unauthorized action.');
+        try
+        {
+            $user=User::findorfail($input['user_id']);
+        }
+        catch(Exception $e)
+        {
+            $message = "Invalid User";
+        }
+        if(!isset($message))
+        {
+            $deleted=$user->delete();
+            $message="User Deleted Successfully";
+        }
+
+        $users=User::get();
+        return View::make('getUsers')
+                    ->with('users', $users)
+                    ->with('message', $message);
+    }
+
     /*
      * Handles sending of notification mail
      * Requires two arguements $lease, $ mode. 
