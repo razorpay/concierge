@@ -44,7 +44,7 @@
                    <td>{{{$lease['protocol']}}}</td>
                    <td>{{{$lease['port_from']}}}-{{{$lease['port_to']}}}</td>
                    <td>
-                   @if($lease['invite_email'])
+                   @if(isset($lease['invite_email']) && $lease['invite_email'])
                       @if("NoEmail"==$lease['invite_email'])
                         URL Invite
                       @else
@@ -89,7 +89,7 @@
                    <td>{{{$lease['protocol']}}}</td>
                    <td>{{{$lease['port_from']}}}-{{{$lease['port_to']}}}</td>
                    <td>
-                   @if($lease['invite_email'])
+                   @if(isset($lease['invite_email']) && $lease['invite_email'])
                       @if("NoEmail"==$lease['invite_email'])
                         URL Invite
                       @else
