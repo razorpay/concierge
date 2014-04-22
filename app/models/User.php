@@ -163,11 +163,4 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
         
     }
-
-    public function delete()
-    {
-    	Lease::where("user_id", $this->id)->delete();
-    	Invite::where("user_id", $this->id)->delete();
-    	return parent::delete();
-    }
 }

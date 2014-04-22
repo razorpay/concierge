@@ -24,7 +24,7 @@ class CreateLeasesTable extends Migration {
             $table->string('invite_email')->nullable();
             $table->softDeletes();
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 	}
 
