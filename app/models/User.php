@@ -85,14 +85,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 		return $this->email;
 	}
 
-	public static function getIdFromUsername($username)
-    {
-        $query = DB::table('users')
-                 ->where('username', '=', $username)
-                 ->first();
-        return $query->id;
-    }
-
     public function leases()
     {
         return $this->hasMany('Lease');
@@ -101,6 +93,74 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     public function invites()
     {
         return $this->hasMany('Invite');
+        
+    }
+
+    public static function getIdFromUsername($username)
+    {
+        $query = DB::table('users')
+                 ->where('username', '=', $username)
+                 ->first();
+        return $query->id;
+    }
+
+    public function getActiveInvites($type=NULL)
+    {
+        if(!$type)
+        {
+        	return $this->invites();
+	    }
+	    elseif("url"==$type)
+	    {
+	    	$invites = $this->invites->filter(function($invite)
+			{
+			    if(!$invite->email) return true;
+			});
+			return $invites;
+	    }
+	    elseif("email"==$type)
+	    {
+	    	$invites = $this->invites->filter(function($invite)
+			{
+			    if($invite->email) return true;
+			});
+			return $invites;
+	    }
+
+        
+    }
+
+    public function getActiveLeases($type=NULL)
+    {
+        if(!$type)
+        {
+        	return $this->leases();
+	    }
+	    elseif("self"==$type)
+	    {
+	    	$leases = $this->leases->filter(function($lease)
+			{
+			    if(! $lease->invite_email) return true;
+			});
+			return $leases;
+	    }
+	    elseif("url"==$type)
+	    {
+	    	$leases = $this->leases->filter(function($lease)
+			{
+			    if("NoEmail"==$lease->invite_email) return true;
+			});
+			return $leases;
+	    }
+	    elseif("email"==$type)
+	    {
+	    	$leases = $this->leases->filter(function($lease)
+			{
+			    if("NoEmail"!=$lease->invite_email && $lease->invite_email) return true;
+			});
+			return $leases;
+	    }
+
         
     }
 }
