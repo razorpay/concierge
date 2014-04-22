@@ -47,6 +47,9 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                   <ul class="nav navbar-nav navbar-right">
                     <li><p class="navbar-text">Signed in as {{{Auth::user()->username}}}</p></li>
+                    @if(Auth::user()->admin)
+                    <li><a href="{{ URL::to('/users')}}">Manage Users</a></li>
+                    @endif
                     <li><a href="{{ URL::to('/password')}}"> Change Password</a></li>
                     <li><a href="{{ URL::to('/logout') }}">Logout</a></li>
                   </ul>
