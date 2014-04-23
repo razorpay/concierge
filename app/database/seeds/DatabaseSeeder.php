@@ -12,6 +12,11 @@ class DatabaseSeeder extends Seeder {
 	{
 		Eloquent::unguard();
         $users=Config::get('custom_config.users');
+        foreach($users as &$user)
+        {
+            $user['created_at']=date('Y-m-d H:i:s');
+            $user['updated_at']=date('Y-m-d H:i:s');
+        }
         DB::table('users')->insert($users);
 
 	}

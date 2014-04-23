@@ -87,24 +87,20 @@ return array(
     | You need to run "php artisan migrate --seed" for seeding this data.
     |
     */
-    'users'=>array(
+    'users'=>array( 
             array(
                 'name' => 'Admin Name',
                 'username' => 'admin',
-                'password' => Hash::make('password'),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
+                'password' => Hash::make('password')
                 'admin' => TRUE
             ),
             array(
                 'name' => 'Standard User Name',
                 'username' => 'user',
                 'password' => Hash::make('password'),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
                 'admin' => FALSE
             ),
-            // add more as your requirement
+            // add more arrays as your requirement
     ),
 
 
