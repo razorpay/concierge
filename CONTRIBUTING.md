@@ -1,3 +1,3 @@
 # Contribution Guidelines
 
-Please submit all issues and pull requests to the [laravel/framework](http://github.com/laravel/framework) repository!
+Please submit all issues and pull requests to the [harshilmathur/aws-secmanager](https://github.com/harshilmathur/aws-secmanager) repository!
