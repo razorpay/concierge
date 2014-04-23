@@ -49,17 +49,13 @@
 	        		<td>{{{$lease->protocol}}}</td>
 	        		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
 	        		<td>
-	        		<?php
-	        		    //Calculating Time to Expiry in Hours and minutes
-	        			$time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
-    					$hours=intval(floor($time_left/3600)); 
-    					$minutes=intval(floor(($time_left-$hours*3600)/60));
-    					echo "$hours hours $minutes minutes";
-    				?>
+	        		<div class="time" id="{{{$lease->id}}}">
+	        		{{{strtotime($lease->created_at)+$lease->expiry-time()}}}
+    				</div>
     				</td>
     				<td>
 	    			@if($lease->invite_email)
-	    			 	@if("NoEmail"==$lease->invite_email)
+	    			 	@if("URL"==$lease->invite_email)
 	    			 		URL Invite
 	    			 	@else
 	    			 		Email Invite: {{{$lease->invite_email}}}
@@ -353,4 +349,36 @@
 		</div>    
 	</div>
 	<br/>
+@stop
+@section('footer_scripts')
+@parent
+<script type="text/javascript">
+   function component(x, v) {
+        return Math.floor(x / v);
+    }
+    $('.time').each(function(i, obj) {   
+	    var div=$(this)                   
+	    var timestamp = div.text()
+	    
+	    if(timestamp>0)
+	    {
+		    setInterval(function() { // execute code each second
+
+		        timestamp--; // decrement timestamp with one second each second
+
+		        var hours   = component(timestamp,      60 * 60), // hours
+		            minutes = component(timestamp,           60) % 60, // minutes
+		            seconds = component(timestamp,            1) % 60; // seconds
+
+		        div.text(hours + " hours " + minutes + " minutes " + seconds + " seconds"); // display
+		        //alert($(this).text());
+
+		    }, 1000); // interval each second = 1000 ms
+	    }
+	    else
+	    {
+	    	div.text("Expired");
+	    }
+	});
+</script>
 @stop
