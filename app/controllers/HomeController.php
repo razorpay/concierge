@@ -485,7 +485,45 @@ class HomeController extends BaseController {
     }
 
     /*
-     * Handles creation & deletion of users (only for site admin)
+     * Handles Display of new user form (only to site admin)
+     */ 
+    public function getAddUser()
+    {
+        return View::make('getAddUser');
+    }
+
+    /*
+     * Handles Adding of new user (only for site admin)
+     */ 
+    public function postAddUser()
+    {
+        $input=Input::all();
+        //Validation Rules
+        $user_rules = array(
+        'username'              => 'required|between:3,50|alpha_dash|unique:users',
+        'name'                  => 'required|between:3,100|alpha_spaces',
+        'password'              => 'required|between:7,50|confirmed|case_diff|numbers|letters',
+        'password_confirmation' => 'required|between:7,50',
+        'admin'                 => 'required|in:1,0');
+        
+        $validator = Validator::make($input,$user_rules);
+        if ($validator->fails())
+        {
+             return Redirect::to('/users/add')
+                            ->with('errors', $validator->messages()->toArray() );
+        }
+        else
+        {   
+            User::create($input);
+            return Redirect::to('/users')
+                            ->with('message', "User Added Successfully" );
+        }
+
+    }
+
+
+    /*
+     * Handles deletion of users (only for site admin)
      */ 
     public function postUsers()
     {
