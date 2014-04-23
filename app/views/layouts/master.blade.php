@@ -25,7 +25,9 @@
         @if(Session::has('message'))
         <div id="sessionMessage" class="alert alert-warning fade in">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
-            <p class="center">{{ Session::get('message') }}</p>
+            <p class="center">
+                    {{ Session::get('message') }}
+            </p>
         </div>
         @endif
 
