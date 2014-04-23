@@ -11,33 +11,7 @@ class DatabaseSeeder extends Seeder {
 	public function run()
 	{
 		Eloquent::unguard();
-
-        $users = array(
-            array(
-                'name' => 'Shashank Kumar',
-                'username' => 'shk',
-                'password' => Hash::make('password'),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-                'admin' => TRUE
-            ),
-            array(
-                'name' => 'Harshil Mathur',
-                'username' => 'harshil',
-                'password' => Hash::make('password'),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-                'admin' => TRUE
-            ),
-            array(
-                'name' => 'Abhay Bir Singh Rana',
-                'username' => 'nemo',
-                'password' => Hash::make('password'),
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-                'admin' => FALSE
-            )
-        );
+        $users=Config::get('custom_config.users');
         DB::table('users')->insert($users);
 
 	}

@@ -76,5 +76,36 @@ return array(
 	'mail_from_email' => "root@aws-sec-manager",
 	'mail_from_name' => "AWS Secure Lease Manager",
 
+    /* 
+    |--------------------------------------------------------------------------
+    | Database Seed
+    |--------------------------------------------------------------------------
+    | This is used to create default users for the application so that you can log on.
+    | You need to only add name, username, password. Also, admin can be TRUE or FALSE for creating site admins or standard users,
+    | Admin users can add/delete users & other admins. 
+    | No Validation checks are performed on this data so be careful.
+    | You need to run "php artisan migrate --seed" for seeding this data.
+    |
+    */
+    'users'=>array(
+            array(
+                'name' => 'Admin Name',
+                'username' => 'admin',
+                'password' => Hash::make('password'),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+                'admin' => TRUE
+            ),
+            array(
+                'name' => 'Standard User Name',
+                'username' => 'user',
+                'password' => Hash::make('password'),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+                'admin' => FALSE
+            ),
+            // add more as your requirement
+    ),
+
 
 );
