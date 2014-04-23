@@ -450,7 +450,7 @@ class HomeController extends BaseController {
         $invite=Invite::getByToken($token);
         if(!$invite) return View::make('pages.guest')->with('failure', "Invalid Token. It was already used or has been terminated by the admins");
         $email=$invite->email;
-        if(!$invite->email) $email="NoEmail";
+        if(!$invite->email) $email="URL";
         //Creating the lease
             $lease=array(
                 'user_id'=>$invite->user_id,
@@ -485,7 +485,7 @@ class HomeController extends BaseController {
     }
 
     /*
-     * Handles creatin & deletion of users (only for site admin)
+     * Handles creation & deletion of users (only for site admin)
      */ 
     public function postUsers()
     {
@@ -499,12 +499,14 @@ class HomeController extends BaseController {
         }
         catch(Exception $e)
         {
+            //User not found
             return Redirect::to('/users')
                     ->with('message', "Invalid User");
         }
 
        if($user->id == Auth::user()->id) 
-        {
+        {   
+            //Avoid Self Delete
             $message="You can't delete yourself";
         }
         else

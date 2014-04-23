@@ -148,7 +148,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	    {
 	    	$leases = $this->leases->filter(function($lease)
 			{
-			    if("NoEmail"==$lease->invite_email) return true;
+			    if("URL"==$lease->invite_email) return true;
 			});
 			return $leases;
 	    }
@@ -156,7 +156,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	    {
 	    	$leases = $this->leases->filter(function($lease)
 			{
-			    if("NoEmail"!=$lease->invite_email && $lease->invite_email) return true;
+			    if("URL"!=$lease->invite_email && $lease->invite_email) return true;
 			});
 			return $leases;
 	    }
