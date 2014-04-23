@@ -370,7 +370,7 @@
 		            minutes = component(timestamp,           60) % 60, // minutes
 		            seconds = component(timestamp,            1) % 60; // seconds
 
-		        div.text(hours + " hours " + minutes + " minutes " + seconds + " seconds"); // display
+		        div.text(("0" + hours).slice(-2) + ":" + ("0" + minutes).slice(-2) + ":" + ("0" + seconds).slice(-2) ); // display
 		        //alert($(this).text());
 
 		    }, 1000); // interval each second = 1000 ms
