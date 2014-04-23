@@ -80,4 +80,15 @@ App::down(function()
 
 require app_path().'/filters.php';
 
+/*
+|--------------------------------------------------------------------------
+| Require The Custom Files
+|--------------------------------------------------------------------------
+|
+| Loading user defined custom fiels needed by app.
+|
+|
+*/
+
+require app_path().'/validators.php';
 
