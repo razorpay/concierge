@@ -85,17 +85,32 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 		return $this->email;
 	}
 
+	/**
+	 * One to Many relation with Lease
+	 *
+	 * @return collection
+	 */
     public function leases()
     {
         return $this->hasMany('Lease');
     }
 
+    /**
+	 * One to Many relation with Invite
+	 *
+	 * @return collection
+	 */
     public function invites()
     {
         return $this->hasMany('Invite');
         
     }
 
+    /**
+	 * Returns the id of a username
+	 *
+	 * @return integer
+	 */
     public static function getIdFromUsername($username)
     {
         $query = DB::table('users')
@@ -104,6 +119,13 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         return $query->id;
     }
 
+
+    /**
+	 * Returns a list of active invites by type
+	 * Type can be NULL/Unspecified for all invites, "url" for URL Invites, "email" for email invites
+	 *
+	 * @return collection
+	 */
     public function getActiveInvites($type=NULL)
     {
         if(!$type)
@@ -130,6 +152,12 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
         
     }
 
+    /**
+	 * Returns a list of active leases by type
+	 * Type can be NULL/Unspecified for all leases, "self" for self leases, "url" for URL leases, "email" for email leases
+	 *
+	 * @return collection
+	 */
     public function getActiveLeases($type=NULL)
     {
         if(!$type)
