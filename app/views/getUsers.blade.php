@@ -38,6 +38,7 @@
 		       		<td>{{{$user->getActiveInvites("url")->count()}}}</td>
 		       		<td>{{{$user->getActiveInvites("email")->count()}}}</td>
 	    			<td>
+	    				@if($user->id != Auth::user()->id)
 		    			<form method="post" action="">
 		    			<input type="hidden" name="user_id" value="{{{$user->id}}}" />
 		    			<input type="hidden" name="_token" value="{{{csrf_token()}}}">
@@ -45,6 +46,7 @@
 		    			<span title="Delete User" class="glyphicon glyphicon-minus-sign"></span>
 		    			</a>
 		    			</form>
+		    			@endif
 	    			</td>
 		       	</tr>
 		       	@endforeach

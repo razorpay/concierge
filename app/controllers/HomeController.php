@@ -490,6 +490,8 @@ class HomeController extends BaseController {
     public function postUsers()
     {
         $input=Input::all();
+        $message=NULL;
+
         if(!isset($input['user_id'])) App::abort(403, 'Unauthorized action.');
         try
         {
@@ -497,17 +499,20 @@ class HomeController extends BaseController {
         }
         catch(Exception $e)
         {
-            $message = "Invalid User";
+            return Redirect::to('/users')
+                    ->with('message', "Invalid User");
         }
-        if(!isset($message))
+
+       if($user->id == Auth::user()->id) 
+        {
+            $message="You can't delete yourself";
+        }
+        else
         {
             $deleted=$user->delete();
             $message="User Deleted Successfully";
         }
-
-        $users=User::get();
-        return View::make('getUsers')
-                    ->with('users', $users)
+        return Redirect::to('/users')
                     ->with('message', $message);
     }
 
