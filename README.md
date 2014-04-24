@@ -36,3 +36,7 @@ chmod -R o+wx app/storage/
 * Create a symlink to public director in `/var/www` folder or create an apache vhost for the site & open in your browser to test it.
 * Create the crontab for managing expired leases by running `php artisan custom:croncreator`. 
 * You can check if the crontab can run smoothly by running `php artisan custom:leasemanger` to check it returns no errors.
+
+License
+--------------
+This application is open-sourced software licensed under the MIT license
