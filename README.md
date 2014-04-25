@@ -1,4 +1,4 @@
-Concierge - AWS Security Group Manager
+Concierge - AWS EC2 Secure Lease Manager
 =========
 Web Management & Secure Access Control of AWS Security Groups. Allows you to create IP leases for incoming connections to AWS instances. Also, allows creating invites to allow guest access by URL/Email Invites. Leases expire after specific time or can be manually terminated. Uses two factor authentication for additional security. Maintains a record for all leases to keep an audit trail.
 
