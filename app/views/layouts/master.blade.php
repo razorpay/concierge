@@ -5,7 +5,7 @@
         <meta charset="utf-8" />
         <title>
             @section('title')
-                Aws Access Manager
+                Concierge - AWS Access Control
             @show
         </title>
         @section('headincludes')
@@ -42,7 +42,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                   </button>
-                  <a class="navbar-brand" href="{{ URL::to('/')}}">Home</a>
+                  <a class="navbar-brand" href="{{ URL::to('/')}}">Concierge Home</a>
                 </div>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
