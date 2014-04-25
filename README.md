@@ -40,6 +40,16 @@ chmod -R o+wx app/storage/
 * Create the crontab for managing expired leases by running `php artisan custom:croncreator`. 
 * You can check if the crontab can run smoothly by running `php artisan custom:leasemanger` to check it returns no errors.
 
+Screenshots
+--------------
+### Home Page ![Home](/screenshots/home.png?raw=true "Home Page") 
+
+### Manage Security Group ![Manage Groups](/screenshots/manage-group.png?raw=true "Manage Group") 
+
+### New URL Invite ![URL Invite](/screenshots/url-invite.png?raw=true "New URL Invite") 
+
+### Manage Users ![Manage Users](/screenshots/manage-users.png?raw=true "Manage Users") 
+
 License
 --------------
 This application is open-sourced software licensed under the MIT license
