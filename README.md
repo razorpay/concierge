@@ -35,7 +35,7 @@ chmod -R o+wx app/storage/
 ```
 * Copy the `app/config/custom_config.sample.php` to `app/config/custom_config.php` and modify appropriately. 
 * Copy `app/config/database.sample.php` to `app/config/database.php` and update the password. 
-* Migrate the db with `php artisan migrate` &  seed with `php artisan db:seed` & finally install laravel with `php composer.phar install`
+* Install laravel with `php composer.phar install`. Migrate the db with `php artisan migrate` &  seed with `php artisan db:seed`. 
 * Create a symlink to public director in `/var/www` folder or create an apache vhost for the site & open in your browser to test it.
 * Create the crontab for managing expired leases by running `php artisan custom:croncreator`. 
 * You can check if the crontab can run smoothly by running `php artisan custom:leasemanger` to check it returns no errors.
