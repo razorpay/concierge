@@ -18,7 +18,12 @@
 			</div>	
 			<div class="row">
 			  <div class="col-md-3">VPC-Id:</div>
-			  <div class="col-md-6">{{{$security_group['VpcId']}}}</div>
+			  <div class="col-md-6">
+				{{-- Display The VPC ID if it exists --}}
+				@if(isset($security_group['VpcId']))
+				{{{$security_group['VpcId']}}}
+				@endif
+			  </div>
 			</div>	
 			<div class="row">
 			  <div class="col-md-3">Name Tag: </div>

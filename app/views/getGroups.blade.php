@@ -128,7 +128,12 @@
 			<td><a href="/manage/{{{$security_group['GroupId']}}}">{{{$security_group['GroupName']}}}</a></td>
 			<td>{{{$security_group['GroupId']}}}</td>
 			<td>{{{$security_group['Description']}}}</td>
-			<td>{{{$security_group['VpcId']}}}</td>
+			<td>
+			{{-- Display The VPC ID if it exists --}}
+			@if(isset($security_group['VpcId']))
+			{{{$security_group['VpcId']}}}
+			@endif
+			</td>
 			<td>
 			{{-- Display The Name Tag if it exists --}}
 			@if(isset($security_group['Tags']['0']['Value']))
