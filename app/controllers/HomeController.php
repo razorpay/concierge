@@ -568,16 +568,33 @@ class HomeController extends BaseController {
         $data=array('lease'=>$lease->toArray(), 'mode'=>$mode);
 
         if($mode)
-        {
-            //In case of Lease Creation
+        {  
+            //In case of Lease Creation 
+            $username=$lease->user->username;
+            $type=(isset($lease['invite_email'])) ? (("URL"==$lease['invite_email'])?"URL Invite":$lease['invite_email']) : "Self";
+            
+            
+            Log::info("Secure Lease Created at: ".$lease['created_at'].", Creator: $username, Type: $type, Group: ".$lease['group_id'].
+                ", Leased IP: ".$lease['lease_ip'].", Ports: ".$lease['port_from'].
+                "-".$lease['port_to'].", Protocol: ".$lease['protocol'].", Expiry: ".$lease['expiry']);
+            
+
             Mail::queue('emails.notification', $data, function($message)
             {
                 $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Created');
             });
         }
         else
-        {
+        {   
             //In Case of Lease Termination
+            $username=$lease->user->username;
+            $type=(isset($lease['invite_email'])) ? (("URL"==$lease['invite_email'])?"URL Invite":$lease['invite_email']) : "Self";
+            $terminator=(null !== Auth::user()) ? Auth::user()->username : "Self-Expiry";
+            
+            Log::info("Secure Lease Terminated at: ".$lease['deleted_at'].", Creator: $username, Type: $type, Group: ".$lease['group_id'].
+                ", Leased IP: ".$lease['lease_ip'].", Ports: ".$lease['port_from'].
+                "-".$lease['port_to'].", Protocol: ".$lease['protocol'].", Terminated By: $terminator");
+
             Mail::queue('emails.notification', $data, function($message)
             {
                 $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Terminated');
