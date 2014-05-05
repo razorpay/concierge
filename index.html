@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Concierge by harshilmathur</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Concierge</h1>
+        <h2>Web Management &amp; Secure Access Control of AWS Security Groups.</h2>
+        <a href="https://github.com/harshilmathur/concierge" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="concierge---aws-ec2-secure-lease-manager" class="anchor" href="#concierge---aws-ec2-secure-lease-manager"><span class="octicon octicon-link"></span></a>Concierge - AWS EC2 Secure Lease Manager</h1>
+
+<p>Web Management &amp; Secure Access Control of AWS Security Groups. Allows you to create IP leases for incoming connections to AWS instances. Also, allows creating invites to allow guest access by URL/Email Invites. Leases expire after specific time or can be manually terminated. Uses two factor authentication for additional security. Maintains a record for all leases to keep an audit trail.</p>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>Created as replacement of Dome9 &amp; Cloudpassage for managing &amp; secure access control to EC2 Instances on AWS. </li>
+<li>Allows you to create secure lease for accessing any port on your AWS security groups. Also, supports guest leasing to grant access to guests to specific services for specific time via URL or Email invite.</li>
+<li>Uses two factor authentication using duosecurity ( <a href="http://duosecurity.com">http://duosecurity.com</a> ) for better access control.</li>
+<li>Maintains a record of all the leases acquired/terminated and sends notification mails for them.</li>
+</ul><h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<ul>
+<li>Basic installation</li>
+</ul><div class="highlight highlight-sh"><pre>git clone <span class="o">[</span>git-repo-url<span class="o">]</span>
+chmod -R o+wx app/storage/
+</pre></div>
+
+<ul>
+<li>Create a new user in AWS IAM. Note its access key &amp; secret for next step. And attach following policy to it</li>
+</ul><pre><code>    {
+      "Statement": [
+        {
+          "Action": [
+            "ec2:AuthorizeSecurityGroupIngress",
+            "ec2:DescribeSecurityGroups",
+            "ec2:RevokeSecurityGroupIngress"
+          ],
+          "Effect": "Allow",
+          "Resource": "*"
+        }
+      ]
+    }
+</code></pre>
+
+<ul>
+<li>Copy the <code>app/config/custom_config.sample.php</code> to <code>app/config/custom_config.php</code> and modify appropriately. </li>
+<li>Copy <code>app/config/database.sample.php</code> to <code>app/config/database.php</code> and update the password. </li>
+<li>Install laravel with <code>php composer.phar install</code>. Migrate the db with <code>php artisan migrate</code> &amp;  seed with <code>php artisan db:seed</code>. </li>
+<li>Create a symlink to "public" directory in <code>/var/www</code> folder or create an apache vhost for the site &amp; open in your browser to test it.</li>
+<li>Create the crontab for managing expired leases by running <code>php artisan custom:croncreator</code>. </li>
+<li>You can check if the crontab can run smoothly by running <code>php artisan custom:leasemanger</code> to check it returns no errors.</li>
+</ul><h2>
+<a name="screenshots" class="anchor" href="#screenshots"><span class="octicon octicon-link"></span></a>Screenshots</h2>
+
+<h3>
+<a name="home-page-" class="anchor" href="#home-page-"><span class="octicon octicon-link"></span></a>Home Page <img src="/screenshots/home.png?raw=true" alt="Home" title="Home Page">
+</h3>
+
+<h3>
+<a name="manage-security-group-" class="anchor" href="#manage-security-group-"><span class="octicon octicon-link"></span></a>Manage Security Group <img src="/screenshots/manage-group.png?raw=true" alt="Manage Groups" title="Manage Group">
+</h3>
+
+<h3>
+<a name="new-url-invite-" class="anchor" href="#new-url-invite-"><span class="octicon octicon-link"></span></a>New URL Invite <img src="/screenshots/url-invite.png?raw=true" alt="URL Invite" title="New URL Invite">
+</h3>
+
+<h3>
+<a name="manage-users-" class="anchor" href="#manage-users-"><span class="octicon octicon-link"></span></a>Manage Users <img src="/screenshots/manage-users.png?raw=true" alt="Manage Users" title="Manage Users">
+</h3>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>This application is open-sourced software licensed under the MIT license</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/harshilmathur/concierge/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/harshilmathur/concierge/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/harshilmathur/concierge"></a> is maintained by <a href="https://github.com/harshilmathur">harshilmathur</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-50668221-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
