@@ -16,6 +16,7 @@
 		        <th>Total Leases Created <span title="Includes Terminated & Expired Leases" class="glyphicon glyphicon-question-sign"></span></th>
 		        <th>Active URL Invites</th>
 		        <th>Active Email Invites</th>
+		        <th>Active Deploy Invites</th>
 		        <th>Delete?</th>
 		        </tr>
 		    </thead>
@@ -37,6 +38,7 @@
 		       		<td>{{{$user->leases()->withTrashed()->count()}}}</td>
 		       		<td>{{{$user->getActiveInvites("url")->count()}}}</td>
 		       		<td>{{{$user->getActiveInvites("email")->count()}}}</td>
+		       		<td>{{{$user->getActiveInvites("deploy")->count()}}}</td>
 	    			<td>
 	    				@if($user->id != Auth::user()->id)
 		    			<form method="post" action="">

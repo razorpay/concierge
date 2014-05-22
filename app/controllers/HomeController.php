@@ -212,7 +212,7 @@ class HomeController extends BaseController {
         //Other validations
         $expiry=$input['expiry'];
         if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) array_push($messages, "Invalid Expiry Time");
-        if(!in_array($input['access'], array(1, 2, 3))) array_push($messages, "Invalid invite Email");
+        if(!in_array($input['access'], array(1, 2, 3, 4))) array_push($messages, "Invalid invite Email");
         if(2==$input['access']){
             if(!isset($input['email']) || !filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
                 array_push($messages, "Invalid invite Email");
@@ -255,6 +255,10 @@ class HomeController extends BaseController {
         {
             $email=$input['email'];
         }
+        elseif(4==$input['access'])
+        {
+            $email='DEPLOY';
+        }
 
         $token=md5(time()+rand());
         $invite=array(
@@ -268,7 +272,7 @@ class HomeController extends BaseController {
             'token'=>$token
         );
         $invite=Invite::create($invite);
-        if($email)
+        if($email && $email!='DEPLOY')
         {
             $data=array('invite'=>$invite->toArray());
             //Send Invite Mail
@@ -449,6 +453,7 @@ class HomeController extends BaseController {
     {
         $invite=Invite::getByToken($token);
         if(!$invite) return View::make('pages.guest')->with('failure', "Invalid Token. It was already used or has been terminated by the admins");
+        
         $email=$invite->email;
         if(!$invite->email) $email="URL";
         //Creating the lease
@@ -469,7 +474,7 @@ class HomeController extends BaseController {
                 return View::make('pages.guest')->with('failure', "Error encountered while creating lease. Please try again. If doesn't help contact the admin.");
             }
             $lease=Lease::create($lease);
-            $invite=$invite->delete();
+            if($invite->email != 'DEPLOY') $invite=$invite->delete();
             $this->NotificationMail($lease, TRUE);
             return View::make('pages.guest')->with('lease', $lease); 
     }

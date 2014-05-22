@@ -34,6 +34,8 @@
 	    			@if($lease->invite_email)
 	    			 	@if("URL"==$lease->invite_email)
 	    			 		URL Invite
+	    			 	@elseif("DEPLOY"==$lease->invite_email)
+	    			 		Deploy Invite
 	    			 	@else
 	    			 		Email Invite: {{{$lease->invite_email}}}
 	    			 	@endif
@@ -88,7 +90,9 @@
     				?>
     				</td>
     				<td>
-    				@if($invite->email)
+    				@if($invite->email == 'DEPLOY')
+    					Deploy Invite
+    				@elseif($invite->email)
     					Email: {{{$invite->email}}}
     				@else
     					URL Invite

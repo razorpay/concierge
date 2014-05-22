@@ -140,11 +140,19 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 			});
 			return $invites;
 	    }
+	    elseif("deploy"==$type)
+	    {
+	    	$invites = $this->invites->filter(function($invite)
+			{
+			    if($invite->email == 'DEPLOY') return true;
+			});
+			return $invites;
+	    }
 	    elseif("email"==$type)
 	    {
 	    	$invites = $this->invites->filter(function($invite)
 			{
-			    if($invite->email) return true;
+			    if($invite->email && $invite->email != 'DEPLOY') return true;
 			});
 			return $invites;
 	    }

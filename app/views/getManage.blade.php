@@ -62,6 +62,8 @@
 	    			@if($lease->invite_email)
 	    			 	@if("URL"==$lease->invite_email)
 	    			 		URL Invite
+	    			 	@elseif("DEPLOY"==$lease->invite_email)
+	    			 		Deploy Invite
 	    			 	@else
 	    			 		Email Invite: {{{$lease->invite_email}}}
 	    			 	@endif
@@ -113,7 +115,9 @@
     				?>
     				</td>
     				<td>
-    				@if($invite->email)
+    				@if($invite->email == 'DEPLOY')
+    					Deploy Invite
+    				@elseif($invite->email)
     					Email: {{{$invite->email}}}
     				@else
     					URL Invite
@@ -155,6 +159,7 @@
 				    <input type="radio" name="access" onChange="if(this.checked) $('#ssh_email').hide();" checked="checked" value="1"  /> Self
 				    <input type="radio" name="access" onChange="if(this.checked) $('#ssh_email').show();" value="2"  /> Invite By Email
 				    <input type="radio" name="access" onChange="if(this.checked) $('#ssh_email').hide();" value="3"  /> Invite By Link
+				    <input type="radio" name="access" onChange="if(this.checked) $('#ssh_email').hide();" value="4"  /> Deploy Invite
 				</div>
 			  </div>
 			  <div id="ssh_email" class="row" style="display:none">

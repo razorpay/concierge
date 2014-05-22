@@ -47,6 +47,8 @@
                    @if(isset($lease['invite_email']) && $lease['invite_email'])
                       @if("URL"==$lease['invite_email'])
                         URL Invite
+                      @elseif("DEPLOY"==$lease['invite_email'])
+                        Deploy Invite
                       @else
                         Email Invite: {{{$lease['invite_email']}}}
                       @endif
@@ -92,6 +94,8 @@
                    @if(isset($lease['invite_email']) && $lease['invite_email'])
                       @if("URL"==$lease['invite_email'])
                         URL Invite
+                      @elseif("DEPLOY"==$lease['invite_email'])
+                        Deploy Invite
                       @else
                         Email Invite: {{{$lease['invite_email']}}}
                       @endif
