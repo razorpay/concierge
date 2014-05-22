@@ -6,7 +6,7 @@ Features
 ---------
 * Allows you to create secure lease for accessing any port on your AWS security groups.
 * Supports guest leasing to grant access to guests to specific services for specific time via URL or Email invite.
-* Support for deploy Invites, that can be used in auto-deployment scripts from wercker, shippable etc.
+* Support for deploy Invites, that can be used in auto-deployment scripts from wercker, shippable etc. Deploy invites can be used repeatedly unlike URL invites which are single use.
 * Uses two factor authentication using duosecurity ( http://duosecurity.com ) for better access control.
 * Maintains a record of all the leases acquired/terminated in the database and sends notification mails for them.
 * Maintains a log file of the leases.
