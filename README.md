@@ -1,13 +1,16 @@
 Concierge - AWS EC2 Secure Lease Manager
 =========
-Web Management & Secure Access Control of AWS Security Groups. Allows you to create IP leases for incoming connections to AWS instances. Also, allows creating invites to allow guest access by URL/Email Invites. Leases expire after specific time or can be manually terminated. Uses two factor authentication for additional security. Maintains a record for all leases to keep an audit trail.
+Web Management & Secure Access Control of AWS Security Groups. Created as replacement of Dome9 & Cloudpassage for managing & secure access control to EC2 Instances on AWS. Allows you to create IP leases for incoming connections to AWS instances. Also, allows creating invites to allow guest access by URL/Email Invites. Leases expire after specific time or can be manually terminated. 
 
 Features
 ---------
-* Created as replacement of Dome9 & Cloudpassage for managing & secure access control to EC2 Instances on AWS. 
-* Allows you to create secure lease for accessing any port on your AWS security groups. Also, supports guest leasing to grant access to guests to specific services for specific time via URL or Email invite.
+* Allows you to create secure lease for accessing any port on your AWS security groups.
+* Supports guest leasing to grant access to guests to specific services for specific time via URL or Email invite.
+* Support for deploy Invites, that can be used in auto-deployment scripts from wercker, shippable etc.
 * Uses two factor authentication using duosecurity ( http://duosecurity.com ) for better access control.
-* Maintains a record of all the leases acquired/terminated and sends notification mails for them.
+* Maintains a record of all the leases acquired/terminated in the database and sends notification mails for them.
+* Maintains a log file of the leases.
+
 
 
 Installation
