@@ -194,6 +194,7 @@
 					    <input type="radio" name="access" onChange="if(this.checked) $('#https_email').hide();" checked="checked" value="1"  /> Self
 					    <input type="radio" name="access" onChange="if(this.checked) $('#https_email').show();" value="2"  /> Invite By Email
 					    <input type="radio" name="access" onChange="if(this.checked) $('#https_email').hide();" value="3"  /> Invite By Link
+					    <input type="radio" name="access" onChange="if(this.checked) $('#https_email').hide();" value="4"  /> Deploy Invite
 					</div>
 				</div>
 				<div id="https_email" class="row" style="display:none">
@@ -229,6 +230,7 @@
 					    <input type="radio" name="access" onChange="if(this.checked) $('#custom_email').hide();" checked="checked" value="1"  /> Self
 					    <input type="radio" name="access" onChange="if(this.checked) $('#custom_email').show();" value="2"  /> Invite By Email
 					    <input type="radio" name="access" onChange="if(this.checked) $('#custom_email').hide();" value="3"  /> Invite By Link
+					    <input type="radio" name="access" onChange="if(this.checked) $('#custom_email').hide();" value="4"  /> Deploy Invite
 					</div>
 				</div>
 				<div id="custom_email" class="row" style="display:none">
