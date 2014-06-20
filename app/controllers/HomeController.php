@@ -33,7 +33,7 @@ class HomeController extends BaseController {
 
     /**
      * Stage Two - The Duo Auth form
-     * @return Duo Login View or Redirect on error 
+     * @return Duo Login View or Redirect on error
      */
     public function postSignin()
     {
@@ -220,7 +220,7 @@ class HomeController extends BaseController {
         }
 
         //Validation fails
-        if(!empty($messages)) 
+        if(!empty($messages))
         {
             return Redirect::to("/manage/$group_id")
                             ->with('message', implode("<br/>", $messages));
@@ -233,15 +233,15 @@ class HomeController extends BaseController {
                 'user_id'=>Auth::User()->id,
                 'group_id'=>$group_id,
                 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
-                'protocol'=>$protocol, 
+                'protocol'=>$protocol,
                 'port_from'=>$port_from,
                 'port_to'=>$port_to,
                 'expiry'=>$expiry,
             );
-            
+
             $result=$this->createLease($lease);
             if(!$result)
-            {   
+            {
                 //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
                 return Redirect::to("/manage/$group_id")
                                 ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
@@ -264,7 +264,7 @@ class HomeController extends BaseController {
         $invite=array(
             'user_id'=>Auth::User()->id,
             'group_id'=>$group_id,
-            'protocol'=>$protocol, 
+            'protocol'=>$protocol,
             'port_from'=>$port_from,
             'port_to'=>$port_to,
             'expiry'=>$expiry,
@@ -295,7 +295,7 @@ class HomeController extends BaseController {
      * @return getManage View
      */
     public function postTerminate($group_id)
-    {   
+    {
         $input=Input::all();
         if(isset($input['invite_id']))
         {
@@ -334,7 +334,7 @@ class HomeController extends BaseController {
             $this->NotificationMail($lease, FALSE);
 
             if(!$result)
-            {   
+            {
                 //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
                 return Redirect::to("/manage/$group_id")
                                 ->with('message', "Lease Termination returned error. Assumed the lease was already deleted");
@@ -377,7 +377,7 @@ class HomeController extends BaseController {
         $leases=Lease::get();
         foreach($leases as $lease)
         {
-            $time_left=strtotime($lease->created_at)+$lease->expiry-time(); 
+            $time_left=strtotime($lease->created_at)+$lease->expiry-time();
             if($time_left<=0){
                 $result=$this->terminateLease($lease->toArray());
                 $lease->delete();
@@ -394,15 +394,15 @@ class HomeController extends BaseController {
 
     /*
      * Returns the form for changing Password
-     */ 
+     */
     public function getPassword()
     {
         return View::make('getPassword');
     }
-    
+
     /*
      * Handles the form submission for changing Password
-     */ 
+     */
     public function postPassword()
     {
         $input=Input::all();
@@ -424,7 +424,7 @@ class HomeController extends BaseController {
         $password_rules = array(
         'password'              => 'required|between:7,50|confirmed|case_diff|numbers|letters',
         'password_confirmation' => 'required|between:7,50');
-        
+
         $validator = Validator::make($input,$password_rules);
 
         if ($validator->fails())
@@ -437,7 +437,7 @@ class HomeController extends BaseController {
         $password = array(
             'password' => Hash::make($input['password'])
         );
-        
+
         $result = Auth::user()->update($password);
 
         return Redirect::to('/password')
@@ -448,12 +448,12 @@ class HomeController extends BaseController {
 
     /*
      * Handles Guest Access for lease invites
-     */ 
+     */
     public function getInvite($token)
     {
         $invite=Invite::getByToken($token);
         if(!$invite) return View::make('pages.guest')->with('failure', "Invalid Token. It was already used or has been terminated by the admins");
-        
+
         $email=$invite->email;
         if(!$invite->email) $email="URL";
         //Creating the lease
@@ -461,7 +461,7 @@ class HomeController extends BaseController {
                 'user_id'=>$invite->user_id,
                 'group_id'=>$invite->group_id,
                 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
-                'protocol'=>$invite->protocol, 
+                'protocol'=>$invite->protocol,
                 'port_from'=>$invite->port_from,
                 'port_to'=>$invite->port_to,
                 'expiry'=>$invite->expiry,
@@ -469,19 +469,19 @@ class HomeController extends BaseController {
             );
             $result=$this->createLease($lease);
             if(!$result)
-            {   
+            {
                 //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
                 return View::make('pages.guest')->with('failure', "Error encountered while creating lease. Please try again. If doesn't help contact the admin.");
             }
             $lease=Lease::create($lease);
             if($invite->email != 'DEPLOY') $invite=$invite->delete();
             $this->NotificationMail($lease, TRUE);
-            return View::make('pages.guest')->with('lease', $lease); 
+            return View::make('pages.guest')->with('lease', $lease);
     }
 
     /*
      * Handles Display of details of site users only to site admin
-     */ 
+     */
     public function getUsers()
     {
         $users=User::get();
@@ -491,7 +491,7 @@ class HomeController extends BaseController {
 
     /*
      * Handles Display of new user form (only to site admin)
-     */ 
+     */
     public function getAddUser()
     {
         return View::make('getAddUser');
@@ -499,7 +499,7 @@ class HomeController extends BaseController {
 
     /*
      * Handles Adding of new user (only for site admin)
-     */ 
+     */
     public function postAddUser()
     {
         $input=Input::all();
@@ -510,7 +510,7 @@ class HomeController extends BaseController {
         'password'              => 'required|between:7,50|confirmed|case_diff|numbers|letters',
         'password_confirmation' => 'required|between:7,50',
         'admin'                 => 'required|in:1,0');
-        
+
         $validator = Validator::make($input,$user_rules);
         if ($validator->fails())
         {
@@ -518,8 +518,11 @@ class HomeController extends BaseController {
                             ->with('errors', $validator->messages()->toArray() );
         }
         else
-        {   
+        {
+            $input['password'] = Hash::make($input['password']);
+
             User::create($input);
+            
             return Redirect::to('/users')
                             ->with('message', "User Added Successfully" );
         }
@@ -529,7 +532,7 @@ class HomeController extends BaseController {
 
     /*
      * Handles deletion of users (only for site admin)
-     */ 
+     */
     public function postUsers()
     {
         $input=Input::all();
@@ -547,8 +550,8 @@ class HomeController extends BaseController {
                     ->with('message', "Invalid User");
         }
 
-       if($user->id == Auth::user()->id) 
-        {   
+       if($user->id == Auth::user()->id)
+        {
             //Avoid Self Delete
             $message="You can't delete yourself";
         }
@@ -563,7 +566,7 @@ class HomeController extends BaseController {
 
     /*
      * Handles sending of notification mail
-     * Requires two arguements $lease, $ mode. 
+     * Requires two arguements $lease, $ mode.
      * $lease = Lease Object Containing the lease created or deleted
      * $mode = TRUE for lease created, FALSE for lease deleted
      */
@@ -573,16 +576,16 @@ class HomeController extends BaseController {
         $data=array('lease'=>$lease->toArray(), 'mode'=>$mode);
 
         if($mode)
-        {  
-            //In case of Lease Creation 
+        {
+            //In case of Lease Creation
             $username=$lease->user->username;
             $type=(isset($lease['invite_email'])) ? (("URL"==$lease['invite_email'])?"URL Invite":$lease['invite_email']) : "Self";
-            
-            
+
+
             Log::info("Secure Lease Created at: ".$lease['created_at'].", Creator: $username, Type: $type, Group: ".$lease['group_id'].
                 ", Leased IP: ".$lease['lease_ip'].", Ports: ".$lease['port_from'].
                 "-".$lease['port_to'].", Protocol: ".$lease['protocol'].", Expiry: ".$lease['expiry']);
-            
+
 
             Mail::queue('emails.notification', $data, function($message)
             {
@@ -590,12 +593,12 @@ class HomeController extends BaseController {
             });
         }
         else
-        {   
+        {
             //In Case of Lease Termination
             $username=$lease->user->username;
             $type=(isset($lease['invite_email'])) ? (("URL"==$lease['invite_email'])?"URL Invite":$lease['invite_email']) : "Self";
             $terminator=(null !== Auth::user()) ? Auth::user()->username : "Self-Expiry";
-            
+
             Log::info("Secure Lease Terminated at: ".$lease['deleted_at'].", Creator: $username, Type: $type, Group: ".$lease['group_id'].
                 ", Leased IP: ".$lease['lease_ip'].", Ports: ".$lease['port_from'].
                 "-".$lease['port_to'].", Protocol: ".$lease['protocol'].", Terminated By: $terminator");
@@ -655,7 +658,7 @@ class HomeController extends BaseController {
         {
             return FALSE;
         }
-        return TRUE;  
+        return TRUE;
     }
 
 
