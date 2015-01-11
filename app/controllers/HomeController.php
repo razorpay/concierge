@@ -232,7 +232,7 @@ class HomeController extends BaseController {
             $lease=array(
                 'user_id'=>Auth::User()->id,
                 'group_id'=>$group_id,
-                'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
+                'lease_ip'=>$this->getClientIp()."/32",
                 'protocol'=>$protocol,
                 'port_from'=>$port_from,
                 'port_to'=>$port_to,
@@ -460,7 +460,7 @@ class HomeController extends BaseController {
             $lease=array(
                 'user_id'=>$invite->user_id,
                 'group_id'=>$invite->group_id,
-                'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
+                'lease_ip'=>$this->getClientIp()."/32",
                 'protocol'=>$invite->protocol,
                 'port_from'=>$invite->port_from,
                 'port_to'=>$invite->port_to,
@@ -661,5 +661,17 @@ class HomeController extends BaseController {
         return TRUE;
     }
 
+    private function getClientIp()
+    {   
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR']) {
+            // if behind an ELB
+            $clientIpAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            // if not behind ELB
+            $clientIpAddress = $_SERVER['REMOTE_ADDR'];
+        }
+
+        return $clientIpAddress;
+    }
 
 }
