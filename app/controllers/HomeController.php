@@ -505,9 +505,9 @@ class HomeController extends BaseController {
         $input=Input::all();
         //Validation Rules
         $user_rules = array(
-        'username'              => 'required|between:3,50|alpha_dash|unique:users',
+        'username'              => 'required|between:2,50|alpha_dash|unique:users',
         'name'                  => 'required|between:3,100|alpha_spaces',
-        'password'              => 'required|between:7,50|confirmed|case_diff|numbers|letters',
+        'password'              => 'required|between:7,50|confirmed|numbers|letters',
         'password_confirmation' => 'required|between:7,50',
         'admin'                 => 'required|in:1,0');
 
