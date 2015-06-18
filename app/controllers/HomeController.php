@@ -242,7 +242,7 @@ class HomeController extends BaseController {
             $result=$this->createLease($lease);
             if(!$result)
             {
-                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
+                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocol, port already exists on AWS.
                 return Redirect::to("/manage/$group_id")
                                 ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
             }
@@ -287,6 +287,59 @@ class HomeController extends BaseController {
         else
         {
             return View::make('pages.invited')->with('invite', $invite);
+        }
+    }
+
+    public function postRenew($group_id)
+    {
+        $input = Input::all();
+        if (isset($input['invite_id']))
+        {
+            try
+            {
+                $invite = Invite::findorfail($input['invite_id']);
+            } catch (Exception $e) {
+                $message="Invite not found";
+                return Redirect::to("/manage/$group_id")->with('message', $message);
+            }
+        }
+        else if (isset($input['lease_id']))
+        {
+            // Check for existence of lease
+            try
+            {
+                $lease=Lease::findorFail($input['lease_id']);
+            }
+            catch(Exception $e)
+            {
+                $message="Lease not found";
+                return Redirect::to("/manage/$group_id")->with('message', $message);
+            }
+            // Terminate the lease on AWS
+            $result=$this->terminateLease($lease->toArray());
+            //Delete from DB
+            $lease->delete();
+            $lease = $lease->toArray();
+            $this->NotificationMail($lease, FALSE);
+
+            if(!$result)
+            {
+                //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
+                return Redirect::to("/manage/$group_id")
+                                ->with('message', "Lease Termination returned error. Assumed the lease was already deleted");
+            }
+
+            $result=$this->createLease($lease);
+            if(!$result)
+            {
+                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocol, port already exists on AWS.
+                return Redirect::to("/manage/$group_id")
+                                ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
+            }
+            $lease=Lease::create($lease);
+            $this->NotificationMail($lease, TRUE);
+            return Redirect::to("/manage/$group_id")
+                        ->with('message', "Lease renewed successfully!");
         }
     }
 
@@ -522,7 +575,7 @@ class HomeController extends BaseController {
             $input['password'] = Hash::make($input['password']);
 
             User::create($input);
-            
+
             return Redirect::to('/users')
                             ->with('message', "User Added Successfully" );
         }
@@ -662,7 +715,7 @@ class HomeController extends BaseController {
     }
 
     private function getClientIp()
-    {   
+    {
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR']) {
             // if behind an ELB
             $clientIpAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
