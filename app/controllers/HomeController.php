@@ -513,11 +513,7 @@ class HomeController extends BaseController {
             $lease=array(
                 'user_id'=>$invite->user_id,
                 'group_id'=>$invite->group_id,
-<<<<<<< HEAD
-                'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
-=======
                 'lease_ip'=>$this->getClientIp()."/32",
->>>>>>> d4adc336fdb84343e9ce871e740301f543bee3b8
                 'protocol'=>$invite->protocol,
                 'port_from'=>$invite->port_from,
                 'port_to'=>$invite->port_to,
@@ -579,11 +575,7 @@ class HomeController extends BaseController {
             $input['password'] = Hash::make($input['password']);
 
             User::create($input);
-<<<<<<< HEAD
-            
-=======
 
->>>>>>> d4adc336fdb84343e9ce871e740301f543bee3b8
             return Redirect::to('/users')
                             ->with('message', "User Added Successfully" );
         }
