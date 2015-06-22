@@ -239,14 +239,30 @@ class HomeController extends BaseController {
                 'expiry'=>$expiry,
             );
 
-            $result=$this->createLease($lease);
-            if(!$result)
+            $existingLease = Lease::where('lease_ip', '=', $lease['lease_ip'])
+                                    ->where('group_id', '=', $lease['group_id'])
+                                    ->where('protocol', '=', $lease['protocol'])
+                                    ->where('port_from', '=', $lease['port_from'])
+                                    ->where('port_to', '=', $lease['port_to']);
+
+            if ($existingLease->count() > 0)
             {
-                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocol, port already exists on AWS.
-                return Redirect::to("/manage/$group_id")
-                                ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
+                $newLease = $existingLease->first();
+                $newLease->expiry = $lease['expiry'];
+                $newLease->save();
             }
-            $lease=Lease::create($lease);
+            else 
+            {
+                $result=$this->createLease($lease);
+                if(!$result)
+                {
+                    //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocol, port already exists on AWS.
+                    return Redirect::to("/manage/$group_id")
+                                    ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
+                }
+                $lease=Lease::create($lease);
+            }
+            
             $this->NotificationMail($lease, TRUE);
             return Redirect::to("/manage/$group_id")
                         ->with('message', "Lease created successfully!");
