@@ -15,6 +15,7 @@
 		        <th>Time Left</th>
 		        <th>Type</th>
 		        <th>Terminate?</th>
+                <th>Renew?</th>
 		        </tr>
 		    </thead>
 		    <tbody>
@@ -52,6 +53,15 @@
 		    			</a>
 		    			</form>
 	    			</td>
+                    <td>
+                        <form method="post" action="/manage/{{{$lease->group_id}}}/renew">
+                        <input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
+                        <input type="hidden" name="_token" value="{{{csrf_token()}}}">
+                        <a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to renew this lease?')) {parentNode.submit();} return false;">
+                        <span title="Renew Lease" class="glyphicon glyphicon-repeat"></span>
+                        </a>
+                        </form>
+                    </td>
 		       	</tr>
 		       	@endforeach
 
@@ -84,7 +94,7 @@
 	        		<td>
 	        		<?php
 	        		    //Calculating Time to Expiry in Hours and minutes
-    					$hours=intval(floor($invite->expiry/3600)); 
+    					$hours=intval(floor($invite->expiry/3600));
     					$minutes=intval(floor(($invite->expiry-$hours*3600)/60));
     					echo "$hours hours $minutes minutes";
     				?>
@@ -106,7 +116,7 @@
 	    					<span title="Terminate Invite" class="glyphicon glyphicon-minus-sign"></span>
 	    				</a>
 	    				</form>
-    				</td>	
+    				</td>
 	        	</tr>
 	        	@endforeach
 	        	@if(!$invites->count())
@@ -157,10 +167,10 @@
    function component(x, v) {
         return Math.floor(x / v);
     }
-    $('.time').each(function(i, obj) {   
-	    var div=$(this)                   
+    $('.time').each(function(i, obj) {
+	    var div=$(this)
 	    var timestamp = div.text()
-	    
+
 	    if(timestamp>0)
 	    {
 		    setInterval(function() { // execute code each second

@@ -20,6 +20,8 @@ Route::group(array('before' => 'auth'), function()
 
 	Route::post('/manage/{group_id}', array('before'=>'csrf', 'uses'=>'HomeController@postManage'));
 
+    Route::post('/manage/{group_id}/renew', array('before'=>'csrf', 'uses'=>'HomeController@postRenew'));
+
 	Route::post('/manage/{group_id}/terminate', array('before'=>'csrf', 'uses'=>'HomeController@postTerminate'));
 
 	Route::get('/logout', 'HomeController@getLogout');

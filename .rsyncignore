@@ -1,0 +1,9 @@
+/bootstrap/compiled.php
+composer.phar
+.env.*.php
+.env.php
+.DS_Store
+Thumbs.db
+/app/config/database.php
+/app/config/custom_config.php
+/app/storage

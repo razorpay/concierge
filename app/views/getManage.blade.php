@@ -11,11 +11,11 @@
 			<div class="row">
 			  <div class="col-md-3">Id:</div>
 			  <div class="col-md-6">{{{$security_group['GroupId']}}}</div>
-			</div>	
+			</div>
 			<div class="row">
 			  <div class="col-md-3">Description:</div>
 			  <div class="col-md-6">{{{$security_group['Description']}}}</div>
-			</div>	
+			</div>
 			<div class="row">
 			  <div class="col-md-3">VPC-Id:</div>
 			  <div class="col-md-6">
@@ -24,7 +24,7 @@
 				{{{$security_group['VpcId']}}}
 				@endif
 			  </div>
-			</div>	
+			</div>
 			<div class="row">
 			  <div class="col-md-3">Name Tag: </div>
 			  <div class="col-md-6">
@@ -32,7 +32,7 @@
 				{{{$security_group['Tags']['0']['Value']}}}
 			  @endif
 			  </div>
-			</div>	
+			</div>
 			<h2>Active Leases</h2>
 			<table class="table table-hover table-bordered">
 	        <thead>
@@ -44,6 +44,7 @@
 	            <th>Time Left</th>
 	            <th>Type</th>
 	            <th>Terminate?</th>
+                <th>Renew?</th>
 	          </tr>
 	        </thead>
 	        <tbody>
@@ -79,7 +80,16 @@
 	    					<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
 	    				</a>
 	    				</form>
-    				</td>	
+    				</td>
+                    <td>
+                        <form method="post" action="{{URL::to('/manage')}}/{{$lease->group_id}}/renew">
+                        <input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
+                        <input type="hidden" name="_token" value="{{{csrf_token()}}}">
+                        <a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to renew this lease?')) {parentNode.submit();} return false;">
+                            <span title="Renew Lease" class="glyphicon glyphicon-repeat"></span>
+                        </a>
+                        </form>
+                    </td>
 	        	</tr>
 	        	@endforeach
 	        	@if(!$leases->count())
@@ -87,7 +97,7 @@
 		       	@endif
 	        </tbody>
 	        </table>
-	        
+
 	        <h2>Active Invites</h2>
 			<table class="table table-hover table-bordered">
 	        <thead>
@@ -109,7 +119,7 @@
 	        		<td>
 	        		<?php
 	        		    //Calculating Time to Expiry in Hours and minutes
-    					$hours=intval(floor($invite->expiry/3600)); 
+    					$hours=intval(floor($invite->expiry/3600));
     					$minutes=intval(floor(($invite->expiry-$hours*3600)/60));
     					echo "$hours hours $minutes minutes";
     				?>
@@ -131,7 +141,7 @@
 	    					<span title="Terminate Invite" class="glyphicon glyphicon-minus-sign"></span>
 	    				</a>
 	    				</form>
-    				</td>	
+    				</td>
 	        	</tr>
 	        	@endforeach
 	        	@if(!$invites->count())
@@ -165,7 +175,7 @@
 			  <div id="ssh_email" class="row" style="display:none">
 			  	<label for="email" class="col-sm-4 control-label">Email:</label>
 			    <div class="col-sm-8">
-				    <input type="email" class="form-control" name="email" placeholder="some@someone.com"  /> 
+				    <input type="email" class="form-control" name="email" placeholder="some@someone.com"  />
 				</div>
 			  </div>
 			  <div class="row">
@@ -200,7 +210,7 @@
 				<div id="https_email" class="row" style="display:none">
 				  	<label for="email" class="col-sm-4 control-label">Email:</label>
 				    <div class="col-sm-8">
-					    <input type="email" class="form-control" name="email" placeholder="some@someone.com"  /> 
+					    <input type="email" class="form-control" name="email" placeholder="some@someone.com"  />
 					</div>
 			    </div>
 			    <div class="row">
@@ -219,7 +229,7 @@
 			  	</div>
 
 		    </form>
-		    
+
 		    <form id="custom_form" class="form-horizontal" role="form-horizontal" style="display:none" action="" method="POST">
 			    <h4>Define Custom Rule:</h4>
 			    <input type="hidden" name="rule_type" value="custom" />
@@ -236,7 +246,7 @@
 				<div id="custom_email" class="row" style="display:none">
 				  	<label for="email" class="col-sm-4 control-label">Email:</label>
 				    <div class="col-sm-8">
-					    <input type="email" class="form-control" name="email" placeholder="some@someone.com"  /> 
+					    <input type="email" class="form-control" name="email" placeholder="some@someone.com"  />
 					</div>
 			    </div>
 			    <div class="row">
@@ -244,7 +254,7 @@
 			    	<div class="col-sm-8">
 			    		<input type="text" name="protocol" placeholder="tcp/udp" class="form-control" required />
 			    	</div>
-			    	<br/>	   
+			    	<br/>
 			    </div>
 
 			    <div class="row">
@@ -254,12 +264,12 @@
 			    	</div>
 			    	<div class="col-sm-4">
 			    		<input type="text" name="port_to" placeholder="To port" class="form-control" required/>
-			    	</div> 
+			    	</div>
 			    </div>
 			    <div>
 			    <div class="col-sm-offset-4 col-sm-8">Keep From & To Port same for single port access.</div>
 			    </div>
-			  			    
+
 			    <div class="row">
 			    	<label for="expiry" class="col-sm-4 control-label">Custom Access Expiry:</label>
 			    	<div class="col-sm-4">
@@ -277,7 +287,7 @@
 		    </form>
 
 			<h2>Security Group Rules</h2>
-            Inbound Rules: 
+            Inbound Rules:
 	        <table class="table table-hover table-bordered">
 	        <thead>
 	          <tr>
@@ -314,7 +324,7 @@
 					<td>CIDR IP(s): {{$rule_ip['CidrIp']}}</td>
 			    </tr>
 				@endforeach
-		    @endforeach 
+		    @endforeach
 		    </tbody>
 		    </table>
 		    Outbound Rules: <br/>
@@ -358,7 +368,7 @@
 		    </tbody>
 		    </table>
 		    <br/>
-		</div>    
+		</div>
 	</div>
 	<br/>
 @stop
@@ -368,10 +378,10 @@
    function component(x, v) {
         return Math.floor(x / v);
     }
-    $('.time').each(function(i, obj) {   
-	    var div=$(this)                   
+    $('.time').each(function(i, obj) {
+	    var div=$(this)
 	    var timestamp = div.text()
-	    
+
 	    if(timestamp>0)
 	    {
 		    setInterval(function() { // execute code each second

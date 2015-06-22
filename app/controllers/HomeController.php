@@ -232,7 +232,7 @@ class HomeController extends BaseController {
             $lease=array(
                 'user_id'=>Auth::User()->id,
                 'group_id'=>$group_id,
-                'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
+                'lease_ip'=>$this->getClientIp()."/32",
                 'protocol'=>$protocol,
                 'port_from'=>$port_from,
                 'port_to'=>$port_to,
@@ -242,7 +242,7 @@ class HomeController extends BaseController {
             $result=$this->createLease($lease);
             if(!$result)
             {
-                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
+                //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocol, port already exists on AWS.
                 return Redirect::to("/manage/$group_id")
                                 ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
             }
@@ -288,6 +288,59 @@ class HomeController extends BaseController {
         {
             return View::make('pages.invited')->with('invite', $invite);
         }
+    }
+
+    public function postRenew($group_id)
+    {
+        // $input = Input::all();
+        // if (isset($input['invite_id']))
+        // {
+        //     try
+        //     {
+        //         $invite = Invite::findorfail($input['invite_id']);
+        //     } catch (Exception $e) {
+        //         $message="Invite not found";
+        //         return Redirect::to("/manage/$group_id")->with('message', $message);
+        //     }
+        // }
+        // else if (isset($input['lease_id']))
+        // {
+        //     // Check for existence of lease
+        //     try
+        //     {
+        //         $lease=Lease::findorFail($input['lease_id']);
+        //     }
+        //     catch(Exception $e)
+        //     {
+        //         $message="Lease not found";
+        //         return Redirect::to("/manage/$group_id")->with('message', $message);
+        //     }
+        //     // Terminate the lease on AWS
+        //     $result=$this->terminateLease($lease->toArray());
+        //     //Delete from DB
+        //     $lease->delete();
+        //     $lease = $lease->toArray();
+        //     $this->NotificationMail($lease, FALSE);
+
+        //     if(!$result)
+        //     {
+        //         //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
+        //         return Redirect::to("/manage/$group_id")
+        //                         ->with('message', "Lease Termination returned error. Assumed the lease was already deleted");
+        //     }
+
+        //     $result=$this->createLease($lease);
+        //     if(!$result)
+        //     {
+        //         //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocol, port already exists on AWS.
+        //         return Redirect::to("/manage/$group_id")
+        //                         ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
+        //     }
+        //     $lease=Lease::create($lease);
+        //     $this->NotificationMail($lease, TRUE);
+        //     return Redirect::to("/manage/$group_id")
+        //                 ->with('message', "Lease renewed successfully!");
+        // }
     }
 
      /*
@@ -460,7 +513,11 @@ class HomeController extends BaseController {
             $lease=array(
                 'user_id'=>$invite->user_id,
                 'group_id'=>$invite->group_id,
+<<<<<<< HEAD
                 'lease_ip'=>$_SERVER['REMOTE_ADDR']."/32",
+=======
+                'lease_ip'=>$this->getClientIp()."/32",
+>>>>>>> d4adc336fdb84343e9ce871e740301f543bee3b8
                 'protocol'=>$invite->protocol,
                 'port_from'=>$invite->port_from,
                 'port_to'=>$invite->port_to,
@@ -505,9 +562,9 @@ class HomeController extends BaseController {
         $input=Input::all();
         //Validation Rules
         $user_rules = array(
-        'username'              => 'required|between:3,50|alpha_dash|unique:users',
+        'username'              => 'required|between:2,50|alpha_dash|unique:users',
         'name'                  => 'required|between:3,100|alpha_spaces',
-        'password'              => 'required|between:7,50|confirmed|case_diff|numbers|letters',
+        'password'              => 'required|between:7,50|confirmed|numbers|letters',
         'password_confirmation' => 'required|between:7,50',
         'admin'                 => 'required|in:1,0');
 
@@ -522,7 +579,11 @@ class HomeController extends BaseController {
             $input['password'] = Hash::make($input['password']);
 
             User::create($input);
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> d4adc336fdb84343e9ce871e740301f543bee3b8
             return Redirect::to('/users')
                             ->with('message', "User Added Successfully" );
         }
@@ -661,5 +722,17 @@ class HomeController extends BaseController {
         return TRUE;
     }
 
+    private function getClientIp()
+    {
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR']) {
+            // if behind an ELB
+            $clientIpAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            // if not behind ELB
+            $clientIpAddress = $_SERVER['REMOTE_ADDR'];
+        }
+
+        return $clientIpAddress;
+    }
 
 }
