@@ -6,7 +6,7 @@
 	"require": {
 		"laravel/framework": "4.1.*",
 		 "aws/aws-sdk-php-laravel": "1.*",
-		 "schuppo/password-strength": "dev-master"
+		 "schuppo/password-strength": "0.*"
 	},
 	"autoload": {
 		"classmap": [
