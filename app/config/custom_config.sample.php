@@ -91,7 +91,7 @@ return array(
             array(
                 'name' => 'Admin Name',
                 'username' => 'admin',
-                'password' => Hash::make('password')
+                'password' => Hash::make('password'),
                 'admin' => TRUE
             ),
             array(
