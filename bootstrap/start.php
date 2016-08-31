@@ -24,11 +24,20 @@ $app = new Illuminate\Foundation\Application;
 |
 */
 
-$env = $app->detectEnvironment(array(
+// $env = $app->detectEnvironment(array(
+//
+// 	'local' => array('your-machine-name'),
+//
+// ));
 
-	'local' => array('your-machine-name'),
+$env = $app->detectEnvironment(function () {
+    if ($_SERVER['SERVER_NAME'] === 'aws-manage.dev')
+    {
+        return 'local';
+    }
 
-));
+    return 'production';
+});
 
 /*
 |--------------------------------------------------------------------------

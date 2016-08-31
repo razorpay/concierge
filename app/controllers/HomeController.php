@@ -47,7 +47,7 @@ class HomeController extends BaseController {
 		else
 		{
 			$token = $google_service->requestAccessToken($code);
-
+			
 			$response = $google_service->request(Config::get('oauth-4-laravel.userinfo_url'));
 			$result = json_decode($response);
 
@@ -56,7 +56,7 @@ class HomeController extends BaseController {
 			// - Belong to razorpay.com domain
 			//
 			// Then only we'll create a user entry in the system or check for one
-			if (!$result->verified_email || explode('@', $result->email)[1] !== 'razorpay.com') return App::abort(404);
+			if (!$result->verified_email || explode('@', $result->email)[1] !== $_ENV['company_domain']) return App::abort(404);
 
 			// Create an entry in the User table
 			$user = User::where('google_id', $result->id)->first();
