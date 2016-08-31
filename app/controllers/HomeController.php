@@ -1,5 +1,7 @@
 <?php
+
 use LaravelDuo\LaravelDuo;
+use Artdarek\OAuth\Facade\OAuth;
 
 class HomeController extends BaseController {
 
@@ -28,6 +30,71 @@ class HomeController extends BaseController {
      */
     public function getIndex()
     {
+		/*
+			Google Auth Logic
+		*/
+
+		$code = Input::get('code');
+
+		$google_service = OAuth::consumer('Google');
+
+		if (!$code)
+		{
+			$url = $google_service->getAuthorizationUri();
+
+			return Redirect::to((string) $url);
+		}
+		else
+		{
+			$token = $google_service->requestAccessToken($code);
+
+			$response = $google_service->request(Config::get('oauth-4-laravel.userinfo_url'));
+			$result = json_decode($response);
+
+			// Email must be:
+			// - Verified
+			// - Belong to razorpay.com domain
+			//
+			// Then only we'll create a user entry in the system or check for one
+			if (!$result->verified_email || explode('@', $result->email)[1] !== 'razorpay.com') return App::abort(404);
+
+			// Create an entry in the User table
+			$user = User::where('google_id', $result->id)->first();
+
+			if ($user)
+			{
+				// Update some fields
+				$user->access_token = $token->getAccessToken();
+
+				$user->save();
+			}
+			else
+			{
+				// Create a new user
+				$user_data = array(
+					'google_id' 	=> $result->id,
+					'email'			=> $result->email,
+					'access_token' 	=> $token->getAccessToken(),
+					'name'			=> $result->name,
+					'username'		=> $result->email,
+					'password'		=> 'void'
+				);
+
+				$user = User::create($user_data);
+			}
+
+			// Login the user into the app
+			Auth::loginUsingId($user->id);
+
+			// If logged in, then redirection
+			if (Auth::check())
+	        {
+	            return Redirect::to('/');
+	        }
+		}
+
+		// This won't be rendered anymore, will remove once
+		// Google auth is working well on production
         return View::make('pages.login');
     }
 
@@ -251,7 +318,7 @@ class HomeController extends BaseController {
                 $newLease->expiry = $lease['expiry'];
                 $newLease->save();
             }
-            else 
+            else
             {
                 $result=$this->createLease($lease);
                 if(!$result)
@@ -262,7 +329,7 @@ class HomeController extends BaseController {
                 }
                 $lease=Lease::create($lease);
             }
-            
+
             $this->NotificationMail($lease, TRUE);
             return Redirect::to("/manage/$group_id")
                         ->with('message', "Lease created successfully!");
