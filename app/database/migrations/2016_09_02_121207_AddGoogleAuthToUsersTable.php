@@ -12,13 +12,15 @@ class AddGoogleAuthToUsersTable extends Migration {
 	 */
 	public function up()
 	{
-        Schema::table('users', function($table)
+        Schema::table('users', function(Blueprint $table)
         {
             // Google Auth related
             $table->string('google_id', 250)->default('');
             $table->string('email', 250)->default('');
             $table->string('access_token', 250)->default('');
         });
+
+        DB::statement("ALTER TABLE `users` MODIFY COLUMN `username` VARCHAR (255) NULL");
 	}
 
 	/**
@@ -28,12 +30,14 @@ class AddGoogleAuthToUsersTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::table('users', function($table)
+		Schema::table('users', function(Blueprint $table)
         {
             $table->dropColumn('google_id');
             $table->dropColumn('email');
             $table->dropColumn('access_token');
         });
+
+        DB::statement("ALTER TABLE `users` MODIFY COLUMN `username` VARCHAR (255) NOT NULL");
 	}
 
 }

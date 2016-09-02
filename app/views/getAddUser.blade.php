@@ -15,27 +15,15 @@
 	        @endif
 	        <form class="form-horizontal" role="form" action="" method="POST">
 			  <div class="form-group">
-			    <label for="username" class="col-sm-4 control-label">Username</label>
+			    <label for="email" class="col-sm-4 control-label">Email</label>
 			    <div class="col-sm-6">
-			      <input type="text" class="form-control" name="username" placeholder="Username" required>
+			      <input type="text" class="form-control" name="email" placeholder="Email" required>
 			    </div>
 			  </div>
 			  <div class="form-group">
 			    <label for="Full Name" class="col-sm-4 control-label">Full Name</label>
 			    <div class="col-sm-6">
 			      <input type="text" class="form-control" name="name" placeholder="Name" required>
-			    </div>
-			  </div>
-			  <div class="form-group">
-			    <label for="password" class="col-sm-4 control-label">Password</label>
-			    <div class="col-sm-6">
-			      <input type="password" class="form-control" name="password" placeholder="Password" required>
-			    </div>
-			  </div>
-			  <div class="form-group">
-			    <label for="password_confirmation" class="col-sm-4 control-label">Confirm Password</label>
-			    <div class="col-sm-6">
-			      <input type="password" class="form-control" name="password_confirmation" placeholder="New Password" required>
 			    </div>
 			  </div>
 			  <div class="form-group">

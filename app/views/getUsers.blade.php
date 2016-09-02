@@ -2,12 +2,12 @@
 
 @section('content')
      <div class="row">
-        <div class="col-md-6 col-md-offset-3 modal-outer noPad">
+        <div class="col-md-12 modal-outer noPad">
 	        <h2>Site Users</h2>
 	        <table class="table table-hover table-bordered">
 		    <thead>
 		        <tr>
-		        <th>Username</th>
+		        <th>Email</th>
 		        <th>Name</th>
 		        <th>Role</th>
 		        <th>Active Self Leases</th>
@@ -23,7 +23,7 @@
 		    <tbody>
 		     	@foreach($users as $user)
 		      	<tr>
-		       		<td>{{{$user->username}}}</td>
+		       		<td>{{{$user->email}}}</td>
 		       		<td>{{{$user->name}}}</td>
 		       		<td>
 		       		@if($user->admin)
