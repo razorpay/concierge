@@ -15,11 +15,6 @@ class CreateUsersTable extends Migration {
         Schema::create('users', function(Blueprint $table) {
             $table->increments('id');
 
-            // Google Auth related
-            $table->string('google_id', 250)->default('');
-            $table->string('email', 250)->default('');
-            $table->string('access_token', 250)->default('');
-
             $table->string('name');
             $table->string('username')->unique();
             $table->string('password');
