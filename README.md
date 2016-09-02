@@ -36,6 +36,7 @@ chmod -R o+wx app/storage/
 	  ]
 	}
 ```
+* Create `bootstrap/env.php` with your environment (`local` for dev).
 * Copy `env.sample.php` to `.env.[production|local].php` and add your google auth client id/secret.
 * Copy the `app/config/custom_config.sample.php` to `app/config/custom_config.php` and modify appropriately.
 * Copy `app/config/database.sample.php` to `app/config/database.php` and update the password.

@@ -2,6 +2,7 @@
 /bootstrap/env.php
 /vendor
 .env.*.php
+!.env.sample.php
 .env.php
 .DS_Store
 Thumbs.db
