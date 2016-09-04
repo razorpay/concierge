@@ -121,6 +121,7 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		'Aws\Laravel\AwsServiceProvider',
 		'Schuppo\PasswordStrength\PasswordStrengthServiceProvider',
+		'Artdarek\OAuth\OAuthServiceProvider',
 
 	),
 
@@ -188,6 +189,7 @@ return array(
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
 		'AWS'             => 'Aws\Laravel\AwsFacade',
+		'OAuth'           => 'Artdarek\OAuth\Facade\OAuth',
 
 	),
 

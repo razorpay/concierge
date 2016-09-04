@@ -15,15 +15,15 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 	protected $gaurded = array('id');
 
 	//Editable fields
-	protected $fillable = array('username', 'name', 'password', 'admin');
-	
+	protected $fillable = array('google_id', 'email', 'access_token', 'username', 'name', 'password', 'admin');
+
 	/**
 	 * The attributes excluded from the model's JSON form.
 	 *
 	 * @var array
 	 */
 	protected $hidden = array('password');
-	
+
 	/**
 	 * Get the unique identifier for the user.
 	 *
@@ -103,7 +103,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
     public function invites()
     {
         return $this->hasMany('Invite');
-        
+
     }
 
     /**
@@ -157,7 +157,7 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 			return $invites;
 	    }
 
-        
+
     }
 
     /**
@@ -197,6 +197,6 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 			return $leases;
 	    }
 
-        
+
     }
 }
