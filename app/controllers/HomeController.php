@@ -56,7 +56,7 @@ class HomeController extends BaseController {
 			// - Belong to razorpay.com domain
 			//
 			// Then only we'll create a user entry in the system or check for one
-			if (!$result->verified_email || explode('@', $result->email)[1] !== $_ENV['company_domain']) return App::abort(404);
+			if (!$result->verified_email || !checkEmailDomain($result->email)) return App::abort(404);
 
 			// Find the user by email
 			$user = User::where('email', $result->email)->first();
@@ -561,7 +561,9 @@ class HomeController extends BaseController {
      */
     public function getAddUser()
     {
-        return View::make('getAddUser');
+		$user = new User;
+
+        return View::make('getAddUser', compact('user'));
     }
 
     /*
@@ -572,11 +574,13 @@ class HomeController extends BaseController {
         $input = Input::all();
         //Validation Rules
         $user_rules = array(
-        'email'              => 'required|between:2,50|email|unique:users',
+        'email'              => 'required|between:2,50|email|unique:users|razorpay_email',
         'name'                  => 'required|between:3,100|alpha_spaces',
         'admin'                 => 'required|in:1,0');
 
-        $validator = Validator::make($input,$user_rules);
+        $validator = Validator::make($input, $user_rules, array(
+			'razorpay_email' => 'Only razorpay.com emails allowed'
+		));
         if ($validator->fails())
         {
              return Redirect::to('/users/add')
@@ -592,6 +596,41 @@ class HomeController extends BaseController {
         }
 
     }
+
+	public function getEditUser($id)
+	{
+		$user = User::find($id);
+
+		return View::make('getAddUser', compact('user'));
+	}
+
+	public function postEditUser($id)
+	{
+
+		$input = Input::all();
+
+		//Validation Rules
+        $user_rules = array(
+			'email'              => "required|between:2,50|email|unique:users,email,$id|razorpay_email",
+			'name'               => 'required|between:3,100|alpha_spaces',
+			'admin'              => 'required|in:1,0'
+		);
+
+        $validator = Validator::make($input, $user_rules, array(
+			'razorpay_email' => 'Only razorpay.com emails allowed'
+		));
+
+        if ($validator->fails())
+        {
+			return Redirect::to("/user/$id/edit")->with('errors', $validator->messages()->toArray());
+        }
+        else
+        {
+            User::find($id)->update($input);
+
+            return Redirect::to('/users')->with('message', "User Saved Successfully" );
+        }
+	}
 
 
     /*
