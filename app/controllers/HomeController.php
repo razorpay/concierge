@@ -1,5 +1,7 @@
 <?php
+
 use LaravelDuo\LaravelDuo;
+use Artdarek\OAuth\Facade\OAuth;
 
 class HomeController extends BaseController {
 
@@ -28,6 +30,56 @@ class HomeController extends BaseController {
      */
     public function getIndex()
     {
+		/*
+			Google Auth Logic
+		*/
+
+		$code = Input::get('code');
+
+		$google_service = OAuth::consumer('Google');
+
+		if (!$code)
+		{
+			$url = $google_service->getAuthorizationUri();
+
+			return Redirect::to((string) $url);
+		}
+		else
+		{
+			$token = $google_service->requestAccessToken($code);
+
+			$response = $google_service->request(Config::get('oauth-4-laravel.userinfo_url'));
+			$result = json_decode($response);
+
+			// Email must be:
+			// - Verified
+			// - Belong to razorpay.com domain
+			//
+			// Then only we'll create a user entry in the system or check for one
+			if (!$result->verified_email || !checkEmailDomain($result->email)) return App::abort(404);
+
+			// Find the user by email
+			$user = User::where('email', $result->email)->first();
+
+			if ($user)
+			{
+				// Update some fields
+				$user->access_token = $token->getAccessToken();
+				$user->google_id = $result->id;
+				$user->password = ''; // backward compatibility
+
+				$user->save();
+
+				// Login the user into the app
+				Auth::loginUsingId($user->id);
+			}
+
+			// whether logged in or not, just redirect
+			return Redirect::to('/');
+		}
+
+		// This won't be rendered anymore, will remove once
+		// Google auth is working well on production
         return View::make('pages.login');
     }
 
@@ -251,7 +303,7 @@ class HomeController extends BaseController {
                 $newLease->expiry = $lease['expiry'];
                 $newLease->save();
             }
-            else 
+            else
             {
                 $result=$this->createLease($lease);
                 if(!$result)
@@ -262,7 +314,7 @@ class HomeController extends BaseController {
                 }
                 $lease=Lease::create($lease);
             }
-            
+
             $this->NotificationMail($lease, TRUE);
             return Redirect::to("/manage/$group_id")
                         ->with('message', "Lease created successfully!");
@@ -462,60 +514,6 @@ class HomeController extends BaseController {
     }
 
     /*
-     * Returns the form for changing Password
-     */
-    public function getPassword()
-    {
-        return View::make('getPassword');
-    }
-
-    /*
-     * Handles the form submission for changing Password
-     */
-    public function postPassword()
-    {
-        $input=Input::all();
-        $user = array(
-            'username' => Auth::user()->username,
-            'password' => $input['old_password']
-        );
-
-        /**
-         * Validate the user details to check old password
-         */
-        if(! Auth::validate($user))
-        {
-            return Redirect::to('/password')
-                            ->with('message', "Incorrect Password");
-        }
-
-        //Validation Rules
-        $password_rules = array(
-        'password'              => 'required|between:7,50|confirmed|case_diff|numbers|letters',
-        'password_confirmation' => 'required|between:7,50');
-
-        $validator = Validator::make($input,$password_rules);
-
-        if ($validator->fails())
-        {
-             return Redirect::to('/password')
-                            ->with('message', implode("<br/>", $validator->messages()->get('password')));
-        }
-
-        //Everything Good. Change the password
-        $password = array(
-            'password' => Hash::make($input['password'])
-        );
-
-        $result = Auth::user()->update($password);
-
-        return Redirect::to('/password')
-                            ->with('message', "Password Changed Successfully");
-
-
-    }
-
-    /*
      * Handles Guest Access for lease invites
      */
     public function getInvite($token)
@@ -563,7 +561,9 @@ class HomeController extends BaseController {
      */
     public function getAddUser()
     {
-        return View::make('getAddUser');
+		$user = new User;
+
+        return View::make('getAddUser', compact('user'));
     }
 
     /*
@@ -571,16 +571,16 @@ class HomeController extends BaseController {
      */
     public function postAddUser()
     {
-        $input=Input::all();
+        $input = Input::all();
         //Validation Rules
         $user_rules = array(
-        'username'              => 'required|between:2,50|alpha_dash|unique:users',
+        'email'              => 'required|between:2,50|email|unique:users|razorpay_email',
         'name'                  => 'required|between:3,100|alpha_spaces',
-        'password'              => 'required|between:7,50|confirmed|numbers|letters',
-        'password_confirmation' => 'required|between:7,50',
         'admin'                 => 'required|in:1,0');
 
-        $validator = Validator::make($input,$user_rules);
+        $validator = Validator::make($input, $user_rules, array(
+			'razorpay_email' => 'Only razorpay.com emails allowed'
+		));
         if ($validator->fails())
         {
              return Redirect::to('/users/add')
@@ -588,8 +588,7 @@ class HomeController extends BaseController {
         }
         else
         {
-            $input['password'] = Hash::make($input['password']);
-
+			$input['password'] = ''; // Backward compatible
             User::create($input);
 
             return Redirect::to('/users')
@@ -597,6 +596,41 @@ class HomeController extends BaseController {
         }
 
     }
+
+	public function getEditUser($id)
+	{
+		$user = User::find($id);
+
+		return View::make('getAddUser', compact('user'));
+	}
+
+	public function postEditUser($id)
+	{
+
+		$input = Input::all();
+
+		//Validation Rules
+        $user_rules = array(
+			'email'              => "required|between:2,50|email|unique:users,email,$id|razorpay_email",
+			'name'               => 'required|between:3,100|alpha_spaces',
+			'admin'              => 'required|in:1,0'
+		);
+
+        $validator = Validator::make($input, $user_rules, array(
+			'razorpay_email' => 'Only razorpay.com emails allowed'
+		));
+
+        if ($validator->fails())
+        {
+			return Redirect::to("/user/$id/edit")->with('errors', $validator->messages()->toArray());
+        }
+        else
+        {
+            User::find($id)->update($input);
+
+            return Redirect::to('/users')->with('message', "User Saved Successfully" );
+        }
+	}
 
 
     /*

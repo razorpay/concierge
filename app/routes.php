@@ -42,6 +42,10 @@ Route::group(array('before' => 'auth|admin'), function()
 
 	Route::post('/users/add', array('before'=>'csrf', 'uses'=> 'HomeController@postAddUser'));
 
+    Route::get('/user/{id}/edit', 'HomeController@getEditUser');
+
+    Route::post('/user/{id}/edit', 'HomeController@postEditUser');
+
 });
 
 //Routes for non-logged in user
