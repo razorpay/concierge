@@ -30,10 +30,10 @@
 			    <label for="admin" class="col-sm-4 control-label">Role</label>
 			    <div class="col-sm-6">
 			    <label class="radio-inline">
-			      <input type="radio" name="admin" value="0" checked>Standard User
+			      <input type="radio" name="admin" value="0" {{ $user->admin ? '' : 'checked' }}>Standard User
 			    </label>
 			    <label class="radio-inline">
-			      <input type="radio" name="admin" value="1" >Admin User
+			      <input type="radio" name="admin" value="1" {{ $user->admin ? 'checked' : '' }}>Admin User
 			    </label>
 			    </div>
 			  </div>
