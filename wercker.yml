@@ -7,26 +7,26 @@ build:
           name: install dependencies
           code: composer install --no-interaction
     after-steps:
-      - williamli/slack-notify-no-owner-info:
-          subdomain: razorpay
-          token: $SLACK_TOKEN
+      - slack-notifier:
+          url: $SLACK_URL
           channel: tech_bots
+          username: wercker
+          icon_url: https://cdn.rawgit.com/wantedly/step-pretty-slack-notify/master/icons/$WERCKER_RESULT.jpg
 deploy:
     steps:
       - script:
           name: Change to production mode
           code: sed -i "/'debug'/c\ 'debug' => false," app/config/app.php
-
       - nhuray/aws-code-deploy:
-            key: $AWS_KEY
-            secret: $AWS_SECRET
-            region: $AWS_REGION
-            application-name: concierge
-            deployment-group-name: $WERCKER_DEPLOYTARGET_NAME
-            s3-bucket: rzp-codedeploy
-
+          key: $AWS_KEY
+          secret: $AWS_SECRET
+          region: $AWS_REGION
+          application-name: concierge
+          deployment-group-name: $WERCKER_DEPLOYTARGET_NAME
+          s3-bucket: rzp-code-deploy
     after-steps:
-      - williamli/slack-notify-no-owner-info:
-          subdomain: razorpay
-          token: $SLACK_TOKEN
+      - slack-notifier:
+          url: $SLACK_URL
           channel: tech_bots
+          username: wercker
+          icon_url: https://cdn.rawgit.com/wantedly/step-pretty-slack-notify/master/icons/$WERCKER_RESULT.jpg
