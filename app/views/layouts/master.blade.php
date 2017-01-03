@@ -49,7 +49,7 @@
                 <!-- Collect the nav links, forms, and other content for toggling -->
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                   <ul class="nav navbar-nav navbar-right">
-                    <li><p class="navbar-text">Signed in as {{{Auth::user()->username}}}</p></li>
+                    <li><p class="navbar-text">Signed in as {{{Auth::user()->name}}}</p></li>
                     @if(Auth::user()->admin)
                     <li><a href="{{ URL::to('/users')}}">Manage Users</a></li>
                     @endif
