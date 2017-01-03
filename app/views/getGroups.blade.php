@@ -21,7 +21,7 @@
 		    <tbody>
 		     	@foreach($leases as $lease)
 		      	<tr>
-		       		<td>{{{$lease->user->username}}}</td>
+		       		<td>{{{$lease->user->name}}}</td>
 		       		<td>{{{$lease->lease_ip}}}</td>
 		       		<td><a href="/manage/{{{$lease->group_id}}}">{{{$lease->group_id}}}</a></td>
 		       		<td>{{{$lease->protocol}}}</td>
