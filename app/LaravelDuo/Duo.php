@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelDuo;
+namespace App\LaravelDuo;
 
 /**
  * Class Duo from https://github.com/duosecurity/duo_php/blob/master/duo_web.php
