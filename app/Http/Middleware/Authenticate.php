@@ -38,7 +38,9 @@ class Authenticate {
     {
         if ($this->auth->guest())
         {
-            return response('Unauthorized.', 401);
+            return redirect('/');
         }
+
+        return $next($request);
     }
 }

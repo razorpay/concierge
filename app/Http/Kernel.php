@@ -36,7 +36,6 @@ class Kernel extends HttpKernel {
      * @var array
      */
     protected $routeMiddleware = [
-        // \Illuminate\Cookie\Middleware\EncryptCookies::class,
         'auth'          => 'App\Http\Middleware\Authenticate',
     ];
 
