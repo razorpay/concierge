@@ -2,19 +2,20 @@
 
 namespace App\LaravelDuo;
 
-class LaravelDuo extends Duo
-{
+use Duo\Web as DuoWeb;
 
+class LaravelDuo extends DuoWeb
+{
     private $_AKEY;
     private $_IKEY;
     private $_SKEY;
     private $_HOST;
 
     public function __construct() {
-        $this->_AKEY = \Config::get('custom_config.duo_akey');
-        $this->_IKEY = \Config::get('custom_config.duo_ikey');
-        $this->_SKEY = \Config::get('custom_config.duo_skey');
-        $this->_HOST = \Config::get('custom_config.duo_host');
+        $this->_AKEY = config('custom_config.duo_akey');
+        $this->_IKEY = config('custom_config.duo_ikey');
+        $this->_SKEY = config('custom_config.duo_skey');
+        $this->_HOST = config('custom_config.duo_host');
     }
 
     public function get_akey()
