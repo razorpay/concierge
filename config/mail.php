@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => Config::get('custom_config.mail_from_email'), 'name' => Config::get('custom_config.mail_from_name')),
+	'from' => array('address' => config('custom_config.mail_from_email'), 'name' => config('custom_config.mail_from_name')),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -118,7 +118,7 @@ return array(
 	| you may inspect the message. This is great for local development.
 	|
 	*/
-    
-	'pretend' => Config::get('custom_config.mail_pretend'),
+
+	'pretend' => config('custom_config.mail_pretend'),
 
 );

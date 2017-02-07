@@ -21,8 +21,8 @@ return array(
          * Google
          */
         'Google' => array(
-            'client_id'     => $_ENV['google_client_id'],
-            'client_secret' => $_ENV['google_client_secret'],
+            'client_id'     => env('google_client_id'),
+            'client_secret' => env('google_client_secret'),
             'scope'         => array('userinfo_email', 'userinfo_profile'),
         ),
 

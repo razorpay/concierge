@@ -32,8 +32,8 @@ return array(
     |
     */
 
-    'key'    => Config::get('custom_config.aws_key'),
-    'secret' => Config::get('custom_config.aws_secret'),
+    'key'    => config('custom_config.aws_key'),
+    'secret' => config('custom_config.aws_secret'),
 
     /*
     |--------------------------------------------------------------------------
@@ -48,7 +48,7 @@ return array(
     | eu-west-1, sa-east-1, ap-northeast-1, ap-southeast-1, ap-southeast-2
     |
     */
-    'region' => Config::get('custom_config.aws_region'),
+    'region' => config('custom_config.aws_region'),
 
     /*
     |--------------------------------------------------------------------------

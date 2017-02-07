@@ -2,8 +2,11 @@
 
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\Reminders\RemindableInterface;
+use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
 class User extends Eloquent implements UserInterface, RemindableInterface {
+
+    use SoftDeletingTrait;
 
 	/**
 	 * The database table used by the model.
@@ -16,6 +19,8 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 
 	//Editable fields
 	protected $fillable = array('google_id', 'email', 'access_token', 'username', 'name', 'password', 'admin');
+
+    protected $dates  = ['created_at', 'updated_at', 'deleted_at'];
 
 	/**
 	 * The attributes excluded from the model's JSON form.

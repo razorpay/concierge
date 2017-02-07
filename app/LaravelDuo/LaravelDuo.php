@@ -1,5 +1,7 @@
-<?php 
+<?php
+
 namespace LaravelDuo;
+
 class LaravelDuo extends Duo
 {
 
@@ -35,4 +37,4 @@ class LaravelDuo extends Duo
         return $this->_HOST;
     }
 
-} 
+}
