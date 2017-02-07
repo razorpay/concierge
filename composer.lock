@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "268d2e23e803ff554dea14a45981675b",
+    "content-hash": "03b250100f942c698936fa30180c7977",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -295,6 +295,39 @@
                 "string"
             ],
             "time": "2015-11-06T14:35:42+00:00"
+        },
+        {
+            "name": "duosecurity/duo_php",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/duosecurity/duo_php.git",
+                "reference": "f74f48ab4e4bf7e5a571c255fb18401016ca43f3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/duosecurity/duo_php/zipball/f74f48ab4e4bf7e5a571c255fb18401016ca43f3",
+                "reference": "f74f48ab4e4bf7e5a571c255fb18401016ca43f3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~5.1",
+                "satooshi/php-coveralls": "dev-master",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Duo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "A PHP implementation of the Duo Web SDK.",
+            "homepage": "https://duo.com/",
+            "time": "2016-08-05T12:37:41+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -2463,7 +2496,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "oriceon/oauth-5-laravel": 20
+        "oriceon/oauth-5-laravel": 20,
+        "duosecurity/duo_php": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
