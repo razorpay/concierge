@@ -8,7 +8,7 @@
 
             <div class="col-md-6 col-md-offset-3">
 
-                {{ HTML::script('assets/js/Duo-Web-v1.bundled.min.js') }}
+                <script src="assets/js/Duo-Web-v1.bundled.min.js"></script>
 
                 <script>
                     Duo.init({

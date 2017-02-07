@@ -18,7 +18,7 @@ class Lease extends Model
     // Lease __belongs_to__ User
     public function user()
     {
-        return $this->belongsTo('User');
+        return $this->belongsTo('App\Models\User');
     }
 
     /*
