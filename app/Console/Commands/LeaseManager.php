@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Http\Controllers\HomeController;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -30,7 +31,7 @@ class LeaseManager extends Command {
      */
     public function handle()
     {
-        $home_controller=new HomeController(new LaravelDuo\LaravelDuo);
+        $home_controller=new HomeController;
         $cleaner = $home_controller->cleanLeases();
         if($cleaner) $this->info($cleaner);
     }

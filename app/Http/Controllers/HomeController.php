@@ -31,11 +31,6 @@ class HomeController extends BaseController
 	*/
     private $_laravelDuo;
 
-    function __construct(LaravelDuo $laravelDuo)
-    {
-        $this->_laravelDuo = $laravelDuo;
-    }
-
     /**
      * Stage One - The Login form
      * @return  Login View
