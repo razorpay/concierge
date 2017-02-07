@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App;
+use Auth;
 use OAuth;
 use Request;
+use App\Models;
 use App\LaravelDuo\LaravelDuo;
 
 class HomeController extends BaseController
@@ -65,7 +67,7 @@ class HomeController extends BaseController
             }
 
 			// Find the user by email
-			$user = User::where('email', $result->email)->first();
+			$user = Models\User::where('email', $result->email)->first();
 
 			if ($user)
 			{
@@ -83,10 +85,6 @@ class HomeController extends BaseController
 			// whether logged in or not, just redirect
 			return Redirect::to('/');
 		}
-
-		// This won't be rendered anymore, will remove once
-		// Google auth is working well on production
-        return View::make('pages.login');
     }
 
     /**
@@ -144,7 +142,7 @@ class HomeController extends BaseController
             /**
              * Get the id of the authenticated user from their email address
              */
-            $id = User::getIdFromUsername($U);
+            $id = Models\User::getIdFromUsername($U);
 
             /**
              * Log the user in by their ID
@@ -584,7 +582,7 @@ class HomeController extends BaseController
      */
     public function getUsers()
     {
-        $users=User::get();
+        $users = Models\User::get();
         return View::make('getUsers')
                     ->with('users', $users);
     }
@@ -594,7 +592,7 @@ class HomeController extends BaseController
      */
     public function getAddUser()
     {
-		$user = new User;
+		$user = new Models\User;
 
         return View::make('getAddUser', compact('user'));
     }
@@ -632,7 +630,7 @@ class HomeController extends BaseController
 
 	public function getEditUser($id)
 	{
-		$user = User::find($id);
+		$user = Models\User::find($id);
 
 		return View::make('getAddUser', compact('user'));
 	}
@@ -659,7 +657,7 @@ class HomeController extends BaseController
         }
         else
         {
-            User::find($id)->update($input);
+            Models\User::find($id)->update($input);
 
             return Redirect::to('/users')->with('message', "User Saved Successfully" );
         }
@@ -671,13 +669,13 @@ class HomeController extends BaseController
      */
     public function postUsers()
     {
-        $input=Request::all();
-        $message=NULL;
+        $input = Request::all();
+        $message = NULL;
 
         if(!isset($input['user_id'])) App::abort(403, 'Unauthorized action.');
         try
         {
-            $user=User::findorfail($input['user_id']);
+            $user = Models\User::findorfail($input['user_id']);
         }
         catch(Exception $e)
         {
@@ -709,7 +707,7 @@ class HomeController extends BaseController
 
     private function NotificationMail($lease, $mode)
     {
-        $data=array('lease'=>$lease->toArray(), 'mode'=>$mode);
+        $data = array('lease'=>$lease->toArray(), 'mode'=>$mode);
 
         if($mode)
         {

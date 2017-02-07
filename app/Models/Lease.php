@@ -1,6 +1,10 @@
 <?php
 
-class Lease extends Eloquent
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Lease extends Model
 {
     use \Illuminate\Database\Eloquent\SoftDeletes;
 

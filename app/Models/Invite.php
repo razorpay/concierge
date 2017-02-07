@@ -1,6 +1,10 @@
 <?php
 
-class Invite extends Eloquent
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Invite extends Model
 {
     use \Illuminate\Database\Eloquent\SoftDeletes;
 
