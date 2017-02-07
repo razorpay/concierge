@@ -12,7 +12,7 @@
 */
 
 //Routes for logged in user
-Route::group(array('before' => 'auth'), function()
+Route::group(['middleware' => 'auth'], function()
 {
     Route::get('/groups', 'HomeController@getGroups');
 

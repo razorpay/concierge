@@ -78,10 +78,13 @@ class HomeController extends BaseController
 
 				// Login the user into the app
 				Auth::loginUsingId($user->id);
-			}
 
-			// whether logged in or not, just redirect
-			return Redirect::to('/');
+                return redirect('/groups');
+			}
+            else
+            {
+                App::abort(401);
+            }
 		}
     }
 
@@ -114,7 +117,7 @@ class HomeController extends BaseController
         }
         else
         {
-            return Redirect::to('/')->with('message', 'Your username and/or password was incorrect')->withInput();
+            return redirect('/')->with('message', 'Your username and/or password was incorrect')->withInput();
         }
 
     }
@@ -152,14 +155,14 @@ class HomeController extends BaseController
              */
             if(Auth::check())
             {
-                return Redirect::to('/');
+                return redirect('/');
             }
         }
 
         /**
          * Otherwise, Auth failed, redirect to homepage with message
          */
-        return Redirect::to('/')->with('message', 'Unable to authenticate you.');
+        return redirect('/')->with('message', 'Unable to authenticate you.');
 
     }
 
@@ -170,7 +173,7 @@ class HomeController extends BaseController
     public function getLogout()
     {
         Auth::logout();
-        return Redirect::to('/');
+        return redirect('/');
     }
 
 	/**
@@ -276,7 +279,7 @@ class HomeController extends BaseController
         //Validation fails
         if(!empty($messages))
         {
-            return Redirect::to("/manage/$group_id")
+            return redirect("/manage/$group_id")
                             ->with('message', implode("<br/>", $messages));
         }
 
@@ -311,14 +314,14 @@ class HomeController extends BaseController
                 if(!$result)
                 {
                     //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocol, port already exists on AWS.
-                    return Redirect::to("/manage/$group_id")
+                    return redirect("/manage/$group_id")
                                     ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
                 }
                 $lease=Lease::create($lease);
             }
 
             $this->NotificationMail($lease, TRUE);
-            return Redirect::to("/manage/$group_id")
+            return redirect("/manage/$group_id")
                         ->with('message', "Lease created successfully!");
         }
         elseif(2==$input['access'])
@@ -350,7 +353,7 @@ class HomeController extends BaseController
             {
                 $message->to($email, 'Invite' )->subject('Access Lease Invite');
             });
-            return Redirect::to("/manage/$group_id")
+            return redirect("/manage/$group_id")
                            ->with('message', "Invite Sent successfully!");
 
         }
@@ -360,63 +363,10 @@ class HomeController extends BaseController
         }
     }
 
-    public function postRenew($group_id)
-    {
-        // $input = Request::all();
-        // if (isset($input['invite_id']))
-        // {
-        //     try
-        //     {
-        //         $invite = Invite::findorfail($input['invite_id']);
-        //     } catch (Exception $e) {
-        //         $message="Invite not found";
-        //         return Redirect::to("/manage/$group_id")->with('message', $message);
-        //     }
-        // }
-        // else if (isset($input['lease_id']))
-        // {
-        //     // Check for existence of lease
-        //     try
-        //     {
-        //         $lease=Lease::findorFail($input['lease_id']);
-        //     }
-        //     catch(Exception $e)
-        //     {
-        //         $message="Lease not found";
-        //         return Redirect::to("/manage/$group_id")->with('message', $message);
-        //     }
-        //     // Terminate the lease on AWS
-        //     $result=$this->terminateLease($lease->toArray());
-        //     //Delete from DB
-        //     $lease->delete();
-        //     $lease = $lease->toArray();
-        //     $this->NotificationMail($lease, FALSE);
-
-        //     if(!$result)
-        //     {
-        //         //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
-        //         return Redirect::to("/manage/$group_id")
-        //                         ->with('message', "Lease Termination returned error. Assumed the lease was already deleted");
-        //     }
-
-        //     $result=$this->createLease($lease);
-        //     if(!$result)
-        //     {
-        //         //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocol, port already exists on AWS.
-        //         return Redirect::to("/manage/$group_id")
-        //                         ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
-        //     }
-        //     $lease=Lease::create($lease);
-        //     $this->NotificationMail($lease, TRUE);
-        //     return Redirect::to("/manage/$group_id")
-        //                 ->with('message', "Lease renewed successfully!");
-        // }
-    }
-
-     /*
-     * Terminates the active leases & invites
-     * @return getManage View
-     */
+    /*
+      * Terminates the active leases & invites
+      * @return getManage View
+    */
     public function postTerminate($group_id)
     {
         $input=Request::all();
@@ -431,10 +381,10 @@ class HomeController extends BaseController
             catch(Exception $e)
             {
                 $message="Invite not found";
-                return Redirect::to("/manage/$group_id")->with('message', $message);
+                return redirect("/manage/$group_id")->with('message', $message);
             }
             $invite->delete();
-            return Redirect::to("/manage/$group_id")
+            return redirect("/manage/$group_id")
                                 ->with('message', "Invite terminated successfully");
         }
         elseif(isset($input['lease_id']))
@@ -448,7 +398,7 @@ class HomeController extends BaseController
             catch(Exception $e)
             {
                 $message="Lease not found";
-                return Redirect::to("/manage/$group_id")->with('message', $message);
+                return redirect("/manage/$group_id")->with('message', $message);
             }
             // Terminate the lease on AWS
             $result=$this->terminateLease($lease->toArray());
@@ -459,10 +409,10 @@ class HomeController extends BaseController
             if(!$result)
             {
                 //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
-                return Redirect::to("/manage/$group_id")
+                return redirect("/manage/$group_id")
                                 ->with('message', "Lease Termination returned error. Assumed the lease was already deleted");
             }
-            return Redirect::to("/manage/$group_id")
+            return redirect("/manage/$group_id")
                                 ->with('message', "Lease terminated successfully");
         }
         else
@@ -585,7 +535,7 @@ class HomeController extends BaseController
 		));
         if ($validator->fails())
         {
-             return Redirect::to('/users/add')
+             return redirect('/users/add')
                             ->with('errors', $validator->messages()->toArray() );
         }
         else
@@ -593,7 +543,7 @@ class HomeController extends BaseController
 			$input['password'] = ''; // Backward compatible
             User::create($input);
 
-            return Redirect::to('/users')
+            return redirect('/users')
                             ->with('message', "User Added Successfully" );
         }
 
@@ -624,13 +574,13 @@ class HomeController extends BaseController
 
         if ($validator->fails())
         {
-			return Redirect::to("/user/$id/edit")->with('errors', $validator->messages()->toArray());
+			return redirect("/user/$id/edit")->with('errors', $validator->messages()->toArray());
         }
         else
         {
             Models\User::find($id)->update($input);
 
-            return Redirect::to('/users')->with('message', "User Saved Successfully" );
+            return redirect('/users')->with('message', "User Saved Successfully" );
         }
 	}
 
@@ -651,7 +601,7 @@ class HomeController extends BaseController
         catch(Exception $e)
         {
             //User not found
-            return Redirect::to('/users')
+            return redirect('/users')
                     ->with('message', "Invalid User");
         }
 
@@ -665,7 +615,7 @@ class HomeController extends BaseController
             $deleted=$user->delete();
             $message="User Deleted Successfully";
         }
-        return Redirect::to('/users')
+        return redirect('/users')
                     ->with('message', $message);
     }
 
