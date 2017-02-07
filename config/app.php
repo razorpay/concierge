@@ -39,7 +39,7 @@ return array(
     |
     */
 
-    'url' => env('BASE_URL', 'https://dashboard.razorpay.com'),
+    'url' => env('BASE_URL', 'https://ac.razorpay.com'),
 
     /*
     |--------------------------------------------------------------------------
@@ -126,6 +126,7 @@ return array(
         /*
          * Laravel Framework Service Providers...
          */
+        Artdarek\OAuth\OAuthServiceProvider::class,
         Illuminate\Foundation\Providers\ArtisanServiceProvider::class,
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
@@ -149,8 +150,8 @@ return array(
         Illuminate\View\ViewServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Aws\Laravel\AwsServiceProvider::class,
-        Artdarek\OAuth\OAuthServiceProvider::class,
         Schuppo\PasswordStrength\PasswordStrengthServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,
     ],
 
     /*
