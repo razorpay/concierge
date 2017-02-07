@@ -1,6 +1,6 @@
 <?php
 
-use LaravelDuo\LaravelDuo;
+use App\LaravelDuo\LaravelDuo;
 use Artdarek\OAuth\Facade\OAuth;
 
 class HomeController extends BaseController

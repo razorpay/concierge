@@ -1,6 +1,6 @@
 <?php
 
-namespace LaravelDuo;
+namespace App\LaravelDuo;
 
 class LaravelDuo extends Duo
 {
