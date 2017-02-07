@@ -1,7 +1,10 @@
 <?php
 
+namespace App\Http\Controllers;
+
+use OAuth;
+use Request;
 use App\LaravelDuo\LaravelDuo;
-use Artdarek\OAuth\Facade\OAuth;
 
 class HomeController extends BaseController
 {
@@ -20,7 +23,7 @@ class HomeController extends BaseController
 	|	Route::get('/', 'HomeController@showWelcome');
 	|
 	*/
-        private $_laravelDuo;
+    private $_laravelDuo;
 
     function __construct(LaravelDuo $laravelDuo)
     {
@@ -33,11 +36,7 @@ class HomeController extends BaseController
      */
     public function getIndex()
     {
-		/*
-			Google Auth Logic
-		*/
-
-		$code = Input::get('code');
+		$code = Request::get('code');
 
 		$google_service = OAuth::consumer('Google');
 
@@ -45,13 +44,13 @@ class HomeController extends BaseController
 		{
 			$url = $google_service->getAuthorizationUri();
 
-			return Redirect::to((string) $url);
+			return redirect((string) $url);
 		}
 		else
 		{
 			$token = $google_service->requestAccessToken($code);
 
-			$response = $google_service->request(Config::get('oauth-4-laravel.userinfo_url'));
+			$response = $google_service->request(config('oauth-5-laravel.userinfo_url'));
 			$result = json_decode($response);
 
 			// Email must be:
@@ -93,8 +92,8 @@ class HomeController extends BaseController
     public function postSignin()
     {
         $user = array(
-            'username' => Input::get('username'),
-            'password' => Input::get('password')
+            'username' => Request::get('username'),
+            'password' => Request::get('password')
         );
 
         /**
@@ -102,7 +101,7 @@ class HomeController extends BaseController
          */
         if(Auth::validate($user))
         {
-            $U    = Input::get('username');
+            $U    = Request::get('username');
 
             $duoinfo = array(
                 'HOST' => $this->_laravelDuo->get_host(),
@@ -229,9 +228,10 @@ class HomeController extends BaseController
      */
     public function postManage($group_id)
     {
-        $input=Input::all();
-        $messages = array();
-        $email = NULL;
+        $input = Request::all();
+        $messages = [];
+        $email = null;
+
         /*
          For Lease Creation
         */
@@ -279,7 +279,7 @@ class HomeController extends BaseController
         //Other validations
         $expiry = $input['expiry'];
 
-        if (!is_numeric($expiry) or $expiry <= 0 || $expiry > self::MAX_EXPIRY)
+        if (!is_numeric($expiry) or $expiry <= 0 or $expiry > self::MAX_EXPIRY)
         {
             array_push($messages, "Invalid Expiry Time");
         }
@@ -389,7 +389,7 @@ class HomeController extends BaseController
 
     public function postRenew($group_id)
     {
-        // $input = Input::all();
+        // $input = Request::all();
         // if (isset($input['invite_id']))
         // {
         //     try
@@ -446,7 +446,7 @@ class HomeController extends BaseController
      */
     public function postTerminate($group_id)
     {
-        $input=Input::all();
+        $input=Request::all();
         if(isset($input['invite_id']))
         {
             //Terminate Invite
@@ -600,7 +600,7 @@ class HomeController extends BaseController
      */
     public function postAddUser()
     {
-        $input = Input::all();
+        $input = Request::all();
         //Validation Rules
         $user_rules = array(
         'email'              => 'required|between:2,50|email|unique:users|razorpay_email',
@@ -636,7 +636,7 @@ class HomeController extends BaseController
 	public function postEditUser($id)
 	{
 
-		$input = Input::all();
+		$input = Request::all();
 
 		//Validation Rules
         $user_rules = array(
@@ -667,7 +667,7 @@ class HomeController extends BaseController
      */
     public function postUsers()
     {
-        $input=Input::all();
+        $input=Request::all();
         $message=NULL;
 
         if(!isset($input['user_id'])) App::abort(403, 'Unauthorized action.');
