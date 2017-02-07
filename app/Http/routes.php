@@ -49,7 +49,7 @@ Route::group(array('before' => ['auth', 'admin']), function()
 });
 
 //Routes for non-logged in user
-Route::group(array(), function()
+Route::group(array('middleware' => 'guest'), function()
 {
     Route::get('/', 'HomeController@getIndex');
 

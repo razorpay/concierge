@@ -34,9 +34,10 @@ class RedirectIfAuthenticated
      */
     public function handle($request, Closure $next)
     {
+        // If already logged in
         if ($this->auth->check())
         {
-            return new RedirectResponse(url('/groups'));
+            return redirect('/groups');
         }
 
         return $next($request);

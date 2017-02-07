@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App;
 use Auth;
+use View;
 use OAuth;
 use Request;
 use App\Models;
@@ -183,20 +184,21 @@ class HomeController extends BaseController
 	public function getGroups()
 	{
         //Get All security groups
-		$ec2 = App::make('aws')->get('ec2');
+		$ec2 = App::make('aws')->createClient('ec2');
 		$security_groups=$ec2->describeSecurityGroups();
 		$security_groups=$security_groups['SecurityGroups'];
 
         //Get all active leases
-        $leases= Lease::get();
+        $leases= Models\Lease::get();
 
         //get all active Invites
-        $invites= Invite::get();
+        $invites= Models\Invite::get();
 
-        return View::make('getGroups')
-                    ->with('security_groups', $security_groups)
-                    ->with('leases', $leases)
-                    ->with('invites', $invites);
+        return view('getGroups', [
+            'security_groups'   => $security_groups,
+            'leases'            => $leases,
+            'invites'           => $invites,
+        ]);
 	}
 
     /*
@@ -214,10 +216,10 @@ class HomeController extends BaseController
 		$security_group=$security_group['SecurityGroups'][0];
 
         //get Active Leases
-        $leases= Lease::getByGroupId($group_id);
+        $leases= Models\Lease::getByGroupId($group_id);
 
         //get Active Invites
-        $invites= Invite::getByGroupId($group_id);
+        $invites= Models\Invite::getByGroupId($group_id);
 
         return View::make('getManage')
                     ->with('security_group', $security_group)
@@ -296,7 +298,7 @@ class HomeController extends BaseController
                 'expiry'=>$expiry,
             );
 
-            $existingLease = Lease::where('lease_ip', '=', $lease['lease_ip'])
+            $existingLease = Models\Lease::where('lease_ip', '=', $lease['lease_ip'])
                                     ->where('group_id', '=', $lease['group_id'])
                                     ->where('protocol', '=', $lease['protocol'])
                                     ->where('port_from', '=', $lease['port_from'])
@@ -317,7 +319,7 @@ class HomeController extends BaseController
                     return redirect("/manage/$group_id")
                                     ->with('message', "Lease Creation Failed! Does a similar lease already exist? Terminate that first.");
                 }
-                $lease=Lease::create($lease);
+                $lease=Models\Lease::create($lease);
             }
 
             $this->NotificationMail($lease, TRUE);
@@ -344,7 +346,7 @@ class HomeController extends BaseController
             'email'=>$email,
             'token'=>$token
         );
-        $invite=Invite::create($invite);
+        $invite=Models\Invite::create($invite);
         if($email && $email!='DEPLOY')
         {
             $data=array('invite'=>$invite->toArray());
@@ -376,7 +378,7 @@ class HomeController extends BaseController
             // Check for existence of invite
             try
             {
-                $invite=Invite::findorFail($input['invite_id']);
+                $invite=Models\Invite::findorFail($input['invite_id']);
             }
             catch(Exception $e)
             {
@@ -393,7 +395,7 @@ class HomeController extends BaseController
             // Check for existence of lease
             try
             {
-                $lease=Lease::findorFail($input['lease_id']);
+                $lease=Models\Lease::findorFail($input['lease_id']);
             }
             catch(Exception $e)
             {
@@ -428,10 +430,10 @@ class HomeController extends BaseController
         $security_group=$security_group['SecurityGroups'][0];
 
         //get Active Leases
-        $leases= Lease::getByGroupId($group_id);
+        $leases= Models\Lease::getByGroupId($group_id);
 
         //get Active Invites
-        $invites= Invite::getByGroupId($group_id);
+        $invites= Models\Invite::getByGroupId($group_id);
 
         return View::make('getManage')
                     ->with('security_group', $security_group)
@@ -447,7 +449,7 @@ class HomeController extends BaseController
     public function cleanLeases()
     {
         $messages=array();
-        $leases=Lease::get();
+        $leases=Models\Lease::get();
         foreach($leases as $lease)
         {
             $time_left=strtotime($lease->created_at)+$lease->expiry-time();
@@ -470,7 +472,7 @@ class HomeController extends BaseController
      */
     public function getInvite($token)
     {
-        $invite=Invite::getByToken($token);
+        $invite=Models\Invite::getByToken($token);
         if(!$invite) return View::make('pages.guest')->with('failure', "Invalid Token. It was already used or has been terminated by the admins");
 
         $email=$invite->email;
@@ -492,7 +494,7 @@ class HomeController extends BaseController
                 //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
                 return View::make('pages.guest')->with('failure', "Error encountered while creating lease. Please try again. If doesn't help contact the admin.");
             }
-            $lease=Lease::create($lease);
+            $lease=Models\Lease::create($lease);
             if($invite->email != 'DEPLOY') $invite=$invite->delete();
             $this->NotificationMail($lease, TRUE);
             return View::make('pages.guest')->with('lease', $lease);
@@ -504,8 +506,9 @@ class HomeController extends BaseController
     public function getUsers()
     {
         $users = Models\User::get();
-        return View::make('getUsers')
-                    ->with('users', $users);
+        return view('getUsers', [
+            'users' => $users
+        ]);
     }
 
     /*

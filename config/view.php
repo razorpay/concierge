@@ -13,7 +13,9 @@ return array(
 	|
 	*/
 
-	'paths' => array(__DIR__.'/../views'),
+	'paths' => [
+        realpath(base_path('resources/views'))
+    ],
 
 	/*
 	|--------------------------------------------------------------------------
@@ -27,5 +29,7 @@ return array(
 	*/
 
 	'pagination' => 'pagination::slider-3',
+
+    'compiled' => realpath(storage_path().'/framework/views'),
 
 );
