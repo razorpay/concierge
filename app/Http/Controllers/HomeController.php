@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App;
+use Log;
 use Auth;
+use Mail;
 use View;
 use OAuth;
 use Request;
@@ -209,7 +211,7 @@ class HomeController extends BaseController
 	{
 
         //get security group details
-		$ec2 = App::make('aws')->get('ec2');
+		$ec2 = App::make('aws')->createClient('ec2');
 		$security_group=$ec2->describeSecurityGroups(array(
 			'GroupIds' => array($group_id),
         ));
@@ -423,7 +425,7 @@ class HomeController extends BaseController
         }
 
         //get security group details
-        $ec2 = App::make('aws')->get('ec2');
+        $ec2 = App::make('aws')->createClient('ec2');
         $security_group=$ec2->describeSecurityGroups(array(
             'GroupIds' => array($group_id),
         ));
@@ -647,7 +649,7 @@ class HomeController extends BaseController
 
             Mail::queue('emails.notification', $data, function($message)
             {
-                $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Created');
+                $message->to(config('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Created');
             });
         }
         else
@@ -663,7 +665,7 @@ class HomeController extends BaseController
 
             Mail::queue('emails.notification', $data, function($message)
             {
-                $message->to(Config::get('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Terminated');
+                $message->to(config('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Terminated');
             });
         }
     }
@@ -675,7 +677,7 @@ class HomeController extends BaseController
      */
     private function createLease($lease)
     {
-        $ec2 = App::make('aws')->get('ec2');
+        $ec2 = App::make('aws')->createClient('ec2');
         try
         {
             $result = $ec2->authorizeSecurityGroupIngress(array(
@@ -700,7 +702,7 @@ class HomeController extends BaseController
      */
     private function terminateLease($lease)
     {
-        $ec2 = App::make('aws')->get('ec2');
+        $ec2 = App::make('aws')->createClient('ec2');
         try
         {
             $result = $ec2->revokeSecurityGroupIngress(array(
