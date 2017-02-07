@@ -32,7 +32,7 @@ Route::group(array('before' => 'auth'), function()
 });
 
 //Routes for site admin
-Route::group(array('before' => 'auth|admin'), function()
+Route::group(array('before' => ['auth', 'admin']), function()
 {
     Route::get('/users', 'HomeController@getUsers');
 
@@ -48,10 +48,10 @@ Route::group(array('before' => 'auth|admin'), function()
 
 });
 
-Route::get('/', 'HomeController@getIndex');
 //Routes for non-logged in user
 Route::group(array(), function()
 {
+    Route::get('/', 'HomeController@getIndex');
 
     Route::post('/signin', array('before'=>'csrf', 'uses'=>'HomeController@postSignin'));
 
