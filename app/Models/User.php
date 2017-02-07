@@ -102,7 +102,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	 */
     public function leases()
     {
-        return $this->hasMany('Lease');
+        return $this->hasMany('App\Models\Lease');
     }
 
     /**
@@ -112,7 +112,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	 */
     public function invites()
     {
-        return $this->hasMany('Invite');
+        return $this->hasMany('App\Models\Invite');
 
     }
 
