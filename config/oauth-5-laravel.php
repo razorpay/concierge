@@ -17,8 +17,8 @@ return [
          * Google
          */
         'Google' => [
-            'client_id'     => env('google_client_id'),
-            'client_secret' => env('google_client_secret'),
+            'client_id'     => env('GOOGLE_CLIENT_ID'),
+            'client_secret' => env('GOOGLE_CLIENT_SECRET'),
             'scope'         => ['userinfo_email', 'userinfo_profile'],
         ],
 
