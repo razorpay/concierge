@@ -1,4 +1,5 @@
 <?php
+
 /*
 * app/validators.php
 * Custom Validation Rules

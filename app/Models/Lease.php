@@ -1,10 +1,8 @@
 <?php
 
-use Illuminate\Database\Eloquent\SoftDeletingTrait;
-
 class Lease extends Eloquent
 {
-    use SoftDeletingTrait;
+    use \Illuminate\Database\Eloquent\SoftDeletes;
 
 	protected $guarded = array('id');
 

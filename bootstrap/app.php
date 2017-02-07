@@ -60,4 +60,7 @@ $app->singleton(
 |
 */
 
+require_once __DIR__.'/../app/lib/helpers.php';
+// require_once __DIR__.'/../app/lib/validators.php';
+
 return $app;

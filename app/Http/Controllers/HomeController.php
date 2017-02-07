@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App;
 use OAuth;
 use Request;
 use App\LaravelDuo\LaravelDuo;
@@ -58,7 +59,10 @@ class HomeController extends BaseController
 			// - Belong to razorpay.com domain
 			//
 			// Then only we'll create a user entry in the system or check for one
-			if (!$result->verified_email or !checkEmailDomain($result->email)) return App::abort(404);
+			if (!$result->verified_email || !checkEmailDomain($result->email))
+            {
+                return App::abort(404);
+            }
 
 			// Find the user by email
 			$user = User::where('email', $result->email)->first();
