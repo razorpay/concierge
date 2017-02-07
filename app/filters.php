@@ -19,7 +19,9 @@ App::before(function($request)
 
 App::after(function($request, $response)
 {
-	//
+    $response->headers->set('X-Frame-Options', 'DENY', true);
+    $response->headers->set('X-XSS-Protection', '1; mode=block', true);
+	$response->headers->set('X-Content-Type-Options', 'nosniff', true);
 });
 
 /*
