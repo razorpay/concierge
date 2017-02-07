@@ -184,8 +184,7 @@
 				    <select name="expiry" class="form-control" required>
 					  <option value="3600" selected>1 hour</option>
 					  <option value="14400">4 hours</option>
-					  <option value="43200">12 hours</option>
-					  <option value="86400">1 Day</option>
+					  <option value="21600">6 hours</option>
 					</select>
 				</div>
 				<div class="col-sm-4">
@@ -219,8 +218,7 @@
 			    		<select name="expiry" class="form-control" required>
 						  <option value="3600" selected>1 hour</option>
 						  <option value="14400">4 hours</option>
-						  <option value="43200">12 hours</option>
-						  <option value="86400">1 Day</option>
+						  <option value="21600">6 hours</option>
 						</select>
 					</div>
 			    <div class="col-sm-4">
@@ -276,8 +274,7 @@
 			    		<select name="expiry" class="form-control" required>
 						  <option value="3600" selected>1 hour</option>
 						  <option value="14400">4 hours</option>
-						  <option value="43200">12 hours</option>
-						  <option value="86400">1 Day</option>
+						  <option value="21600">6 hours</option>
 						</select>
 					</div>
 				    <div class="col-sm-4">
