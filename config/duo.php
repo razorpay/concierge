@@ -16,4 +16,4 @@ return [
     'ikey' => env('DUO_IKEY'),
     'skey' => env('DUO_SKEY'),
     'host' => env('DUO_HOST'),
-]
+];
