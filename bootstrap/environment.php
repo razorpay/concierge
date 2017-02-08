@@ -7,7 +7,6 @@
  |
  */
 use Dotenv\Dotenv;
-use Dotenv\Exception\InvalidPathException;
 
 $envDir = __DIR__.'/../environment';
 
@@ -22,12 +21,9 @@ $app->useEnvironmentPath($envDir);
 
 $env = 'production';
 
-if (env('APP_ENV') === 'testing')
-{
+if (env('APP_ENV') === 'testing') {
     $env = 'testing';
-}
-else if (file_exists($file = __DIR__ . '/../environment/env.php'))
-{
+} elseif (file_exists($file = __DIR__.'/../environment/env.php')) {
     $env = require $file;
 }
 
@@ -35,7 +31,7 @@ putenv("APP_ENV=$env");
 
 $file = $app->environmentFile();
 
-$cascadingEnvFile = '.env.' . $env;
+$cascadingEnvFile = '.env.'.$env;
 
 //
 // Environment variable files are loaded in the order
@@ -47,14 +43,12 @@ $cascadingEnvFile = '.env.' . $env;
 // while last one comes into the folder when baking amis via brahma
 //
 
-if (! function_exists('read_env_file'))
-{
+if (!function_exists('read_env_file')) {
     function read_env_file($envDir, $fileName)
     {
-        $file = $envDir . '/' . $fileName;
+        $file = $envDir.'/'.$fileName;
 
-        if (file_exists($file) === false)
-        {
+        if (file_exists($file) === false) {
             return;
         }
 

@@ -3,11 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
-class CronCreator extends Command {
-
+class CronCreator extends Command
+{
     /**
      * The console command name.
      *
@@ -33,20 +31,16 @@ class CronCreator extends Command {
         $output = shell_exec('crontab -l');
 
         //The cron needed for this repo
-        $cron="* * * * *  ".config('concierge.php_path')." ".config('concierge.artisan_path')." custom:leasemanager";
+        $cron = '* * * * *  '.config('concierge.php_path').' '.config('concierge.artisan_path').' custom:leasemanager';
 
         //Check if Cron Already exists
-        if(strpos($output,$cron)===FALSE)
-        {
+        if (strpos($output, $cron) === false) {
             //setup Old Cron with the new cron included
             file_put_contents('/tmp/crontab.txt', $output.$cron.PHP_EOL);
             exec('crontab /tmp/crontab.txt');
-            $this->info("Cron Added for running every minute");
+            $this->info('Cron Added for running every minute');
+        } else {
+            $this->info('Cron Already exists');
         }
-        else
-        {
-            $this->info("Cron Already exists");
-        }
-
     }
 }

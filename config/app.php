@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,7 @@ return array(
     |
     */
 
-    'cipher' => "AES-256-CBC",
+    'cipher' => 'AES-256-CBC',
 
     'timezone' => 'UTC',
 
@@ -178,7 +178,7 @@ return array(
     |
     */
 
-    'aliases' => array(
+    'aliases' => [
 
         'App'             => Illuminate\Support\Facades\App::class,
         'Artisan'         => Illuminate\Support\Facades\Artisan::class,
@@ -216,7 +216,7 @@ return array(
 
         'AWS'             => Aws\Laravel\AwsFacade::class,
         'OAuth'           => Artdarek\OAuth\Facade\OAuth::class,
-    ),
+    ],
 
     'context' => env('CONTEXT', 'dev'),
-);
+];

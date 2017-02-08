@@ -4,11 +4,10 @@ namespace App\Http\Middleware;
 
 use Auth;
 use Closure;
-use Gate;
 use Illuminate\Contracts\Auth\Guard;
 
-class Authenticate {
-
+class Authenticate
+{
     /**
      * The Guard implementation.
      *
@@ -19,7 +18,8 @@ class Authenticate {
     /**
      * Create a new filter instance.
      *
-     * @param  Guard  $auth
+     * @param Guard $auth
+     *
      * @return void
      */
     public function __construct(Guard $auth)
@@ -30,18 +30,16 @@ class Authenticate {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
+     *
      * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        if ($this->auth->guest())
-        {
+        if ($this->auth->guest()) {
             return redirect('/');
-        }
-        else
-        {
+        } else {
             return $next($request);
         }
     }

@@ -3,16 +3,16 @@
 return [
 
     'defaults' => [
-        'guard' => 'user',
+        'guard'     => 'user',
         'passwords' => 'user',
     ],
 
     //Authenticating guards
     'guards' => [
-        'user' =>[
-            'driver' => 'session',
+        'user' => [
+            'driver'   => 'session',
             'provider' => 'users',
-        ]
+        ],
     ],
 
     //User Providers
@@ -20,8 +20,8 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
-        ]
-    ]
+            'model'  => App\Models\User::class,
+        ],
+    ],
 
 ];
