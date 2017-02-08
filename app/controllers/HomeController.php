@@ -3,7 +3,10 @@
 use LaravelDuo\LaravelDuo;
 use Artdarek\OAuth\Facade\OAuth;
 
-class HomeController extends BaseController {
+class HomeController extends BaseController
+{
+    // 6 hours
+    const MAX_EXPIRY = 21600;
 
 	/*
 	|--------------------------------------------------------------------------
@@ -56,7 +59,7 @@ class HomeController extends BaseController {
 			// - Belong to razorpay.com domain
 			//
 			// Then only we'll create a user entry in the system or check for one
-			if (!$result->verified_email || !checkEmailDomain($result->email)) return App::abort(404);
+			if (!$result->verified_email or !checkEmailDomain($result->email)) return App::abort(404);
 
 			// Find the user by email
 			$user = User::where('email', $result->email)->first();
@@ -227,34 +230,46 @@ class HomeController extends BaseController {
     public function postManage($group_id)
     {
         $input=Input::all();
-        $messages=array();
-        $email=NULL;
+        $messages = array();
+        $email = NULL;
         /*
          For Lease Creation
         */
-        if("ssh"==$input["rule_type"])
+        if("ssh" == $input["rule_type"])
         {
             $protocol="tcp";
             $port_from="22";
             $port_to="22";
         }
-        elseif("https"==$input["rule_type"])
+        elseif("https" == $input["rule_type"])
         {
             $protocol="tcp";
             $port_from="443";
             $port_to="443";
         }
-        elseif("custom"==$input["rule_type"])
+        elseif("custom" == $input["rule_type"])
         {
             $protocol=$input['protocol'];
             $port_from=$input['port_from'];
             $port_to=$input['port_to'];
 
             //Validations
-            if($protocol != "tcp" && $protocol!="udp") array_push($messages, "Invalid Protocol");
-            if(!is_numeric($port_from) || $port_from>65535 || $port_from<=0) array_push($messages, "Invalid From port");
-            if(!is_numeric($port_to) || $port_to>65535 || $port_to<=0) array_push($messages, "Invalid To port");
-            if($port_from>$port_to) array_push($messages, "From port Must be less than equal to To Port");
+            if ($protocol !== "tcp" and $protocol !== "udp")
+            {
+                array_push($messages, "Invalid Protocol");
+            }
+            if (!is_numeric($port_from) or $port_from > 65535 or $port_from <= 0)
+            {
+                array_push($messages, "Invalid From port");
+            }
+            if (!is_numeric($port_to) or $port_to > 65535 or $port_to <= 0)
+            {
+                array_push($messages, "Invalid To port");
+            }
+            if ($port_from > $port_to)
+            {
+                array_push($messages, "From port Must be less than equal to To Port");
+            }
         }
         else
         {
@@ -262,11 +277,22 @@ class HomeController extends BaseController {
         }
 
         //Other validations
-        $expiry=$input['expiry'];
-        if(!is_numeric($expiry) || $expiry <= 0 || $expiry >86400) array_push($messages, "Invalid Expiry Time");
-        if(!in_array($input['access'], array(1, 2, 3, 4))) array_push($messages, "Invalid invite Email");
-        if(2==$input['access']){
-            if(!isset($input['email']) || !filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
+        $expiry = $input['expiry'];
+
+        if (!is_numeric($expiry) or $expiry <= 0 || $expiry > self::MAX_EXPIRY)
+        {
+            array_push($messages, "Invalid Expiry Time");
+        }
+
+        if (!in_array($input['access'], array(1, 2, 3, 4)))
+        {
+            array_push($messages, "Invalid invite Email");
+        }
+
+        if (2 == $input['access'])
+        {
+            if(!isset($input['email']) or !filter_var($input['email'], FILTER_VALIDATE_EMAIL))
+            {
                 array_push($messages, "Invalid invite Email");
             }
         }
@@ -278,10 +304,10 @@ class HomeController extends BaseController {
                             ->with('message', implode("<br/>", $messages));
         }
 
-        if(1==$input['access'])
+        if(1 == $input['access'])
         {
             //Creating the lease
-            $lease=array(
+            $lease = array(
                 'user_id'=>Auth::User()->id,
                 'group_id'=>$group_id,
                 'lease_ip'=>$this->getClientIp()."/32",
@@ -319,15 +345,16 @@ class HomeController extends BaseController {
             return Redirect::to("/manage/$group_id")
                         ->with('message', "Lease created successfully!");
         }
-        elseif(2==$input['access'])
+        elseif(2 == $input['access'])
         {
             $email=$input['email'];
         }
-        elseif(4==$input['access'])
+        elseif(4 == $input['access'])
         {
             $email='DEPLOY';
         }
 
+        // TODO: Improve this
         $token=md5(time()+rand());
         $invite=array(
             'user_id'=>Auth::User()->id,
@@ -339,8 +366,10 @@ class HomeController extends BaseController {
             'email'=>$email,
             'token'=>$token
         );
+
         $invite=Invite::create($invite);
-        if($email && $email!='DEPLOY')
+
+        if($email and $email!='DEPLOY')
         {
             $data=array('invite'=>$invite->toArray());
             //Send Invite Mail
@@ -766,7 +795,7 @@ class HomeController extends BaseController {
 
     private function getClientIp()
     {
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR']) {
+        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) and $_SERVER['HTTP_X_FORWARDED_FOR']) {
             // if behind an ELB
             $clientIpAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
         } else {
