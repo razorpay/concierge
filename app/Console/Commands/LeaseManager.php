@@ -2,13 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Http\Controllers\HomeController;
-use Symfony\Component\Console\Input\InputOption;
+use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
-class LeaseManager extends Command {
-
+class LeaseManager extends Command
+{
     /**
      * The console command name.
      *
@@ -31,12 +31,14 @@ class LeaseManager extends Command {
      */
     public function handle()
     {
-        $home_controller=new HomeController;
+        $home_controller = new HomeController();
         $cleaner = $home_controller->cleanLeases();
-        if($cleaner) $this->info($cleaner);
+        if ($cleaner) {
+            $this->info($cleaner);
+        }
     }
 
-    /**
+    /*
      * Get the console command arguments.
      *
      * @return array
@@ -48,7 +50,7 @@ class LeaseManager extends Command {
         );
     }*/
 
-    /**
+    /*
      * Get the console command options.
      *
      * @return array
@@ -59,5 +61,4 @@ class LeaseManager extends Command {
             array('example', null, InputOption::VALUE_OPTIONAL, 'An example option.', null),
         );
     }*/
-
 }

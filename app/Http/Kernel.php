@@ -4,8 +4,8 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
-class Kernel extends HttpKernel {
-
+class Kernel extends HttpKernel
+{
     /**
      * The application's global HTTP middleware stack.
      *
@@ -20,14 +20,14 @@ class Kernel extends HttpKernel {
     ];
 
     /**
-      * The application's route middleware groups.
-      *
-      * @var array
-      */
+     * The application's route middleware groups.
+     *
+     * @var array
+     */
     protected $middlewareGroups = [
         'web' => [
 
-        ]
+        ],
     ];
 
     /**
@@ -39,5 +39,4 @@ class Kernel extends HttpKernel {
         'auth'          => 'App\Http\Middleware\Authenticate',
         'guest'         => 'App\Http\Middleware\RedirectIfAuthenticated',
     ];
-
 }
