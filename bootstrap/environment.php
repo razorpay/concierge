@@ -43,7 +43,7 @@ $cascadingEnvFile = '.env.'.$env;
 // while last one comes into the folder when baking amis via brahma
 //
 
-if (!function_exists('read_env_file')) {
+if (! function_exists('read_env_file')) {
     function read_env_file($envDir, $fileName)
     {
         $file = $envDir.'/'.$fileName;
