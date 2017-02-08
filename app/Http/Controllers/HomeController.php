@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App;
-use App\Models;
-use Auth;
 use Log;
+use Auth;
 use Mail;
+use View;
 use OAuth;
 use Request;
-use View;
+use App\Models;
 
 class HomeController extends BaseController
 {
@@ -40,7 +40,7 @@ class HomeController extends BaseController
 
         $google_service = OAuth::consumer('Google');
 
-        if (!$code) {
+        if (! $code) {
             $url = $google_service->getAuthorizationUri();
 
             return redirect((string) $url);
@@ -55,7 +55,7 @@ class HomeController extends BaseController
             // - Belong to razorpay.com domain
             //
             // Then only we'll create a user entry in the system or check for one
-            if (!$result->verified_email || !checkEmailDomain($result->email)) {
+            if (! $result->verified_email || ! checkEmailDomain($result->email)) {
                 return App::abort(404);
             }
 
@@ -246,10 +246,10 @@ class HomeController extends BaseController
             if ($protocol != 'tcp' && $protocol != 'udp') {
                 array_push($messages, 'Invalid Protocol');
             }
-            if (!is_numeric($port_from) || $port_from > 65535 || $port_from <= 0) {
+            if (! is_numeric($port_from) || $port_from > 65535 || $port_from <= 0) {
                 array_push($messages, 'Invalid From port');
             }
-            if (!is_numeric($port_to) || $port_to > 65535 || $port_to <= 0) {
+            if (! is_numeric($port_to) || $port_to > 65535 || $port_to <= 0) {
                 array_push($messages, 'Invalid To port');
             }
             if ($port_from > $port_to) {
@@ -261,21 +261,20 @@ class HomeController extends BaseController
 
         //Other validations
         $expiry = $input['expiry'];
-
-        if (!is_numeric($expiry) || $expiry <= 0 || $expiry > self::MAX_EXPIRY) {
+        if (! is_numeric($expiry) || $expiry <= 0 || $expiry > self::MAX_EXPIRY) {
             array_push($messages, 'Invalid Expiry Time');
         }
-        if (!in_array($input['access'], [1, 2, 3, 4])) {
+        if (! in_array($input['access'], [1, 2, 3, 4])) {
             array_push($messages, 'Invalid invite Email');
         }
         if (2 == $input['access']) {
-            if (!isset($input['email']) || !filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
+            if (! isset($input['email']) || ! filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
                 array_push($messages, 'Invalid invite Email');
             }
         }
 
         //Validation fails
-        if (!empty($messages)) {
+        if (! empty($messages)) {
             return redirect("/manage/$group_id")
                             ->with('message', implode('<br/>', $messages));
         }
@@ -304,7 +303,7 @@ class HomeController extends BaseController
                 $newLease->save();
             } else {
                 $result = $this->createLease($lease);
-                if (!$result) {
+                if (! $result) {
                     //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocol, port already exists on AWS.
                     return redirect("/manage/$group_id")
                                     ->with('message', 'Lease Creation Failed! Does a similar lease already exist? Terminate that first.');
@@ -385,7 +384,7 @@ class HomeController extends BaseController
             $lease->delete();
             $this->NotificationMail($lease, false);
 
-            if (!$result) {
+            if (! $result) {
                 //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
                 return redirect("/manage/$group_id")
                                 ->with('message', 'Lease Termination returned error. Assumed the lease was already deleted');
@@ -431,12 +430,12 @@ class HomeController extends BaseController
                 $result = $this->terminateLease($lease->toArray());
                 $lease->delete();
                 $this->NotificationMail($lease, false);
-                if (!$result) {
+                if (! $result) {
                     array_push($messages, "Lease Termination of Lease ID $lease->id reported error on AWS API Call. Assumed already deleted.");
                 }
             }
         }
-        if (!empty($messages)) {
+        if (! empty($messages)) {
             return implode("\n", $messages);
         }
     }
@@ -447,12 +446,12 @@ class HomeController extends BaseController
     public function getInvite($token)
     {
         $invite = Models\Invite::getByToken($token);
-        if (!$invite) {
+        if (! $invite) {
             return View::make('pages.guest')->with('failure', 'Invalid Token. It was already used or has been terminated by the admins');
         }
 
         $email = $invite->email;
-        if (!$invite->email) {
+        if (! $invite->email) {
             $email = 'URL';
         }
         //Creating the lease
@@ -467,7 +466,7 @@ class HomeController extends BaseController
                 'invite_email'=> $email,
             ];
         $result = $this->createLease($lease);
-        if (!$result) {
+        if (! $result) {
             //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
                 return View::make('pages.guest')->with('failure', "Error encountered while creating lease. Please try again. If doesn't help contact the admin.");
         }
@@ -568,7 +567,7 @@ class HomeController extends BaseController
         $input = Request::all();
         $message = null;
 
-        if (!isset($input['user_id'])) {
+        if (! isset($input['user_id'])) {
             App::abort(403, 'Unauthorized action.');
         }
         try {

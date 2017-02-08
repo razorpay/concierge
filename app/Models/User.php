@@ -3,10 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-use Illuminate\Database\Eloquent\Model;
 
 class User extends Model implements AuthenticatableContract, CanResetPasswordContract
 {
@@ -138,11 +138,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      */
     public function getActiveInvites($type = null)
     {
-        if (!$type) {
+        if (! $type) {
             return $this->invites();
         } elseif ('url' == $type) {
             $invites = $this->invites->filter(function ($invite) {
-                if (!$invite->email) {
+                if (! $invite->email) {
                     return true;
                 }
             });
@@ -175,11 +175,11 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
      */
     public function getActiveLeases($type = null)
     {
-        if (!$type) {
+        if (! $type) {
             return $this->leases();
         } elseif ('self' == $type) {
             $leases = $this->leases->filter(function ($lease) {
-                if (!$lease->invite_email) {
+                if (! $lease->invite_email) {
                     return true;
                 }
             });

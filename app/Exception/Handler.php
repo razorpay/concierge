@@ -3,11 +3,11 @@
 namespace App\Exception;
 
 use Exception;
+use Illuminate\Session\TokenMismatchException;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
