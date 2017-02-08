@@ -2,18 +2,18 @@
 
 return [
 
-	/*
-	|--------------------------------------------------------------------------
-	| oAuth Config
-	|--------------------------------------------------------------------------
-	*/
+    /*
+    |--------------------------------------------------------------------------
+    | oAuth Config
+    |--------------------------------------------------------------------------
+    */
 
-	/**
-	 * Consumers
-	 */
-	'consumers' => [
+    /*
+     * Consumers
+     */
+    'consumers' => [
 
-        /**
+        /*
          * Google
          */
         'Google' => [
@@ -22,8 +22,8 @@ return [
             'scope'         => ['userinfo_email', 'userinfo_profile'],
         ],
 
-	],
+    ],
 
-    'userinfo_url' => 'https://www.googleapis.com/oauth2/v1/userinfo'
+    'userinfo_url' => 'https://www.googleapis.com/oauth2/v1/userinfo',
 
 ];

@@ -1,7 +1,7 @@
 <?php
 
 return [
-	/*
+    /*
     |--------------------------------------------------------------------------
     | Paths
     |--------------------------------------------------------------------------
@@ -11,22 +11,22 @@ return [
     |
     */
 
-	'php_path' => "/usr/bin/php",
-	'artisan_path'=> base_path('artisan'),
+    'php_path'    => '/usr/bin/php',
+    'artisan_path'=> base_path('artisan'),
 
-	/*
-	|--------------------------------------------------------------------------
+    /*
+    |--------------------------------------------------------------------------
     | Mail Configuration
     |--------------------------------------------------------------------------
-	| This application sends notification mail for all leases created/terminated.
-	| Please provide an emailid for sending the mails.
-	| In developemnt environment change mail_pretend to true to skip actual sedning of mails & just log in it in laravel log
-	| You can also set the global form address & name for the notfication mail
-	|
-	*/
+    | This application sends notification mail for all leases created/terminated.
+    | Please provide an emailid for sending the mails.
+    | In developemnt environment change mail_pretend to true to skip actual sedning of mails & just log in it in laravel log
+    | You can also set the global form address & name for the notfication mail
+    |
+    */
 
-	'notification_emailid' => "root@localhost",
-	'mail_pretend'         => false,
-	'mail_from_email'      => "root@aws-sec-manager",
-	'mail_from_name'       => "Concierge [AWS Lease Manager]",
+    'notification_emailid' => 'root@localhost',
+    'mail_pretend'         => false,
+    'mail_from_email'      => 'root@aws-sec-manager',
+    'mail_from_name'       => 'Concierge [AWS Lease Manager]',
 ];

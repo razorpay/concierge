@@ -8,12 +8,12 @@ class Invite extends Model
 {
     use \Illuminate\Database\Eloquent\SoftDeletes;
 
-	protected $guarded = array('id');
+    protected $guarded = ['id'];
 
-	//Deleting only changes deleted_at column value, doesnt remove the field for tracking
-	protected $softDelete = true;
+    //Deleting only changes deleted_at column value, doesnt remove the field for tracking
+    protected $softDelete = true;
 
-    protected $dates  = ['created_at', 'updated_at', 'deleted_at'];
+    protected $dates = ['created_at', 'updated_at', 'deleted_at'];
 
     // Lease __belongs_to__ User
     public function user()
@@ -25,16 +25,15 @@ class Invite extends Model
      *Returns active invite by token
      */
     public static function getByToken($token)
-	{
-		try{
+    {
+        try {
             $invite = self::where('token', $token)->firstOrFail();
+        } catch (Exception $e) {
+            $invite = false;
         }
-        catch(Exception $e)
-        {
-            $invite = FALSE;
-        }
-		return $invite;
-	}
+
+        return $invite;
+    }
 
     /*
      *Returns active invites by groupid
@@ -42,6 +41,7 @@ class Invite extends Model
     public static function getByGroupId($group_id)
     {
         $invites = self::where('group_id', $group_id)->get();
+
         return $invites;
     }
 }
