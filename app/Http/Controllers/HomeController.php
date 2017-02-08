@@ -261,7 +261,7 @@ class HomeController extends BaseController
 
         //Other validations
         $expiry = $input['expiry'];
-        if (! is_numeric($expiry) || $expiry <= 0 || $expiry > self::MAX_EXPIRY) {
+        if (! is_numeric($expiry) or $expiry <= 0 or $expiry > self::MAX_EXPIRY) {
             array_push($messages, 'Invalid Expiry Time');
         }
         if (! in_array($input['access'], [1, 2, 3, 4])) {
