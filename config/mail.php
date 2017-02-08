@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => config('custom_config.mail_from_email'), 'name' => config('custom_config.mail_from_name')),
+	'from' => array('address' => config('concierge.mail_from_email'), 'name' => config('concierge.mail_from_name')),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -119,6 +119,6 @@ return array(
 	|
 	*/
 
-	'pretend' => config('custom_config.mail_pretend'),
+	'pretend' => config('concierge.mail_pretend'),
 
 );

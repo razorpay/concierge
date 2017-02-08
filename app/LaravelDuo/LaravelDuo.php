@@ -12,10 +12,10 @@ class LaravelDuo extends DuoWeb
     private $_HOST;
 
     public function __construct() {
-        $this->_AKEY = config('custom_config.duo_akey');
-        $this->_IKEY = config('custom_config.duo_ikey');
-        $this->_SKEY = config('custom_config.duo_skey');
-        $this->_HOST = config('custom_config.duo_host');
+        $this->_AKEY = config('duo.akey');
+        $this->_IKEY = config('duo.ikey');
+        $this->_SKEY = config('duo.skey');
+        $this->_HOST = config('duo.host');
     }
 
     public function get_akey()

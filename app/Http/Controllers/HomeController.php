@@ -674,7 +674,7 @@ class HomeController extends BaseController
 
             Mail::queue('emails.notification', $data, function($message)
             {
-                $message->to(config('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Created');
+                $message->to(config('concierge.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Created');
             });
         }
         else
@@ -690,7 +690,7 @@ class HomeController extends BaseController
 
             Mail::queue('emails.notification', $data, function($message)
             {
-                $message->to(config('custom_config.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Terminated');
+                $message->to(config('concierge.notification_emailid'), 'Security Notification' )->subject('Secure Access Lease Terminated');
             });
         }
     }

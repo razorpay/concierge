@@ -33,7 +33,7 @@ class CronCreator extends Command {
         $output = shell_exec('crontab -l');
 
         //The cron needed for this repo
-        $cron="* * * * *  ".config('custom_config.php_path')." ".config('custom_config.artisan_path')." custom:leasemanager";
+        $cron="* * * * *  ".config('concierge.php_path')." ".config('concierge.artisan_path')." custom:leasemanager";
 
         //Check if Cron Already exists
         if(strpos($output,$cron)===FALSE)
