@@ -20,9 +20,6 @@ build:
           icon_url: https://cdn.rawgit.com/wantedly/step-pretty-slack-notify/master/icons/$WERCKER_RESULT.jpg
 deploy:
     steps:
-      - script:
-          name: Change to production mode
-          code: sed -i "/'debug'/c\ 'debug' => false," app/config/app.php
       - nhuray/aws-code-deploy:
           key: $AWS_KEY
           secret: $AWS_SECRET
