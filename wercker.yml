@@ -1,7 +1,13 @@
-box: wercker/php
-services:
-    - wercker/mysql
+box:
+  id: razorpay/docker:php7
+
 build:
+    services:
+      - id: mysql
+        tag: latest
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: root
     steps:
       - script:
           name: install dependencies
