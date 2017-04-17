@@ -16,7 +16,7 @@ Installation
 * Basic installation
 ```sh
 git clone [git-repo-url]
-chmod -R o+wx app/storage/
+chmod -R o+wx storage/
 # Install laravel
 php composer.phar install
 cp environment/env.sample environment/.env.dev
