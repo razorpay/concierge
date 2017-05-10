@@ -66,7 +66,7 @@
 		       	@endforeach
 
 		       	@if(!$leases->count())
-		       	<tr><td colspan="8" style="text-align:center">No Active Leases</td></tr>
+		       	<tr><td colspan="9" style="text-align:center">No Active Leases</td></tr>
 		       	@endif
 		    </tbody>
    		    </table>
