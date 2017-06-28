@@ -29,4 +29,6 @@ return [
     'mail_pretend'         => false,
     'mail_from_email'      => 'root@aws-sec-manager',
     'mail_from_name'       => 'Concierge [AWS Lease Manager]',
+
+    'cron_password'        => env('CRON_PASSWORD'),
 ];

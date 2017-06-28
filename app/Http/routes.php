@@ -54,4 +54,8 @@ Route::group(['middleware' => 'guest'], function () {
     Route::post('/duologin', 'HomeController@postDuologin');
 });
 
+Route::group(['middleware' => 'cron'], function() {
+   Route::any('/cron', 'HomeController@cleanLeases');
+});
+
 Route::get('/invite/{token}', 'HomeController@getInvite');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+
 use App;
 use Log;
 use Auth;
@@ -10,6 +11,7 @@ use View;
 use OAuth;
 use Request;
 use App\Models;
+use App\Console\Commands\LeaseManager;
 
 class HomeController extends BaseController
 {
@@ -688,5 +690,11 @@ class HomeController extends BaseController
         }
 
         return $clientIpAddress;
+    }
+
+    public function runCron()
+    {
+        // TODO: Add auth
+
     }
 }
