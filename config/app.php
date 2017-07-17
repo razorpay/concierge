@@ -126,7 +126,6 @@ return [
         /*
          * Laravel Framework Service Providers...
          */
-        Artdarek\OAuth\OAuthServiceProvider::class,
         Illuminate\Foundation\Providers\ArtisanServiceProvider::class,
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
@@ -151,6 +150,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Aws\Laravel\AwsServiceProvider::class,
         Schuppo\PasswordStrength\PasswordStrengthServiceProvider::class,
+        Artdarek\OAuth\OAuthServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
     ],
 
@@ -182,6 +182,7 @@ return [
 
         'App'             => Illuminate\Support\Facades\App::class,
         'Artisan'         => Illuminate\Support\Facades\Artisan::class,
+        'SocialOAuth'     => Artdarek\OAuth\Facade\OAuth::class,
         'Auth'            => Illuminate\Support\Facades\Auth::class,
         'Blade'           => Illuminate\Support\Facades\Blade::class,
         'Bus'             => Illuminate\Support\Facades\Bus::class,
@@ -213,9 +214,7 @@ return [
         'URL'             => Illuminate\Support\Facades\URL::class,
         'Validator'       => Illuminate\Support\Facades\Validator::class,
         'View'            => Illuminate\Support\Facades\View::class,
-
         'AWS'             => Aws\Laravel\AwsFacade::class,
-        'OAuth'           => Artdarek\OAuth\Facade\OAuth::class,
     ],
 
     'context' => env('CONTEXT', 'dev'),
