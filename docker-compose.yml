@@ -15,8 +15,9 @@ services:
       DB_DATABASE: concierge
       DB_USERNAME: concierge
       DB_PASSWORD: concierge
-    # volumes:
-    #   - ~/.aws:/var/lib/nginx/.aws
+      AWS_ACCESS_KEY_ID: <VALUE>
+      AWS_SECRET_ACCESS_KEY: <VALUE>
+      AWS_REGION: <VALUE>
 
   db-concierge:
     image: mysql:5.6

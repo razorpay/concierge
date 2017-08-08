@@ -1,7 +1,5 @@
 ## Running the app using docker-compose
 
-To run locally, you need to have a `~/.aws` folder. The steps should be followed as mentioned in the docs here [https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
-
 You just need to add a small change in your `docker-compose.yml` here
 
 ```yaml
@@ -22,15 +20,16 @@ services:
       DB_DATABASE: concierge
       DB_USERNAME: concierge
       DB_PASSWORD: concierge
-    volumes:
-      - ~/.aws:/var/lib/nginx/.aws
+      AWS_ACCESS_KEY_ID: <VALUE>
+      AWS_SECRET_ACCESS_KEY: <VALUE>
+      AWS_REGION: <VALUE>
 
   db-concierge:
     image: mysql:5.6
     ports:
       - 3306:3306
     volumes:
-      - ./docker/data:/docker-entrypoint-initdb.d
+     - ./docker/data:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: concierge
       MYSQL_DATABASE: concierge
