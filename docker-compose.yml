@@ -1,0 +1,31 @@
+version: '2'
+services:
+  concierge-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    links:
+      - db-concierge
+    depends_on: 
+      - db-concierge
+    ports: 
+      - 80:80
+    environment:
+      DB_HOST: db-concierge
+      DB_DATABASE: concierge
+      DB_USERNAME: concierge
+      DB_PASSWORD: concierge
+    # volumes:
+    #   - ~/.aws:/var/lib/nginx/.aws
+
+  db-concierge:
+    image: mysql:5.6
+    ports:
+      - 3306:3306
+    # volumes:
+    #  - ./docker/data:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: concierge
+      MYSQL_DATABASE: concierge
+      MYSQL_USER: concierge
+      MYSQL_PASSWORD: concierge

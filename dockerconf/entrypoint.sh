@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# copy nginx config
+cp dockerconf/concierge.docker.conf /etc/nginx/conf.d/concierge.conf
+
+cp environment/env.sample.php environment/env.php
+
+echo "create /app/storage/framework/views/"
+mkdir storage/framework/views
+
+# Fix permissions
+echo  "$(date) Fix Storage permissions"
+cd /app/ && chmod -R o+wx storage/
+
+mkdir -p /run/
+chown 0755 /run/
+
+/usr/sbin/php-fpm7
+/usr/sbin/nginx -g 'daemon off;'
