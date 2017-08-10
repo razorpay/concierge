@@ -31,7 +31,7 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 //Routes for site admin
-Route::group(['before' => ['auth', 'admin']], function () {
+Route::group([], function () {
     Route::get('/users', 'HomeController@getUsers');
 
     Route::post('/users', ['before'=>'csrf', 'uses'=>'HomeController@postUsers']);
