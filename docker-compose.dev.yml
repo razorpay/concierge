@@ -3,9 +3,10 @@ services:
   concierge:
     build:
       context: .
-      args:
-       - GIT_TOKEN
+      dockerfile: Dockerfile.dev
     image: razorpay:concierge
+    volume:
+      - .:/app
     links:
       - db-concierge
     depends_on:
