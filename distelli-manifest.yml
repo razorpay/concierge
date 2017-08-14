@@ -1,0 +1,50 @@
+razorpay/concierge-service:
+  Build:
+    ### Docker Build Commands ###
+    - docker login -u "$DISTELLI_DOCKER_USERNAME" -p "$DISTELLI_DOCKER_PW" -e "$DISTELLI_DOCKER_EMAIL" $DISTELLI_DOCKER_ENDPOINT
+    - docker build --quiet=false -t "$DISTELLI_DOCKER_REPO" "$DISTELLI_DOCKER_PATH" --build-arg GIT_COMMIT_HASH=$DISTELLI_RELREVISION --build-arg GIT_TOKEN=$GIT_TOKEN
+    - docker tag "$DISTELLI_DOCKER_REPO" "$DISTELLI_DOCKER_REPO":"$DISTELLI_RELREVISION"
+    - docker run --entrypoint=./dockerconf/run_tests.sh -e "APP_MODE=testing" -e "MAX_REQUESTS=1" "$DISTELLI_DOCKER_REPO":"$DISTELLI_RELREVISION"
+    - docker push "$DISTELLI_DOCKER_REPO":"$DISTELLI_RELREVISION"
+    ### End Docker Build Commands ###
+
+  PreStart:
+    ### Check if the repo is concierge service
+    - if [[ "$DISTELLI_DOCKER_REPO" != 'razorpay/concierge' ]]; then
+    - echo "Trying to deploy non concierge service repo to concierge service"
+    - echo "Exiting..."
+    - exit 1
+    - fi
+    ### Check if the deployment environment is specified
+    - if [[ "$ENVIRONMENT" == 'unknown' ]]; then
+    -   echo "This environment deploy is not configured correctly."
+    -   echo "The environment in Distelli should have an environment"
+    -   echo " variable $ENVIRONMENT set to one of the following:"
+    -   echo "  * beta"
+    -   echo "  * prod"
+    -   echo ""
+    -   echo "Exiting..."
+    -   exit 1
+    - fi
+    ### Check the environment for deploy
+    - if [[ "$ENVIRONMENT" == 'prod' && "$DISTELLI_RELBRANCH" != 'master' ]]; then
+    - echo "Trying to deploy non master branch to prod"
+    - echo "Exiting..."
+    - exit 1
+    - fi
+    ### Docker Pre Install Commands ###
+    - sudo docker login -u "$DISTELLI_DOCKER_USERNAME" -p "$DISTELLI_DOCKER_PW" $DISTELLI_DOCKER_ENDPOINT
+    - sudo -E systemctl stop concierge.service
+    ### End Docker Pre Install Commands ###
+
+  Start:
+    ### Docker Exec Commands ###
+    - sudo -E echo "GIT_COMMIT_ID=$DISTELLI_RELREVISION" > /opt/razorpay/concierge
+    - sudo -E systemctl start concierge.service
+    ### End Docker Exec Commands ###
+
+  PostStart:
+    ### Output the systemctl status ###
+    - export SYSTEMCTL_STATUS=$(sudo systemctl status concierge.service)
+    - echo "Systemctl Status"
+    - echo "$SYSTEMCTL_STATUS"
