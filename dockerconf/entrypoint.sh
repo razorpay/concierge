@@ -17,5 +17,7 @@ chown 0755 /run/
 
 sed -i -- 's/;clear_env = no/clear_env = no/g' /etc/php7/php-fpm.d/www.conf
 
+echo "GIT_COMMIT_HASH=${GIT_COMMIT_HASH}" >> /app/.env
+
 /usr/sbin/php-fpm7
 /usr/sbin/nginx -g 'daemon off;'
