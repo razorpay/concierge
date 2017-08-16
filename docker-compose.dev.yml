@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     image: razorpay:concierge
-    volume:
+    volumes:
       - .:/app
     links:
       - db-concierge
