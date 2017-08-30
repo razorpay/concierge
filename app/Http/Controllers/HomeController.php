@@ -8,7 +8,7 @@ use Log;
 use Auth;
 use Mail;
 use View;
-use OAuth;
+use SocialOAuth;
 use Request;
 use App\Models;
 
@@ -39,7 +39,7 @@ class HomeController extends BaseController
     {
         $code = Request::get('code');
 
-        $google_service = OAuth::consumer('Google');
+        $google_service = SocialOAuth::consumer('Google');
 
         if (! $code) {
             $url = $google_service->getAuthorizationUri();

@@ -5,8 +5,6 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     image: razorpay:concierge
-    volumes:
-      - .:/app
     links:
       - db-concierge
     depends_on:
@@ -19,6 +17,20 @@ services:
       DB_USERNAME: concierge
       DB_PASSWORD: 123
       APP_ENV: dev
+      APP_DEBUG: "true"
+      APP_KEY: "base64:JQdqGUBXe48nLuiwezzS41zhYBjFY38RhVahI7JMnDw="
+      GOOGLE_CLIENT_ID:
+      GOOGLE_CLIENT_SECRET:
+      COMPANY_DOMAIN: razorpay.com
+      APP_DOMAIN: concierge.razorpay.dev
+      BASE_URL: http://concierge.razorpay.dev:27080
+      # TODO: Write the plaintext version here
+      CRON_PASSWORD: "$$2a$$06$$I.gCuJphwKzHxiZ2QpG8uudVyV53b.F9tDAarb7VaneJFRZWwdVAe"
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+      AWS_REGION: ap-south-1
+      SECURE_SESSION: "false"
+
   db-concierge:
     image: mysql:5.6
     ports:

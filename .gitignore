@@ -10,3 +10,4 @@ environment/env.php
 !environment/.env.beta
 !environment/.env.alpha
 storage/
+docker-compose.dev.yml

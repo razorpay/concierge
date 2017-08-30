@@ -1,0 +1,51 @@
+fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+fastcgi_param  QUERY_STRING       $query_string;
+fastcgi_param  REQUEST_METHOD     $request_method;
+fastcgi_param  CONTENT_TYPE       $content_type;
+fastcgi_param  CONTENT_LENGTH     $content_length;
+
+fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+fastcgi_param  REQUEST_URI        $request_uri;
+fastcgi_param  DOCUMENT_URI       $document_uri;
+fastcgi_param  DOCUMENT_ROOT      $document_root;
+fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+fastcgi_param  REQUEST_SCHEME     $scheme;
+fastcgi_param  HTTPS              $https if_not_empty;
+
+fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+
+fastcgi_param  REMOTE_ADDR        $remote_addr;
+fastcgi_param  REMOTE_PORT        $remote_port;
+fastcgi_param  SERVER_ADDR        $server_addr;
+fastcgi_param  SERVER_PORT        $server_port;
+fastcgi_param  SERVER_NAME        $server_name;
+
+# TODO: Change these calls to lookup
+fastcgi_param  DB_HOST				{{ db_host }}
+fastcgi_param  DB_DATABASE				{{ db_name }}
+fastcgi_param  DB_USERNAME				{{ db_username }}
+fastcgi_param  DB_PASSWORD				{{ db_passwword }}
+fastcgi_param  APP_ENV			  "production"
+fastcgi_param  APP_DEBUG		  "false"
+fastcgi_param  APP_KEY			  {{ app_key }}
+fastcgi_param  GOOGLE_CLIENT_ID				{{ google_client_id }}
+fastcgi_param  GOOGLE_CLIENT_SECRET				{{ gogle_client_secret }}
+fastcgi_param  COMPANY_DOMAIN				"razorpay.com";
+
+# TODO: Figure this out for k8s?
+fastcgi_param  APP_DOMAIN				{{ concierge.razorpay.dev }}
+# something.vpc perhaps?
+fastcgi_param  BASE_URL				{{ http://concierge.razorpay.dev:27080 }}
+fastcgi_param  CRON_PASSWORD				{{ cron_password }}
+
+# Use these if we don't have kube2iam working
+# AWS
+fastcgi_param  AWS_ACCESS_KEY_ID				{{ aws_access_key_id }}
+fastcgi_param  AWS_SECRET_ACCESS_KEY				{{ aws_secret_access_key }}
+fastcgi_param  AWS_REGION				{{ aws_region }}
+# This is because we aren't doing SSL on nginx
+fastcgi_param  SECURE_SESSION			"false"
+
+# PHP only, required if PHP was built with --enable-force-cgi-redirect
+fastcgi_param  REDIRECT_STATUS    200;

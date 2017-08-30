@@ -10,8 +10,7 @@ COPY ./dockerconf/entrypoint.sh /entrypoint.sh
 
 WORKDIR /app
 
-RUN composer config -g github-oauth.github.com ${GIT_TOKEN} && \
-    composer install --no-interaction
+RUN composer install --no-interaction
 
 EXPOSE 80
 
