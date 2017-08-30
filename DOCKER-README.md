@@ -13,7 +13,7 @@ If everything is in order, then running it would be
 ```bash
 cp docker-compose.sample.yml docker-compose.dev.yml
 # Fix the variables in the docker-compose.dev.yml file
-docker-compose -f docker-compose.yml up --build
+docker-compose -f docker-compose.dev.yml up --build
 ```
 
 Now you should be able to access <http://concierge.razorpay.dev:28070> in your system. In order to get AWS parts working, you will need the AWS_ keys set correctly.

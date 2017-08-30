@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # wait for db to be provisioned
-# sleep 30
+sleep 10
 
 echo "Creating Log Files"
 mkdir -p /var/log/nginx
