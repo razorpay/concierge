@@ -28,7 +28,7 @@ fastcgi_param  DB_USERNAME				{{ lookup('db_username') }}
 fastcgi_param  DB_PASSWORD				{{ lookup('db_passwword') }}
 fastcgi_param  APP_ENV			  "production"
 fastcgi_param  APP_DEBUG		  "false"
-fastcgi_param  APP_KEY			  {{ lookup('app_key }}
+fastcgi_param  APP_KEY			  {{ lookup('app_key') }}
 fastcgi_param  GOOGLE_CLIENT_ID				{{ lookup('google_client_id') }}
 fastcgi_param  GOOGLE_CLIENT_SECRET				{{ lookup('gogle_client_secret') }}
 fastcgi_param  COMPANY_DOMAIN				"razorpay.com";
