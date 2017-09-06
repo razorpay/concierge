@@ -39,7 +39,7 @@ class HomeController extends BaseController
     {
         $code = Request::get('code');
 
-        $google_service = SocialOAuth::consumer('Google');
+        $google_service = SocialOAuth::consumer('Google', config('app.url'));
 
         if (! $code) {
             $url = $google_service->getAuthorizationUri();

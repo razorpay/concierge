@@ -2,12 +2,10 @@
 set -euo pipefail
 
 # wait for db to be provisioned
-sleep 10
+sleep 30
 
 echo "Creating Log Files"
 mkdir -p /var/log/nginx
-
-ALOHOMORA_BIN=$(which alohomora)
 
 # fix permissions
 chown -R nginx.nginx /app
@@ -31,6 +29,7 @@ if [[ "${APP_ENV}" == "dev" ]]; then
   sed -i -- 's/;clear_env = no/clear_env = no/g' /etc/php7/php-fpm.d/www.conf
 
 else
+  ALOHOMORA_BIN=$(which alohomora)
   # casting alohomora to unlock the secrets
   echo "<?php return 'production';" > "environment/env.php"
   $ALOHOMORA_BIN cast --region ap-south-1 --env $APP_ENV --app concierge "dockerconf/concierge.nginx.conf.j2" "dockerconf/fastcgi.conf.j2"
