@@ -7,7 +7,7 @@ sleep 10
 echo "Creating Log Files"
 mkdir -p /var/log/nginx
 
-# ALOHOMORA_BIN=$(which alohomora)
+ALOHOMORA_BIN=$(which alohomora)
 
 # fix permissions
 chown -R nginx.nginx /app
