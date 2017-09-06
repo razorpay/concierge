@@ -23,7 +23,7 @@ fastcgi_param  SERVER_NAME        $server_name;
 
 # TODO: Change these calls to lookup
 fastcgi_param  DB_USERNAME				{{ lookup('db_username') }}
-fastcgi_param  DB_PASSWORD				{{ lookup('db_passwword') }}
+fastcgi_param  DB_PASSWORD				{{ lookup('db_password') }}
 fastcgi_param  APP_ENV			  "production"
 fastcgi_param  APP_DEBUG		  "false"
 fastcgi_param  APP_KEY			  {{ lookup('app_key') }}

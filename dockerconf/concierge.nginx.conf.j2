@@ -8,9 +8,9 @@ server {
 server {
     listen 80;
     {% if env != 'prod' %}
-    server_name {{ env }}-concierge.razorpay.com
+    server_name {{ env }}-concierge.razorpay.com;
     {% else %}
-    server_name concierge.razorpay.com
+    server_name concierge.razorpay.com;
     {% endif %}
     root "/app/public";
 
