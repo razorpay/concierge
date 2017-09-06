@@ -21,27 +21,23 @@ fastcgi_param  SERVER_ADDR        $server_addr;
 fastcgi_param  SERVER_PORT        $server_port;
 fastcgi_param  SERVER_NAME        $server_name;
 
-# TODO: Change these calls to lookup
-fastcgi_param  DB_USERNAME				{{ lookup('db_username') }};
-fastcgi_param  DB_PASSWORD				{{ lookup('db_password') }};
-fastcgi_param  APP_ENV			  "production";
-fastcgi_param  APP_DEBUG		  "false";
-fastcgi_param  APP_KEY			  {{ lookup('app_key') }};
-fastcgi_param  GOOGLE_CLIENT_ID				{{ lookup('google_client_id') }};
-fastcgi_param  GOOGLE_CLIENT_SECRET				{{ lookup('google_client_secret') }};
-fastcgi_param  COMPANY_DOMAIN				"razorpay.com";
+# Concierge config follows
+fastcgi_param  DB_USERNAME			{{ lookup('db_username') }};
+fastcgi_param  DB_PASSWORD			{{ lookup('db_password') }};
+fastcgi_param  APP_KEY			  	{{ lookup('app_key') }};
+fastcgi_param  GOOGLE_CLIENT_ID		{{ lookup('google_client_id') }};
+fastcgi_param  GOOGLE_CLIENT_SECRET	{{ lookup('google_client_secret') }};
+fastcgi_param  CRON_PASSWORD		{{ lookup('cron_password') }};
 
-# TODO: Figure this out for k8s?
-fastcgi_param  APP_DOMAIN				https://concierge.razorpay.com;
-# something.vpc perhaps?
-fastcgi_param  BASE_URL				razorpay.com;
-fastcgi_param  CRON_PASSWORD				{{ lookup('cron_password') }};
+fastcgi_param  COMPANY_DOMAIN		"razorpay.com";
+fastcgi_param  APP_DEBUG		  	"false";
+fastcgi_param  APP_ENV			 	"production";
+fastcgi_param  APP_DOMAIN			"concierge.razorpay.com";
+fastcgi_param  BASE_URL				"https://concierge.razorpay.com";
 
-# Use these if we don't have kube2iam working
-# AWS
-fastcgi_param  AWS_REGION				ap-south-1;
+fastcgi_param  AWS_REGION			"ap-south-1";
 # This is because we aren't doing SSL on nginx
-fastcgi_param  SECURE_SESSION			"false";
+fastcgi_param  SECURE_SESSION		"false";
 
 # PHP only, required if PHP was built with --enable-force-cgi-redirect
 fastcgi_param  REDIRECT_STATUS    200;
