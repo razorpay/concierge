@@ -22,6 +22,7 @@ fastcgi_param  SERVER_PORT        $server_port;
 fastcgi_param  SERVER_NAME        $server_name;
 
 # Concierge config follows
+fastcgi_param  DB_HOST 				{{ lookup('db_host') }};
 fastcgi_param  DB_USERNAME			{{ lookup('db_username') }};
 fastcgi_param  DB_PASSWORD			{{ lookup('db_password') }};
 fastcgi_param  APP_KEY			  	{{ lookup('app_key') }};
