@@ -151,6 +151,7 @@ return [
         Aws\Laravel\AwsServiceProvider::class,
         Schuppo\PasswordStrength\PasswordStrengthServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\AppServiceProvider::class,
         Artdarek\OAuth\OAuthServiceProvider::class,
     ],
 
