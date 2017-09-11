@@ -18,7 +18,19 @@ server {
 
     charset utf-8;
 
+    # Otherwise, AWS Health Checks get redirected to HTTPS as well
+    location /health {
+        access_log off;
+        return  200;
+    }
+
     location / {
+
+        # See https://oanhnn.github.io/2016-02-29/how-to-force-https-behind-aws-elb.html
+        if ($http_x_forwarded_proto != 'https') {
+            return 301 https://$server_name$request_uri;
+        }
+
         try_files $uri $uri/ /index.php?$query_string;
     }
 
