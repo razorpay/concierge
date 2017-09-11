@@ -93,7 +93,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY', 'xOlhfx6IBUR2FDulBrueOHzlUCEbJ8oT'),
+    'key' => env('APP_KEY'),
 
     /*
     |--------------------------------------------------------------------------
@@ -166,7 +166,7 @@ return [
     |
     */
 
-    'manifest' => storage_path().'/meta',
+    'manifest' => storage_path() . '/meta',
 
     /*
     |--------------------------------------------------------------------------
@@ -180,7 +180,6 @@ return [
     */
 
     'aliases' => [
-
         'App'             => Illuminate\Support\Facades\App::class,
         'Artisan'         => Illuminate\Support\Facades\Artisan::class,
         'Auth'            => Illuminate\Support\Facades\Auth::class,
