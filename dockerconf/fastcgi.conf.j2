@@ -35,10 +35,7 @@ fastcgi_param  APP_DEBUG		  	"false";
 fastcgi_param  APP_ENV			 	"production";
 fastcgi_param  APP_DOMAIN			"concierge.razorpay.com";
 fastcgi_param  BASE_URL				"https://concierge.razorpay.com";
-
 fastcgi_param  AWS_REGION			"ap-south-1";
-# This is because we aren't doing SSL on nginx
-fastcgi_param  SECURE_SESSION		"false";
 
 # PHP only, required if PHP was built with --enable-force-cgi-redirect
 fastcgi_param  REDIRECT_STATUS    200;

@@ -42,7 +42,9 @@ class HomeController extends BaseController
         $google_service = SocialOAuth::consumer('Google', config('app.url'));
 
         if (! $code) {
-            $url = $google_service->getAuthorizationUri();
+            $url = $google_service->getAuthorizationUri([
+                'hosted_domain' =>  config('concierge.google_domain')
+            ]);
 
             return redirect((string) $url);
         } else {
@@ -74,7 +76,9 @@ class HomeController extends BaseController
                 // Login the user into the app
                 Auth::loginUsingId($user->id);
 
-                return redirect('/groups');
+                $redirectUrl = config('app.url') . '/groups';
+                return redirect($redirectUrl);
+
             } else {
                 App::abort(401);
             }

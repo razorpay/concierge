@@ -46,7 +46,7 @@ $cascadingEnvFile = '.env.'.$env;
 if (! function_exists('read_env_file')) {
     function read_env_file($envDir, $fileName)
     {
-        $file = $envDir.'/'.$fileName;
+        $file = $envDir . '/' . $fileName;
 
         if (file_exists($file) === false) {
             return;
