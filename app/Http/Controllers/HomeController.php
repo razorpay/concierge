@@ -443,6 +443,8 @@ class HomeController extends BaseController
         if (! empty($messages)) {
             return implode("\n", $messages);
         }
+
+        return "No leases to clear";
     }
 
     /*

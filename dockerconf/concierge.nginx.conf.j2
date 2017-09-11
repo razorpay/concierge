@@ -19,7 +19,7 @@ server {
     charset utf-8;
 
     # Otherwise, AWS Health Checks get redirected to HTTPS as well
-    location /health {
+    location ^/(elb-ping|health)/ {
         access_log off;
         return  200;
     }
