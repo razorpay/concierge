@@ -538,8 +538,10 @@ class HomeController extends BaseController
             return redirect('/users/add')
                             ->with('errors', $validator->messages()->toArray());
         } else {
-            $input['password'] = ''; // Backward compatible
-            User::create($input);
+
+            // Backward compatible
+            $input['password'] = '';
+            Models\User::create($input);
 
             return redirect('/users')
                             ->with('message', 'User Added Successfully');
