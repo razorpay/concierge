@@ -9,5 +9,8 @@ environment/env.php
 !environment/.env.production
 !environment/.env.beta
 !environment/.env.alpha
-storage/
+!storage/framework/views/.gitignore
+!storage/framework/sessions/.gitignore
+!storage/framework/cache/.gitignore
+/storage/
 docker-compose.dev.yml
