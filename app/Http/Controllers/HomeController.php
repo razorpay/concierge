@@ -61,12 +61,6 @@ class HomeController extends BaseController
 
             if ($result->verified_email !== true or $result->hd !== config('concierge.google_domain'))
             {
-                var_dump([
-                    $result->verified_email,
-                    $result->hd,
-                    config('concierge.google_domain')
-                ]);
-                die;
                 return App::abort(404);
             }
 
