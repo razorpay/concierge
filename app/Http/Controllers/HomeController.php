@@ -11,6 +11,7 @@ use SocialOAuth;
 use Request;
 use App\Models;
 use Validator;
+use Exception;
 
 class HomeController extends BaseController
 {
