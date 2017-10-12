@@ -24,6 +24,11 @@ server {
         return  200;
     }
 
+    location /commit.txt {
+      alias /app/public/commit.txt ;
+      access_log off;
+    }
+
     location / {
 
         # See https://oanhnn.github.io/2016-02-29/how-to-force-https-behind-aws-elb.html
