@@ -53,6 +53,8 @@ Route::group(['middleware' => ['web']], function() {
         Route::post('/signin', ['before'=>'csrf', 'uses'=>'HomeController@postSignin']);
 
         Route::post('/duologin', 'HomeController@postDuologin');
+
+        Route::get('/v1/status', 'HomeController@getIndex');
     });
 
     Route::get('/invite/{token}', 'HomeController@getInvite');
