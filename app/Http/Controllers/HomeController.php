@@ -704,4 +704,25 @@ class HomeController extends BaseController
 
         return $clientIpAddress;
     }
+
+    public function getStatus()
+    {
+        $msgArray = [];
+
+        try
+        {
+            if(DB::connection('mysql')->getPdo())
+            {
+                $msgArray = [
+                    'msg' => 'Connected to DB',
+                ];
+            }
+
+            return Response::json($msgArray);
+        }
+        catch(\Exception $e)
+        {
+            return Response::json(['error' => 'DB Connection error'], 500);
+        }
+    }
 }
