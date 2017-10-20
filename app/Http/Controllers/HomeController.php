@@ -7,6 +7,7 @@ use Log;
 use Auth;
 use Mail;
 use View;
+use DB;
 use SocialOAuth;
 use Request;
 use App\Models;
@@ -711,7 +712,7 @@ class HomeController extends BaseController
 
         try
         {
-            if(DB::connection('mysql')->getPdo())
+            if (DB::connection('mysql')->getPdo())
             {
                 $msgArray = [
                     'msg' => 'Connected to DB',
