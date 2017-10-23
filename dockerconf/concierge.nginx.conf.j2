@@ -26,21 +26,15 @@ server {
 
     location /commit.txt {
       alias /app/public/commit.txt ;
-      access_log off;
     }
 
     location / {
 
-        # See https://oanhnn.github.io/2016-02-29/how-to-force-https-behind-aws-elb.html
-        if ($http_x_forwarded_proto != 'https') {
-            return 301 https://$server_name$request_uri;
-        }
-
         try_files $uri $uri/ /index.php?$query_string;
     }
 
-    access_log /var/log/nginx/{{ env }}-concierge-access.log combined;
-    error_log  /var/log/nginx/{{ env }}-concierge-error.log error;
+    access_log /var/log/nginx/NGINX_HOST-{{ env }}-concierge-access.log combined;
+    error_log  /var/log/nginx/NGINX_HOST-{{ env }}-concierge-error.log error;
 
     sendfile off;
 
