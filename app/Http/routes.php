@@ -54,7 +54,7 @@ Route::group(['middleware' => ['web']], function() {
 
         Route::post('/duologin', 'HomeController@postDuologin');
 
-        Route::get('/v1/status', 'HomeController@getStatus');
+        Route::get('/status', 'HomeController@getStatus');
     });
 
     Route::get('/invite/{token}', 'HomeController@getInvite');
