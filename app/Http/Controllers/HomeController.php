@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-
 use App;
 use Log;
 use Auth;
 use Mail;
 use View;
-use OAuth;
+use DB;
+use SocialOAuth;
 use Request;
 use App\Models;
+use Validator;
+use Exception;
 
 class HomeController extends BaseController
 {
@@ -39,10 +41,12 @@ class HomeController extends BaseController
     {
         $code = Request::get('code');
 
-        $google_service = OAuth::consumer('Google');
+        $google_service = SocialOAuth::consumer('Google', config('app.url'));
 
         if (! $code) {
-            $url = $google_service->getAuthorizationUri();
+            $url = $google_service->getAuthorizationUri([
+                'hosted_domain' =>  config('concierge.google_domain')
+            ]);
 
             return redirect((string) $url);
         } else {
@@ -56,7 +60,9 @@ class HomeController extends BaseController
             // - Belong to razorpay.com domain
             //
             // Then only we'll create a user entry in the system or check for one
-            if (! $result->verified_email || ! checkEmailDomain($result->email)) {
+
+            if ($result->verified_email !== true or $result->hd !== config('concierge.google_domain'))
+            {
                 return App::abort(404);
             }
 
@@ -74,7 +80,9 @@ class HomeController extends BaseController
                 // Login the user into the app
                 Auth::loginUsingId($user->id);
 
-                return redirect('/groups');
+                $redirectUrl = config('app.url') . '/groups';
+                return redirect($redirectUrl);
+
             } else {
                 App::abort(401);
             }
@@ -439,6 +447,8 @@ class HomeController extends BaseController
         if (! empty($messages)) {
             return implode("\n", $messages);
         }
+
+        return "No leases to clear";
     }
 
     /*
@@ -508,21 +518,26 @@ class HomeController extends BaseController
     public function postAddUser()
     {
         $input = Request::all();
+
         //Validation Rules
         $user_rules = [
-        'email'                 => 'required|between:2,50|email|unique:users|razorpay_email',
-        'name'                  => 'required|between:3,100|alpha_spaces',
-        'admin'                 => 'required|in:1,0', ];
+            'email'                 => 'required|between:2,50|email|unique:users|org_email',
+            'name'                  => 'required|between:3,100',
+            'admin'                 => 'required|in:1,0',
+        ];
 
         $validator = Validator::make($input, $user_rules, [
-            'razorpay_email' => 'Only razorpay.com emails allowed',
+            'org_email' => "Only {config('concierge.google_domain')} emails allowed",
         ]);
+
         if ($validator->fails()) {
             return redirect('/users/add')
                             ->with('errors', $validator->messages()->toArray());
         } else {
-            $input['password'] = ''; // Backward compatible
-            User::create($input);
+
+            // Backward compatible
+            $input['password'] = '';
+            Models\User::create($input);
 
             return redirect('/users')
                             ->with('message', 'User Added Successfully');
@@ -542,13 +557,13 @@ class HomeController extends BaseController
 
         //Validation Rules
         $user_rules = [
-            'email'              => "required|between:2,50|email|unique:users,email,$id|razorpay_email",
+            'email'              => "required|between:2,50|email|unique:users,email,$id|org",
             'name'               => 'required|between:3,100|alpha_spaces',
             'admin'              => 'required|in:1,0',
         ];
 
         $validator = Validator::make($input, $user_rules, [
-            'razorpay_email' => 'Only razorpay.com emails allowed',
+            'org' => 'Only razorpay.com emails allowed',
         ]);
 
         if ($validator->fails()) {
@@ -689,5 +704,26 @@ class HomeController extends BaseController
         }
 
         return $clientIpAddress;
+    }
+
+    public function getStatus()
+    {
+        $msgArray = [];
+
+        try
+        {
+            if (DB::connection('mysql')->getPdo())
+            {
+                $msgArray = [
+                    'msg' => 'Connected to DB',
+                ];
+            }
+
+            return Response::json($msgArray);
+        }
+        catch(\Exception $e)
+        {
+            return Response::json(['error' => 'DB Connection error'], 500);
+        }
     }
 }

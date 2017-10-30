@@ -34,12 +34,12 @@
 
             @if($invite['email']!=='DEPLOY')
             <h4>Share the following link to invite someone for this lease</h4>
-            <input type="text" onclick="this.focus();this.select()" class="form-control" readonly="readonly" value="{{URL::to('/invite/')}}/{{$invite['token']}}">
+            <input type="text" onclick="this.focus();this.select()" class="form-control" readonly="readonly" value="{{url('/invite/')}}/{{$invite['token']}}">
             <p>Information: The link will only work once.</p>
 
             @else
             <h4>Make a get request to following link for using this lease</h4>
-            <input type="text" onclick="this.focus();this.select()" class="form-control" readonly="readonly" value="{{URL::to('/invite/')}}/{{$invite['token']}}">
+            <input type="text" onclick="this.focus();this.select()" class="form-control" readonly="readonly" value="{{url('/invite/')}}/{{$invite['token']}}">
             <p>Information: The link will keep working until you manually delete the invite. The link will show an error in case the lease is already active.</p>
 
             @endif

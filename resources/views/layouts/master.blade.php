@@ -43,7 +43,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                   </button>
-                  <a class="navbar-brand" href="{{ URL::to('/')}}">Concierge Home</a>
+                  <a class="navbar-brand" href="/">Concierge Home</a>
                 </div>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
@@ -51,9 +51,9 @@
                   <ul class="nav navbar-nav navbar-right">
                     <li><p class="navbar-text">Signed in as {{{Auth::user()->name}}}</p></li>
                     @if(Auth::user()->admin)
-                    <li><a href="{{ URL::to('/users')}}">Manage Users</a></li>
+                    <li><a href="/users">Manage Users</a></li>
                     @endif
-                    <li><a href="{{ URL::to('/logout') }}">Logout</a></li>
+                    <li><a href="/logout">Logout</a></li>
                   </ul>
                 </div><!-- /.navbar-collapse -->
               </div><!-- /.container-fluid -->

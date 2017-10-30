@@ -48,10 +48,10 @@
                    </tr>
                 </tbody>
             </table>
-            <h4>Click <a href="{{URL::to('/invite')}}/{{$invite['token']}}" target="_blank">here</a> to access the lease.</h4>
+            <h4>Click <a href="{{url('/invite')}}/{{$invite['token']}}" target="_blank">here</a> to access the lease.</h4>
             <p>
             Alternatively, you may open the following link in your browser:<br/>
-            {{URL::to('/invite')}}/{{$invite['token']}}
+            {{url('/invite')}}/{{$invite['token']}}
             </p>
             <p>Information: The lease will only be valid on the security groups chosen by the creator.</p>
     </body>

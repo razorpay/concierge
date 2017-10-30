@@ -93,7 +93,7 @@ return [
     |
     */
 
-    'key' => env('APP_KEY', 'xOlhfx6IBUR2FDulBrueOHzlUCEbJ8oT'),
+    'key' => env('APP_KEY'),
 
     /*
     |--------------------------------------------------------------------------
@@ -126,7 +126,6 @@ return [
         /*
          * Laravel Framework Service Providers...
          */
-        Artdarek\OAuth\OAuthServiceProvider::class,
         Illuminate\Foundation\Providers\ArtisanServiceProvider::class,
         Illuminate\Auth\AuthServiceProvider::class,
         Illuminate\Broadcasting\BroadcastServiceProvider::class,
@@ -152,6 +151,8 @@ return [
         Aws\Laravel\AwsServiceProvider::class,
         Schuppo\PasswordStrength\PasswordStrengthServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\AppServiceProvider::class,
+        Artdarek\OAuth\OAuthServiceProvider::class,
     ],
 
     /*
@@ -165,7 +166,7 @@ return [
     |
     */
 
-    'manifest' => storage_path().'/meta',
+    'manifest' => storage_path() . '/meta',
 
     /*
     |--------------------------------------------------------------------------
@@ -179,7 +180,6 @@ return [
     */
 
     'aliases' => [
-
         'App'             => Illuminate\Support\Facades\App::class,
         'Artisan'         => Illuminate\Support\Facades\Artisan::class,
         'Auth'            => Illuminate\Support\Facades\Auth::class,
@@ -215,7 +215,7 @@ return [
         'View'            => Illuminate\Support\Facades\View::class,
 
         'AWS'             => Aws\Laravel\AwsFacade::class,
-        'OAuth'           => Artdarek\OAuth\Facade\OAuth::class,
+        'SocialOAuth'     => Artdarek\OAuth\Facade\OAuth::class,
     ],
 
     'context' => env('CONTEXT', 'dev'),

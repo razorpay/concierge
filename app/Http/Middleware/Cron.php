@@ -25,7 +25,7 @@ class Cron
         $username = 'cron';
         $password = $request->getPassword();
 
-        if ($request->getUser() === $username and password_verify($password, config('concierge.cron_password')))
+        if (hash_equals($request->getUser(), $username) and hash_equals($password, config('concierge.cron_password')))
         {
             return $next($request);
         }

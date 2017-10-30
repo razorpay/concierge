@@ -58,7 +58,7 @@
 		       	@endforeach
 		    </tbody>
    		    </table>
-   		    <h4><a href="{{URL::to('/users/add')}}">Create New User</a></h4>
+   		    <h4><a href="{{url('/users/add')}}">Create New User</a></h4>
 		</div>
 	</div>
 @stop
