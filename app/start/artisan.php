@@ -10,5 +10,5 @@
 | the console gets access to each of the command object instances.
 |
 */
-Artisan::add(new leasemanager);
-Artisan::add(new croncreator);
+Artisan::add(new leasemanager());
+Artisan::add(new croncreator());
