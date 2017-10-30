@@ -1210,16 +1210,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/oriceon/oauth-5-laravel.git",
-                "reference": "3e00136592b1e235155af24a2e7cb802d684be76"
+                "reference": "7f62f461c46a3574577b07880b8600c3f545c8fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oriceon/oauth-5-laravel/zipball/3e00136592b1e235155af24a2e7cb802d684be76",
-                "reference": "3e00136592b1e235155af24a2e7cb802d684be76",
+                "url": "https://api.github.com/repos/oriceon/oauth-5-laravel/zipball/7f62f461c46a3574577b07880b8600c3f545c8fc",
+                "reference": "7f62f461c46a3574577b07880b8600c3f545c8fc",
                 "shasum": ""
             },
             "require": {
-                "lusitanian/oauth": "~0.3",
+                "lusitanian/oauth": "*",
                 "php": ">=5.4"
             },
             "require-dev": {
@@ -1255,7 +1255,7 @@
                 "oauth",
                 "php"
             ],
-            "time": "2017-01-28T07:00:19+00:00"
+            "time": "2017-06-09T20:01:54+00:00"
         },
         {
             "name": "paragonie/random_compat",

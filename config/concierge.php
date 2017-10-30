@@ -31,4 +31,6 @@ return [
     'mail_from_name'       => 'Concierge [AWS Lease Manager]',
 
     'cron_password'        => env('CRON_PASSWORD'),
+
+    'google_domain'        => env('COMPANY_DOMAIN'),
 ];

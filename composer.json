@@ -5,10 +5,10 @@
     "license": "MIT",
     "require": {
         "laravel/framework": "5.3.*",
-         "aws/aws-sdk-php-laravel": "3.*",
-         "schuppo/password-strength": "~1.5",
-         "oriceon/oauth-5-laravel": "dev-master",
-         "duosecurity/duo_php": "dev-master"
+        "aws/aws-sdk-php-laravel": "3.*",
+        "schuppo/password-strength": "~1.5",
+        "oriceon/oauth-5-laravel": "dev-master",
+        "duosecurity/duo_php": "dev-master"
     },
     "autoload": {
         "psr-4": {
@@ -24,9 +24,7 @@
             "php artisan clear-compiled",
             "php artisan optimize"
         ],
-        "post-create-project-cmd": [
-            "php artisan key:generate"
-        ]
+        "post-create-project-cmd": ["php artisan key:generate"]
     },
     "config": {
         "preferred-install": "dist"

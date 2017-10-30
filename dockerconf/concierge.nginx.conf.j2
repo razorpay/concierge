@@ -1,0 +1,61 @@
+server {
+  listen 81;
+  location = /elb-ping {
+      return 200;
+  }
+}
+
+server {
+    listen 80;
+    {% if env != 'prod' %}
+    server_name {{ env }}-concierge.razorpay.com;
+    {% else %}
+    server_name concierge.razorpay.com;
+    {% endif %}
+    root "/app/public";
+
+    index index.php;
+
+    charset utf-8;
+
+    # Otherwise, AWS Health Checks get redirected to HTTPS as well
+    location ^/(elb-ping|health)/ {
+        access_log off;
+        return  200;
+    }
+
+    location /commit.txt {
+      alias /app/public/commit.txt ;
+    }
+
+    location / {
+
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    access_log /var/log/nginx/NGINX_HOST-{{ env }}-concierge-access.log combined;
+    error_log  /var/log/nginx/NGINX_HOST-{{ env }}-concierge-error.log error;
+
+    sendfile off;
+
+    client_max_body_size 100m;
+
+    location ~ \.php$ {
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/run/php7.0-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi.conf;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
+        fastcgi_intercept_errors off;
+        fastcgi_buffer_size 16k;
+        fastcgi_buffers 4 16k;
+        fastcgi_connect_timeout 300;
+        fastcgi_send_timeout 300;
+        fastcgi_read_timeout 300;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
