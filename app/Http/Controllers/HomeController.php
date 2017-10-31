@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Auth;
 use Mail;
 use View;
@@ -476,7 +476,9 @@ class HomeController extends BaseController
                 'expiry'      => $invite->expiry,
                 'invite_email'=> $email,
             ];
+
         $result = $this->createLease($lease);
+
         if (! $result) {
             //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
                 return View::make('pages.guest')->with('failure', "Error encountered while creating lease. Please try again. If doesn't help contact the admin.");
@@ -663,6 +665,10 @@ class HomeController extends BaseController
             'CidrIp'     => $lease['lease_ip'],
             ]);
         } catch (Exception $e) {
+            Log::info('Error while creating lease', [
+                'lease'     =>  $lease,
+                'exception' =>  $e->getMessage(),
+            ]);
             return false;
         }
 
