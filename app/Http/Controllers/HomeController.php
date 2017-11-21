@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Auth;
 use Mail;
 use View;
@@ -476,7 +476,9 @@ class HomeController extends BaseController
                 'expiry'      => $invite->expiry,
                 'invite_email'=> $email,
             ];
+
         $result = $this->createLease($lease);
+
         if (! $result) {
             //Lease Creation Failed. AWS Reported an error. Generally in case if a lease with same ip, protocl, port already exists on AWS.
                 return View::make('pages.guest')->with('failure', "Error encountered while creating lease. Please try again. If doesn't help contact the admin.");
@@ -521,18 +523,20 @@ class HomeController extends BaseController
 
         //Validation Rules
         $user_rules = [
-            'email'                 => 'required|between:2,50|email|unique:users|org_email',
-            'name'                  => 'required|between:3,100',
-            'admin'                 => 'required|in:1,0',
+            'email'    => 'required|between:2,50|email|unique:users|org_email',
+            'name'     => 'required|between:3,100',
+            'admin'    => 'required|in:1,0',
         ];
 
+        $domain = config('concierge.google_domain');
+
         $validator = Validator::make($input, $user_rules, [
-            'org_email' => "Only {config('concierge.google_domain')} emails allowed",
+            'org_email' => "Only $domain emails allowed",
         ]);
 
         if ($validator->fails()) {
             return redirect('/users/add')
-                            ->with('errors', $validator->messages()->toArray());
+                ->with('errors', $validator->messages()->toArray());
         } else {
 
             // Backward compatible
@@ -557,13 +561,13 @@ class HomeController extends BaseController
 
         //Validation Rules
         $user_rules = [
-            'email'              => "required|between:2,50|email|unique:users,email,$id|org",
+            'email'              => "required|between:2,50|email|unique:users,email,$id|org_email",
             'name'               => 'required|between:3,100|alpha_spaces',
             'admin'              => 'required|in:1,0',
         ];
 
         $validator = Validator::make($input, $user_rules, [
-            'org' => 'Only razorpay.com emails allowed',
+            'org_email' => 'Only razorpay.com emails allowed',
         ]);
 
         if ($validator->fails()) {
@@ -663,6 +667,10 @@ class HomeController extends BaseController
             'CidrIp'     => $lease['lease_ip'],
             ]);
         } catch (Exception $e) {
+            Log::info('Error while creating lease', [
+                'lease'     =>  $lease,
+                'exception' =>  $e->getMessage(),
+            ]);
             return false;
         }
 
@@ -696,8 +704,37 @@ class HomeController extends BaseController
     private function getClientIp()
     {
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) and $_SERVER['HTTP_X_FORWARDED_FOR']) {
-            // if behind an ELB
+            // if behind an load balancer, assume that all load balancers have private IPs
+            // and the first public IP will be that of the client
             $clientIpAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+            // We pick the first non-public IP we get
+
+            if (strpos($clientIpAddress, ',') !== false)
+            {
+                $ips = array_reverse(array_map('trim', explode(',' , $clientIpAddress)));
+
+                function isPublicIp($ip)
+                {
+                    $flags = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+
+                    return (bool) filter_var(
+                        $ip,
+                        FILTER_VALIDATE_IP,
+                        [
+                            'flags' => $flags,
+                        ]
+                    );
+                }
+
+                foreach ($ips as $ip)
+                {
+                    if (isPublicIp($ip))
+                    {
+                        return $ip;
+                    }
+                }
+            }
         } else {
             // if not behind ELB
             $clientIpAddress = $_SERVER['REMOTE_ADDR'];

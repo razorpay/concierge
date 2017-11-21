@@ -44,7 +44,6 @@ class AppServiceProvider extends ServiceProvider
             $email_domain = end($email_parts);
 
             return ($email_domain === $domain);
-
         });
 
     }
