@@ -523,18 +523,20 @@ class HomeController extends BaseController
 
         //Validation Rules
         $user_rules = [
-            'email'                 => 'required|between:2,50|email|unique:users|org_email',
-            'name'                  => 'required|between:3,100',
-            'admin'                 => 'required|in:1,0',
+            'email'    => 'required|between:2,50|email|unique:users|org_email',
+            'name'     => 'required|between:3,100',
+            'admin'    => 'required|in:1,0',
         ];
 
+        $domain = config('concierge.google_domain');
+
         $validator = Validator::make($input, $user_rules, [
-            'org_email' => "Only {config('concierge.google_domain')} emails allowed",
+            'org_email' => "Only $domain emails allowed",
         ]);
 
         if ($validator->fails()) {
             return redirect('/users/add')
-                            ->with('errors', $validator->messages()->toArray());
+                ->with('errors', $validator->messages()->toArray());
         } else {
 
             // Backward compatible
@@ -559,13 +561,13 @@ class HomeController extends BaseController
 
         //Validation Rules
         $user_rules = [
-            'email'              => "required|between:2,50|email|unique:users,email,$id|org",
+            'email'              => "required|between:2,50|email|unique:users,email,$id|org_email",
             'name'               => 'required|between:3,100|alpha_spaces',
             'admin'              => 'required|in:1,0',
         ];
 
         $validator = Validator::make($input, $user_rules, [
-            'org' => 'Only razorpay.com emails allowed',
+            'org_email' => 'Only razorpay.com emails allowed',
         ]);
 
         if ($validator->fails()) {
