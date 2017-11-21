@@ -702,8 +702,37 @@ class HomeController extends BaseController
     private function getClientIp()
     {
         if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) and $_SERVER['HTTP_X_FORWARDED_FOR']) {
-            // if behind an ELB
+            // if behind an load balancer, assume that all load balancers have private IPs
+            // and the first public IP will be that of the client
             $clientIpAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+
+            // We pick the first non-public IP we get
+
+            if (strpos($clientIpAddress, ',') !== false)
+            {
+                $ips = array_reverse(array_map('trim', explode(',' , $clientIpAddress)));
+
+                function isPublicIp($ip)
+                {
+                    $flags = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+
+                    return (bool) filter_var(
+                        $ip,
+                        FILTER_VALIDATE_IP,
+                        [
+                            'flags' => $flags,
+                        ]
+                    );
+                }
+
+                foreach ($ips as $ip)
+                {
+                    if (isPublicIp($ip))
+                    {
+                        return $ip;
+                    }
+                }
+            }
         } else {
             // if not behind ELB
             $clientIpAddress = $_SERVER['REMOTE_ADDR'];
