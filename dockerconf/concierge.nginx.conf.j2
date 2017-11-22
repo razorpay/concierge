@@ -1,11 +1,4 @@
 server {
-  listen 81;
-  location = /elb-ping {
-      return 200;
-  }
-}
-
-server {
     listen 80;
     {% if env != 'prod' %}
     server_name {{ env }}-concierge.razorpay.com;
@@ -17,16 +10,6 @@ server {
     index index.php;
 
     charset utf-8;
-
-    # Otherwise, AWS Health Checks get redirected to HTTPS as well
-    location ^/(elb-ping|health)/ {
-        access_log off;
-        return  200;
-    }
-
-    location /commit.txt {
-      alias /app/public/commit.txt ;
-    }
 
     location / {
 
