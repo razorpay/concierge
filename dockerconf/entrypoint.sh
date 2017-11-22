@@ -10,12 +10,6 @@ mkdir -p /var/log/nginx
 # fix permissions
 chown -R nginx.nginx /app
 
-echo "GIT commit hash"
-if [[ -n "${GIT_COMMIT_HASH-}" ]]; then
-  echo "GIT_COMMIT_HASH=${GIT_COMMIT_HASH}" >> /app/.env.vault
-  echo "${GIT_COMMIT_HASH}" > /app/public/commit.txt
-fi
-
 # TODO: merge concierge.nginx.conf & concierge.nginx.dev.conf in a single j2 template
 # once `alohomora` has simple jinja2 render capabilities
 # without credstash lookups

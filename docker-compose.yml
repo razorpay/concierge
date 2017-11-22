@@ -3,8 +3,6 @@ services:
   concierge:
     build:
       context: .
-      args:
-       - GIT_TOKEN
     image: razorpay:concierge
     links:
       - db-concierge

@@ -10,6 +10,7 @@ use View;
 use DB;
 use SocialOAuth;
 use Request;
+use Response;
 use App\Models;
 use Validator;
 use Exception;
