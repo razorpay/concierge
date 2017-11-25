@@ -19,6 +19,8 @@ class HomeController extends BaseController
 {
     // 6 hours
     const MAX_EXPIRY = 21600;
+
+    const CONCIERGE_TAG = 'concierge'
     /*
     |--------------------------------------------------------------------------
     | Default Home Controller
@@ -185,7 +187,21 @@ class HomeController extends BaseController
     {
         //Get All security groups
         $ec2 = App::make('aws')->createClient('ec2');
-        $security_groups = $ec2->describeSecurityGroups();
+
+        $filters = [
+            [
+                "Name"   => "tag-key",
+                "Values" => [self::CONCIERGE_TAG]
+            ],[
+                "Name"   => "tag-value",
+                "Values" => ["true"]
+            ],
+        ];
+
+        $security_groups = $ec2->describeSecurityGroups(
+            ['Filters' => $filters]
+        );
+
         $security_groups = $security_groups['SecurityGroups'];
 
         //Get all active leases
