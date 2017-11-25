@@ -14,26 +14,14 @@ use Response;
 use App\Models;
 use Validator;
 use Exception;
+use Carbon\Carbon;
 
 class HomeController extends BaseController
 {
     // 6 hours
     const MAX_EXPIRY = 21600;
 
-    const CONCIERGE_TAG = 'concierge'
-    /*
-    |--------------------------------------------------------------------------
-    | Default Home Controller
-    |--------------------------------------------------------------------------
-    |
-    | You may wish to use controllers instead of, or in addition to, Closure
-    | based routes. That's great! Here is an example controller method to
-    | get you started. To route to this controller, just add the route:
-    |
-    |	Route::get('/', 'HomeController@showWelcome');
-    |
-    */
-    private $_laravelDuo;
+    const CONCIERGE_TAG = 'concierge';
 
     /**
      * Stage One - The Login form.
@@ -670,24 +658,44 @@ class HomeController extends BaseController
      * Handles lease creation by communitacting with AWS API
      * Requires an associative array of lease row.
      * return true if successful, false when AWS API returns error
+     *
+     * @see https://docs.aws.amazon.com/aws-sdk-php/v3/api/api-ec2-2016-11-15.html#updatesecuritygroupruledescriptionsingress
      */
     private function createLease($lease)
     {
         $ec2 = App::make('aws')->createClient('ec2');
+
+        $email = Auth::User()->email;
+        $time = Carbon::now()->toDateTimeString();
+
+        $permissions = [
+            [
+                'FromPort'   => $lease['port_from'],
+                'IpProtocol' => $lease['protocol'],
+                'ToPort'     => $lease['port_to'],
+                'IpRanges'   => [
+                    [
+                        'CidrIp'        => $lease['lease_ip'],
+                        'Description'   => "Created by $email at $time",
+                    ]
+                ],
+            ]
+        ];
         try {
+
             $result = $ec2->authorizeSecurityGroupIngress([
-            'DryRun'     => false,
-            'GroupId'    => $lease['group_id'],
-            'IpProtocol' => $lease['protocol'],
-            'FromPort'   => $lease['port_from'],
-            'ToPort'     => $lease['port_to'],
-            'CidrIp'     => $lease['lease_ip'],
+                'DryRun'     => false,
+                'GroupId'    => $lease['group_id'],
+                'IpPermissions' => $permissions
             ]);
+
         } catch (Exception $e) {
+
             Log::info('Error while creating lease', [
                 'lease'     =>  $lease,
                 'exception' =>  $e->getMessage(),
             ]);
+
             return false;
         }
 
