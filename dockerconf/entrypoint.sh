@@ -23,6 +23,13 @@ else
   ALOHOMORA_BIN=$(which alohomora)
   # casting alohomora to unlock the secrets
   echo "<?php return 'production';" > "environment/env.php"
+  if [[ "${APP_MODE}" == "cron" ]]; then
+    $ALOHOMORA_BIN cast --region ap-south-1 --env $APP_ENV --app concierge "dockerconf/env.sh.j2"
+    source "dockerconf/env.sh"
+    php artisan custom:leasemanager
+    echo "Cron run successfully"
+    exit 0
+  fi
   sed -i "s|NGINX_HOST|$HOSTNAME|g" dockerconf/concierge.nginx.conf.j2
   $ALOHOMORA_BIN cast --region ap-south-1 --env $APP_ENV --app concierge "dockerconf/concierge.nginx.conf.j2"
   $ALOHOMORA_BIN cast --region ap-south-1 --env $APP_ENV --app concierge "dockerconf/fastcgi.conf.j2"

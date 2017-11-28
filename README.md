@@ -54,6 +54,21 @@ Screenshots
 
 ### Manage Users ![Manage Users](/screenshots/manage-users.png?raw=true "Manage Users")
 
+# Docker
+
+A docker container is available at `razorpay/concierge`. It takes in the following environment variables:
+```
+DB_HOST
+DB_USERNAME
+DB_PASSWORD
+APP_KEY
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+CRON_PASSWORD
+```
+
+You can also run the cron by setting `APP_MODE=cron` and starting the container.
+
 License
 --------------
 This application is open-sourced software licensed under the MIT license
