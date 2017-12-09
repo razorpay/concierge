@@ -22,19 +22,19 @@ fastcgi_param  SERVER_PORT        $server_port;
 fastcgi_param  SERVER_NAME        $server_name;
 
 # Concierge config follows
-fastcgi_param  DB_HOST 				"{{ lookup('db_host') }}";
-fastcgi_param  DB_USERNAME			"{{ lookup('db_username') }}";
-fastcgi_param  DB_PASSWORD			"{{ lookup('db_password') }}";
-fastcgi_param  APP_KEY			  	"{{ lookup('app_key') }}";
-fastcgi_param  GOOGLE_CLIENT_ID		"{{ lookup('google_client_id') }}";
-fastcgi_param  GOOGLE_CLIENT_SECRET	"{{ lookup('google_client_secret') }}";
-fastcgi_param  CRON_PASSWORD		"{{ lookup('cron_password') }}";
+fastcgi_param  DB_HOST 				"{{ ENV['DB_HOST'] }}";
+fastcgi_param  DB_USERNAME			"{{ ENV['DB_USERNAME'] }}";
+fastcgi_param  DB_PASSWORD			"{{ ENV['DB_PASSWORD'] }}";
+fastcgi_param  APP_KEY			  	"{{ ENV['APP_KEY'] }}";
+fastcgi_param  GOOGLE_CLIENT_ID		"{{ ENV['GOOGLE_CLIENT_ID'] }}";
+fastcgi_param  GOOGLE_CLIENT_SECRET	"{{ ENV['GOOGLE_CLIENT_SECRET'] }}";
+fastcgi_param  CRON_PASSWORD		"{{ ENV['CRON_PASSWORD'] }}";
 
 fastcgi_param  COMPANY_DOMAIN		"razorpay.com";
 fastcgi_param  APP_DEBUG		  	"false";
 fastcgi_param  APP_ENV			 	"production";
-fastcgi_param  APP_DOMAIN			"concierge.razorpay.com";
-fastcgi_param  BASE_URL				"https://concierge.razorpay.com";
+fastcgi_param  APP_DOMAIN			"{{ ENV['APP_DOMAIN'] }}";
+fastcgi_param  BASE_URL				"{{ ENV['BASE_URL'] }}";
 fastcgi_param  AWS_REGION			"ap-south-1";
 
 # PHP only, required if PHP was built with --enable-force-cgi-redirect
