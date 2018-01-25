@@ -13,7 +13,11 @@ RUN /app/dockerconf/build.sh
 
 WORKDIR /app
 
-RUN composer install --no-interaction
+RUN apk update && \
+    apk add --no-cache \
+    php7-tokenizer \
+    && composer install --no-interaction \
+    && composer clear-cache
 
 EXPOSE 80
 
