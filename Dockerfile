@@ -1,4 +1,4 @@
-FROM razorpay/containers:rzp-php7.1-nginx
+FROM razorpay/pithos:rzp-php7.1-nginx
 
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
