@@ -16,6 +16,8 @@ WORKDIR /app
 RUN apk update && \
     apk add --no-cache \
     php7-tokenizer \
+    php7-xmlwriter \
+    php7-simplexml \
     && composer install --no-interaction \
     && composer clear-cache
 
