@@ -21,5 +21,4 @@ RUN apk update && \
 
 EXPOSE 80
 
-ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
-CMD ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
