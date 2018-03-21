@@ -1,5 +1,7 @@
 FROM razorpay/pithos:rzp-php7.1-nginx
 
+LABEL maintainer="Nemo <n@rzp.io>"
+
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
 
@@ -18,7 +20,7 @@ RUN apk update && \
     php7-tokenizer \
     php7-xmlwriter \
     php7-simplexml \
-    && composer install --no-interaction \
+    && composer install --no-interaction --no-dev --optimize-autoloader\
     && composer clear-cache
 
 EXPOSE 80
