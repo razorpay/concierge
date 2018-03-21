@@ -1,8 +1,0 @@
-razorpay/concierge:
-  Build:
-    ### Docker Build Commands ###
-    - docker login -u "$DISTELLI_DOCKER_USERNAME" -p "$DISTELLI_DOCKER_PW" -e "$DISTELLI_DOCKER_EMAIL" $DISTELLI_DOCKER_ENDPOINT
-    - docker build --quiet=false -t "$DISTELLI_DOCKER_REPO" "$DISTELLI_DOCKER_PATH" --build-arg GIT_COMMIT_HASH=$DISTELLI_RELREVISION
-    - docker tag "$DISTELLI_DOCKER_REPO" "$DISTELLI_DOCKER_REPO":"$DISTELLI_RELREVISION"
-    - docker push "$DISTELLI_DOCKER_REPO":"$DISTELLI_RELREVISION"
-    ### End Docker Build Commands ###

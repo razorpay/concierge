@@ -1,10 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# TODO: merge concierge.nginx.conf & concierge.nginx.dev.conf in a single j2 template
-# once `alohomora` has simple jinja2 render capabilities
-# without credstash lookups
-
 if [[ "${APP_ENV}" == "dev" ]]; then
   cp environment/.env.docker environment/.env.testing
   cp environment/env.sample.php environment/env.php
@@ -34,8 +30,7 @@ else
     exit 0
   fi
 
-  sed -i "s|NGINX_HOST|$HOSTNAME|g" dockerconf/concierge.nginx.conf.j2
-  $ALOHOMORA_BIN cast --region ap-south-1 --env $APP_ENV --app concierge "dockerconf/concierge.nginx.conf.j2" "dockerconf/fastcgi.conf.j2"
+  $ALOHOMORA_BIN cast --region ap-south-1 --env $APP_ENV --app concierge "dockerconf/fastcgi.conf.j2"
   cp dockerconf/concierge.nginx.conf /etc/nginx/conf.d/concierge.conf
   cp dockerconf/fastcgi.conf /etc/nginx/
   chown -R nginx:nginx /app/storage/logs
