@@ -31,7 +31,6 @@ else
   fi
 
   $ALOHOMORA_BIN cast --region ap-south-1 --env $APP_ENV --app concierge "dockerconf/fastcgi.conf.j2"
-  cp dockerconf/concierge.nginx.conf /etc/nginx/conf.d/concierge.conf
   cp dockerconf/fastcgi.conf /etc/nginx/
   chown -R nginx:nginx /app/storage/logs
 fi
