@@ -50,10 +50,6 @@ Route::group(['middleware' => ['web']], function() {
     Route::group(['middleware' => 'guest'], function () {
         Route::get('/', 'HomeController@getIndex');
 
-        Route::post('/signin', ['before'=>'csrf', 'uses'=>'HomeController@postSignin']);
-
-        Route::post('/duologin', 'HomeController@postDuologin');
-
         Route::get('/status', 'HomeController@getStatus');
     });
 

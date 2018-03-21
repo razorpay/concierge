@@ -6,9 +6,7 @@
     "require": {
         "laravel/framework": "5.3.*",
         "aws/aws-sdk-php-laravel": "3.*",
-        "schuppo/password-strength": "~1.5",
-        "oriceon/oauth-5-laravel": "dev-master",
-        "duosecurity/duo_php": "dev-master"
+        "oriceon/oauth-5-laravel": "dev-master"
     },
     "autoload": {
         "psr-4": {
