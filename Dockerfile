@@ -10,6 +10,7 @@ RUN mkdir /app/
 COPY . /app/
 
 COPY ./dockerconf/entrypoint.sh /entrypoint.sh
+COPY ./dockerconf/concierge.nginx.conf /etc/nginx/conf.d/default.conf
 
 RUN /app/dockerconf/build.sh
 
