@@ -18,14 +18,14 @@ services:
       DB_PASSWORD: 123
       APP_ENV: dev
       APP_DEBUG: "true"
-      APP_KEY: "base64:JQdqGUBXe48nLuiwezzS41zhYBjFY38RhVahI7JMnDw="
+      APP_KEY: "<your-APP_KEY-goes-here>"
       GOOGLE_CLIENT_ID:
       GOOGLE_CLIENT_SECRET:
       COMPANY_DOMAIN: razorpay.com
       APP_DOMAIN: concierge.razorpay.dev
       BASE_URL: http://concierge.razorpay.dev:27080
       # TODO: Write the plaintext version here
-      CRON_PASSWORD: "$$2a$$06$$I.gCuJphwKzHxiZ2QpG8uudVyV53b.F9tDAarb7VaneJFRZWwdVAe"
+      CRON_PASSWORD: "<your-CRON_PASSWORD-goes-here>"
       AWS_ACCESS_KEY_ID:
       AWS_SECRET_ACCESS_KEY:
       AWS_REGION: ap-south-1
@@ -36,7 +36,7 @@ services:
     ports:
       - 23306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_ROOT_PASSWORD: <your-MYSQL_ROOT_PASSWORD-goes-here>
       MYSQL_DATABASE: concierge
-      MYSQL_USER: concierge
-      MYSQL_PASSWORD: 123
+      MYSQL_USER: <your-MYSQL_USER-goes-here>
+      MYSQL_PASSWORD: <your-MYSQL_PASSWORD-goes-here>

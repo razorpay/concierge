@@ -69,6 +69,10 @@ CRON_PASSWORD
 
 You can also run the cron by setting `APP_MODE=cron` and starting the container.
 
+Credentials Disclaimer
+--------------
+> Any hard-coded credentials found in this repo are dummy credentials. We have done our best to add comments to the usernames, passwords, keys etc. but in case if you find any, please feel free to replace them with the prod equalant values as per your environment.
+
 License
 --------------
 This application is open-sourced software licensed under the MIT license
