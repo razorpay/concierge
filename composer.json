@@ -1,12 +1,13 @@
 {
-    "name": "laravel/laravel",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "name": "razorpay/concierge",
+    "description": "Razorpay Concierge",
+    "keywords": ["razorpay", "concierge", "whitelist", "cloudpassage"],
     "license": "MIT",
     "require": {
         "laravel/framework": "5.3.*",
         "aws/aws-sdk-php-laravel": "3.*",
-        "oriceon/oauth-5-laravel": "dev-master"
+        "oriceon/oauth-5-laravel": "dev-master",
+        "maclof/kubernetes-client": "^0.11.0"
     },
     "autoload": {
         "psr-4": {
