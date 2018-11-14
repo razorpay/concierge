@@ -14,3 +14,5 @@ environment/env.php
 !storage/framework/cache/.gitignore
 /storage/
 docker-compose.dev.yml
+docker-compose.yml
+bootstrap/cache
