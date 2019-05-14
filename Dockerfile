@@ -5,8 +5,6 @@ LABEL maintainer="Nemo <n@rzp.io>"
 ARG GIT_COMMIT_HASH
 ENV GIT_COMMIT_HASH=${GIT_COMMIT_HASH}
 
-RUN mkdir /app/
-
 COPY . /app/
 
 COPY ./dockerconf/entrypoint.sh /entrypoint.sh
