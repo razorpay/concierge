@@ -4,7 +4,7 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "laravel/framework": "5.3.*",
+        "laravel/framework": "5.8.*",
         "aws/aws-sdk-php-laravel": "3.*",
         "oriceon/oauth-5-laravel": "dev-master"
     },
