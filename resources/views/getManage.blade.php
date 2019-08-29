@@ -298,24 +298,34 @@
 			   @foreach($rule['UserIdGroupPairs'] as $rule_group)
 			    <tr>
 			     	{{-- Checking for all traffic rule --}}
-					@if("-1"!=$rule['IpProtocol'])
-					<td>{{$rule['IpProtocol']}}</td>
+
+                    @if("-1"==$rule['IpProtocol'])
+                    <td>All</td>
+                    @else
+                    <td>{{$rule['IpProtocol']}}</td>
+                    @endif
+
+					@if("tcp"==$rule['IpProtocol'])
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
 					@else
 					<td>All</td>
-					<td>All</td>
 					@endif
+
 					<td>Security Group: <a href="/manage/{{$rule_group['GroupId']}}">{{$rule_group['GroupId']}}</a></td>
 			    </tr>
 				@endforeach
 			    @foreach($rule['IpRanges'] as $rule_ip)
 			    <tr>
 			    	{{-- Checking for all traffic rule --}}
-			    	@if("-1"!=$rule['IpProtocol'])
-					<td>{{$rule['IpProtocol']}}</td>
+                    @if("-1"==$rule['IpProtocol'])
+                    <td>All</td>
+                    @else
+                    <td>{{$rule['IpProtocol']}}</td>
+                    @endif
+
+					@if("tcp"==$rule['IpProtocol'])
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
 					@else
-					<td>All</td>
 					<td>All</td>
 					@endif
 					<td>CIDR IP(s): {{$rule_ip['CidrIp']}}</td>
@@ -338,11 +348,15 @@
 			    @foreach($rule['UserIdGroupPairs'] as $rule_group)
 			    <tr>
 			    	{{-- Checking for all traffic rule --}}
-					@if("-1"!=$rule['IpProtocol'])
-					<td>{{$rule['IpProtocol']}}</td>
+                    @if("-1"==$rule['IpProtocol'])
+                    <td>All</td>
+                    @else
+                    <td>{{$rule['IpProtocol']}}</td>
+                    @endif
+
+					@if("tcp"==$rule['IpProtocol'])
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
 					@else
-					<td>All</td>
 					<td>All</td>
 					@endif
 					<td>Security Group: <a href="/manage/{{$rule_group['GroupId']}}">{{$rule_group['GroupId']}}</a></td>
@@ -351,11 +365,15 @@
 			    @foreach($rule['IpRanges'] as $rule_ip)
 			    <tr>
 			    	{{-- Checking for all traffic rule --}}
-					@if("-1"!=$rule['IpProtocol'])
-					<td>{{$rule['IpProtocol']}}</td>
+                    @if("-1"==$rule['IpProtocol'])
+                    <td>All</td>
+                    @else
+                    <td>{{$rule['IpProtocol']}}</td>
+                    @endif
+
+					@if("tcp"==$rule['IpProtocol'])
 					<td>{{$rule['FromPort']}}-{{$rule['ToPort']}}</td>
 					@else
-					<td>All</td>
 					<td>All</td>
 					@endif
 					<td>CIDR IP(s): {{$rule_ip['CidrIp']}}</td>
