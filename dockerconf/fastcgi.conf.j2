@@ -30,11 +30,11 @@ fastcgi_param  GOOGLE_CLIENT_ID		"{{ lookup('google_client_id') }}";
 fastcgi_param  GOOGLE_CLIENT_SECRET	"{{ lookup('google_client_secret') }}";
 fastcgi_param  CRON_PASSWORD		"{{ lookup('cron_password') }}";
 
-fastcgi_param  COMPANY_DOMAIN		"razorpay.com";
+fastcgi_param  COMPANY_DOMAIN		"razorpay.in";
 fastcgi_param  APP_DEBUG		  	"false";
-fastcgi_param  APP_ENV			 	"production";
-fastcgi_param  APP_DOMAIN			"concierge.razorpay.com";
-fastcgi_param  BASE_URL				"https://concierge.razorpay.com";
+fastcgi_param  APP_ENV			 	"stage";
+fastcgi_param  APP_DOMAIN			"concierge.stage.razorpay.in";
+fastcgi_param  BASE_URL				"http://concierge.stage.razorpay.in";
 fastcgi_param  AWS_REGION			"ap-south-1";
 
 # PHP only, required if PHP was built with --enable-force-cgi-redirect
