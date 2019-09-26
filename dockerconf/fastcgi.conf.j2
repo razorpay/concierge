@@ -32,7 +32,7 @@ fastcgi_param  CRON_PASSWORD		"{{ lookup('cron_password') }}";
 
 fastcgi_param  COMPANY_DOMAIN		"{{ lookup('company_domain') }}";
 fastcgi_param  APP_DEBUG		  	"false";
-fastcgi_param  APP_ENV			 	"production";
+fastcgi_param  APP_ENV			 	"{{ lookup('app_env') }}";
 fastcgi_param  APP_DOMAIN			"{{ lookup('app_domain') }}";
 fastcgi_param  BASE_URL				"{{ lookup('base_url') }}";
 fastcgi_param  AWS_REGION			"ap-south-1";
