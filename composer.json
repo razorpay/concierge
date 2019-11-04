@@ -11,6 +11,8 @@
         "php": "^7.2",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^6.2",
+        "aws/aws-sdk-php-laravel": "~3.0",
+        "oriceon/oauth-5-laravel": "dev-master",
         "laravel/tinker": "^1.0"
     },
     "require-dev": {

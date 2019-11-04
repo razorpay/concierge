@@ -175,6 +175,9 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        // User defined
+        Artdarek\OAuth\OAuthServiceProvider::class,
+        Aws\Laravel\AwsServiceProvider::class,
     ],
 
     /*
@@ -226,6 +229,9 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+        // User defined
+        'OAuth'     => Artdarek\OAuth\Facade\OAuth::class,
+        'AWS' => Aws\Laravel\AwsFacade::class,
     ],
 
 ];
