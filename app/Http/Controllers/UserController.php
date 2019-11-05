@@ -129,12 +129,13 @@ class UserController extends Controller
 
         if ($validator->fails()) {
             return redirect('/users/add')
-                ->with('errors', $validator->messages()->toArray());
+                ->with('errors', $validator->messages());
         } else {
             User::create($input);
 
             return redirect('/users')
-                ->with('message', 'User Added Successfully');
+                ->with('message', 'User Added Successfully')
+                ->with('class', 'Success');
         }
     }
 
@@ -166,10 +167,12 @@ class UserController extends Controller
         $validator = Validator::make($input, $user_rules);
 
         if ($validator->fails()) {
-            return redirect("/user/$id/edit")->with('errors', $validator->messages()->toArray());
+            return redirect("/user/$id/edit")->with('errors', $validator->messages());
         } else {
             User::find($id)->update($input);
-            return redirect('/users')->with('message', 'User Updated Successfully');
+            return redirect('/users')
+                ->with('message', 'User Updated Successfully')
+                ->with('class', 'Success');
         }
     }
 
@@ -188,7 +191,8 @@ class UserController extends Controller
             $user = User::findorfail($input['user_id']);
         } catch (Exception $e) {
             return redirect('/users')
-                    ->with('message', 'Invalid User');
+                ->with('message', 'Invalid User')
+                ->with('class', 'Warning');
         }
         if ($user->id == Auth::user()->id) {
             //Avoid Self Delete
@@ -201,6 +205,7 @@ class UserController extends Controller
         }
 
         return redirect('/users')
-            ->with('message', $message);
+            ->with('message', $message)
+            ->with('class', 'Success');
     }
 }

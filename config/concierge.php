@@ -10,8 +10,8 @@ return [
     | you also need to specify path to artisan, which lies in the root of this repo.
     |
     */
-
-    'php_path'    => '/usr/bin/php',
+    // /usr/bin/php
+    'php_path'    => '/usr/local/bin/php',
     'artisan_path'=> base_path('artisan'),
 
     /*

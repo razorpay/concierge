@@ -126,7 +126,8 @@ class GroupController extends Controller
         //Validation fails
         if (! empty($messages)) {
             return redirect("/manage/$group_id")
-                ->with('message', implode('<br/>', $messages));
+                ->with('message', implode('<br/>', $messages))
+                ->with('class', 'Danger');
         }
 
         //Creating the lease
@@ -158,15 +159,17 @@ class GroupController extends Controller
                 // AWS Reported an error. Generally in case if a lease with same ip,
                 // protocol, port already exists on AWS.
                 return redirect("/manage/$group_id")
-                    ->with('message', 'Lease Creation Failed! Does a similar lease already exist? Terminate that first.');
-            }
+                    ->with('message', 'Lease Creation Failed! Does a similar lease already exist? Terminate that first.')
+                    ->with('class', 'Danger');
+                }
             $lease = Lease::create($lease);
         }
 
         // $this->NotificationMail($lease, true);
 
         return redirect("/manage/$group_id")
-            ->with('message', 'Lease created successfully!');
+            ->with('message', 'Lease created successfully!')
+            ->with('class', 'Success');
     }
 
     private function getClientIp()
@@ -222,7 +225,9 @@ class GroupController extends Controller
                 $lease = Lease::findorFail($input['lease_id']);
             } catch (Exception $e) {
                 $message = 'Lease not found';
-                return redirect("/manage/$group_id")->with('message', $message);
+                return redirect("/manage/$group_id")
+                    ->with('message', $message)
+                    ->with('class', 'Warning');
             }
             // Terminate the lease on AWS
             $result = Lease::terminateLease($lease->toArray());
@@ -232,11 +237,13 @@ class GroupController extends Controller
             if (! $result) {
                 //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
                 return redirect("/manage/$group_id")
-                     ->with('message', 'Lease Termination returned error. Assumed the lease was already deleted');
-            }
+                    ->with('message', 'Lease Termination returned error. Assumed the lease was already deleted')
+                    ->with('class', 'Warning');
+                }
 
             return redirect("/manage/$group_id")
-                ->with('message', 'Lease terminated successfully');
+                ->with('message', 'Lease terminated successfully')
+                ->with('class', 'Success');
         } else {
             App::abort(403, 'Unauthorized action.');
         }

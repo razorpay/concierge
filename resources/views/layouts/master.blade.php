@@ -19,17 +19,12 @@
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         @show
+        <link href="{{ asset('assets/css/flash-message.css') }}" rel="stylesheet">
     </head>
 
     <body>
-
         @if(Session::has('message'))
-        <div id="sessionMessage" class="alert alert-warning fade in">
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
-            <p class="center">
-                    {{ Session::get('message') }}
-            </p>
-        </div>
+        <div class="custom-flash {{ Session::get('class') }} ">{{ Session::get('message') }}</div>
         @endif
 
         @if(Auth::check())
@@ -69,6 +64,7 @@
 
         @section('footer_scripts')
             <script src='https://code.jquery.com/jquery-2.1.0.min.js'></script>
+            <script type="text/javascript" src="{{ asset('assets/js/flash-message.js') }}"></script>
             <script src='https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js'></script>
             <script type="text/javascript">
             setTimeout(function() {

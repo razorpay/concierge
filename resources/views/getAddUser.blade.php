@@ -8,28 +8,38 @@
             @else
                 <h1>Add New User</h1>
             @endif
-            @if(Session::has('errors'))
-                <ul>
-                @foreach(Session::get('errors') as $errors)
-                    @foreach($errors as $error)
-                        <li>{{{$error}}}</li>
-                    @endforeach
-                @endforeach
-                </ul>
-            @endif
             <form class="form-horizontal" role="form" action="" method="POST">
-              <div class="form-group">
-                <label for="email" class="col-sm-4 control-label">Email</label>
+
+            <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
+                <label for="email" class="col-sm-4 control-label">Email Id</label>
                 <div class="col-sm-6">
                   <input type="text" class="form-control" name="email" placeholder="Email" required value="{{$user->email}}">
                 </div>
-              </div>
-              <div class="form-group">
+
+                @if ($errors->has('email'))
+                <div class="col-sm-offset-4 col-sm-6">
+                    <span class="help-block">
+                        <strong>{{ $errors->first('email') }}</strong>
+                    </span>
+                </div>
+                @endif
+            </div>
+
+            <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
                 <label for="Full Name" class="col-sm-4 control-label">Full Name</label>
                 <div class="col-sm-6">
                   <input type="text" class="form-control" name="name" placeholder="Name" required value="{{$user->name}}">
                 </div>
-              </div>
+
+                @if ($errors->has('name'))
+                <div class="col-sm-offset-4 col-sm-6">
+                    <span class="help-block">
+                        <strong>{{ $errors->first('name') }}</strong>
+                    </span>
+                </div>
+                @endif
+            </div>
+
               <div class="form-group">
                 <label for="admin" class="col-sm-4 control-label">Role</label>
                 <div class="col-sm-6">
