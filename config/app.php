@@ -230,7 +230,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
         // User defined
-        'OAuth'     => Artdarek\OAuth\Facade\OAuth::class,
+        'SocialOAuth' => Artdarek\OAuth\Facade\OAuth::class,
         'AWS' => Aws\Laravel\AwsFacade::class,
     ],
 

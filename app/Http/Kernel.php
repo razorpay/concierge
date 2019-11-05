@@ -41,6 +41,9 @@ class Kernel extends HttpKernel
             'throttle:60,1',
             'bindings',
         ],
+        'cron'  =>  [
+            \App\Http\Middleware\Cron::class,
+        ]
     ];
 
     /**

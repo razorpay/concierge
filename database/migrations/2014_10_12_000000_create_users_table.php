@@ -17,7 +17,7 @@ class CreateUsersTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('username')->unique();
-            $table->string('email')->default('');
+            $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->tinyInteger('admin')->nullable();
             $table->string('google_id')->default('');
@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->rememberToken();
             $table->softDeletes();
             $table->timestamps();
+            $table->unique(['email', 'username', 'deleted_at']);
         });
     }
 

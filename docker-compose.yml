@@ -1,0 +1,24 @@
+version: '3'
+
+networks:
+  laravel:
+
+volumes:
+  db-data:
+
+services:
+  mysql:
+    image: mariadb:10.3
+    container_name: laravel-db
+    volumes:
+      - db-data:/var/lib/mysql/data
+    ports:
+      - 3306:3306
+    networks:
+      - laravel
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: helloworld
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
