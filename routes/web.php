@@ -52,7 +52,7 @@ Route::group(['middleware' => ['web']], function () {
 
     //Routes for non-logged in user
     Route::group(['middleware' => 'guest'], function () {
-        Route::get('/', 'UserController@getIndex');
+        Route::get('/', 'UserController@getIndex')->name('/');
 
         Route::get('/status', 'UserController@getStatus');
     });

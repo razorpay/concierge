@@ -1,0 +1,40 @@
+language: php
+
+sudo: required
+services:
+  - mysql
+  - docker
+
+env:
+  COMPOSE_VERSION: 1.24.1
+
+php:
+  - 7.1
+  - 7.2
+
+before_install:
+  - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+  - cp .env.travis .env
+  - composer install --dev --ignore-platform-reqs
+  - php artisan key:generate
+  - mysql -e 'CREATE DATABASE concierge;'
+  - php artisan migrate
+  - php artisan db:seed
+
+script:
+  - mkdir -p build/logs
+  - php vendor/bin/phpunit tests/ --coverage-clover build/logs/clover.xml
+  - php vendor/bin/phpcbf --standard=ruleset.xml app/
+  - php vendor/bin/phpcs --standard=ruleset.xml app/
+  - echo "Testing Docker"
+  - docker-compose build
+  - docker-compose up -d
+  - docker images
+  - docker ps
+
+
+after_script:
+  - php vendor/bin/coveralls -v

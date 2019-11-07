@@ -1,7 +1,7 @@
 {
-    "name": "laravel/laravel",
+    "name": "razorpay/concierge",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "Concierge - AWS EC2 Secure Lease Manager",
     "keywords": [
         "framework",
         "laravel"
@@ -20,7 +20,9 @@
         "fzaninotto/faker": "^1.4",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^3.0",
-        "phpunit/phpunit": "^8.0"
+        "phpunit/phpunit": "^8.0",
+        "php-coveralls/php-coveralls": "^2.1",
+        "squizlabs/php_codesniffer": "^3.3"
     },
     "config": {
         "optimize-autoloader": true,

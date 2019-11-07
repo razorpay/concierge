@@ -136,7 +136,8 @@ class Lease extends Model
                 $result = self::terminateLease($lease->toArray());
                 $lease->delete();
                 if (! $result) {
-                    array_push($messages, "Lease Termination of Lease ID $lease->id reported error on AWS API Call. Assumed already deleted.");
+                    array_push($messages, "Lease Termination of Lease ID " . $lease->id .
+                    "reported error on AWS API Call. Assumed already deleted.");
                 }
             }
         }

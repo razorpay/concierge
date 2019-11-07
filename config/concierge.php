@@ -10,8 +10,8 @@ return [
     | you also need to specify path to artisan, which lies in the root of this repo.
     |
     */
-    // /usr/bin/php
-    'php_path'    => '/usr/local/bin/php',
+
+    'php_path'    => '/usr/bin/php',
     'artisan_path'=> base_path('artisan'),
 
     /*
@@ -26,7 +26,6 @@ return [
     |
     */
 
-    'cron_password'        => env('CRON_PASSWORD'),
-
-    'google_domain'        => env('COMPANY_DOMAIN'),
+    'cron_password' => env('CRON_PASSWORD'),
+    'google_domain' => env('COMPANY_DOMAIN'),
 ];

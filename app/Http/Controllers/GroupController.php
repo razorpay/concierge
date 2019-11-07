@@ -159,9 +159,12 @@ class GroupController extends Controller
                 // AWS Reported an error. Generally in case if a lease with same ip,
                 // protocol, port already exists on AWS.
                 return redirect("/manage/$group_id")
-                    ->with('message', 'Lease Creation Failed! Does a similar lease already exist? Terminate that first.')
+                    ->with(
+                        'message',
+                        'Lease Creation Failed! Does a similar lease already exist? Terminate that first.'
+                    )
                     ->with('class', 'Danger');
-                }
+            }
             $lease = Lease::create($lease);
         }
 
@@ -239,7 +242,7 @@ class GroupController extends Controller
                 return redirect("/manage/$group_id")
                     ->with('message', 'Lease Termination returned error. Assumed the lease was already deleted')
                     ->with('class', 'Warning');
-                }
+            }
 
             return redirect("/manage/$group_id")
                 ->with('message', 'Lease terminated successfully')

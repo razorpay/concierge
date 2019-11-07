@@ -39,9 +39,9 @@ class CronJob extends Command
     {
         //Get the current crontabs
         $output = shell_exec('crontab -l');
-
+        $cron_time = env('CRON_TIME', '* * * * *');
         //The cron needed for this repo
-        $cron = '* * * * *  ' . config('concierge.php_path') . ' '
+        $cron = $cron_time . ' ' . config('concierge.php_path') . ' '
             . config('concierge.artisan_path') . ' concierge:clean-lease';
 
         //Check if Cron Already exists
@@ -49,7 +49,7 @@ class CronJob extends Command
             //setup Old Cron with the new cron included
             file_put_contents('/tmp/crontab.txt', $output.$cron.PHP_EOL);
             exec('crontab /tmp/crontab.txt');
-            $this->info('Cron Added for running every minute');
+            $this->info('Cron Added for running at ' . $cron_time);
         } else {
             $this->info('Cron Already exists');
         }

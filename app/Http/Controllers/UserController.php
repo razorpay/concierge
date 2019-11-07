@@ -23,7 +23,6 @@ class UserController extends Controller
     public function getIndex(Request $request)
     {
         $code = $request->get('code');
-
         $google_service = SocialOAuth::consumer('Google', config('app.url'));
 
         if (! $code) {
@@ -38,15 +37,14 @@ class UserController extends Controller
             $response = $google_service->request(config('oauth-5-laravel.userinfo_url'));
             $result = json_decode($response);
 
-            // dd($result);
-
             // Email must be:
             // - Verified
             // - Belong to razorpay.com domain
             //
             // Then only we'll create a user entry in the system or check for one
 
-            if ($result->verified_email !== true or $result->hd !== config('concierge.google_domain')) {
+            if ($result->verified_email !== true or
+                (isset($result->hd) and $result->hd !== config('concierge.google_domain'))) {
                 return App::abort(404);
             }
 
@@ -62,8 +60,7 @@ class UserController extends Controller
                 // Login the user into the app
                 Auth::loginUsingId($user->id);
 
-                $redirectUrl = config('app.url') . '/groups';
-                return redirect($redirectUrl);
+                return redirect('/groups');
             } else {
                 App::abort(401);
             }

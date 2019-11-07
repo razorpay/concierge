@@ -12,17 +12,19 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        User::insert(
+        $users = [
             [
-                [
-                    'name' => 'Admin',
-                    'username' => 'admin',
-                    'admin'    => 1,
-                    'email'    => 'ankit.infra@razorpay.com',
-                    'access_token' => '',
-                    'google_id' => '',
-                ],
-            ]
-        );
+                'name' => 'Admin',
+                'username' => 'admin',
+                'admin'    => 1,
+                'email'    => 'ankit.infra@razorpay.com',
+                'access_token' => '',
+                'google_id' => '',
+            ],
+        ];
+
+        foreach ($users as $user) {
+            User::updateOrCreate($user);
+        }
     }
 }

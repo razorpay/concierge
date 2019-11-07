@@ -13,7 +13,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0 minimum-scale=1">
         <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
         <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
-        <link rel="stylesheet" href="assets/css/style.css">
+        <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>

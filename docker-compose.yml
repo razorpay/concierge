@@ -1,24 +1,57 @@
 version: '3'
 
 networks:
-  laravel:
+  external:
+  internal:
 
 volumes:
   db-data:
+  concierge-data:
 
 services:
   mysql:
     image: mariadb:10.3
-    container_name: laravel-db
+    container_name: concierge-db
     volumes:
       - db-data:/var/lib/mysql/data
     ports:
       - 3306:3306
     networks:
-      - laravel
+      - internal
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: helloworld
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: laravel
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+
+  concierge:
+    build:
+      context: .
+    image: razorpay:concierge
+    container_name: concierge
+    networks:
+      - internal
+      - external
+    volumes:
+      - concierge-data:/app
+    tty: true
+    stdin_open: true
+    env_file: .env
+    depends_on:
+      - mysql
+    restart: always
+
+  nginx:
+    image: nginx:1.17.3-alpine
+    container_name: concierge-webserver
+    volumes:
+      - concierge-data:/app
+      - ./dockerconf/concierge.nginx.conf:/etc/nginx/conf.d/concierge.conf
+    networks:
+      - external
+    ports:
+      - 8090:80
+    depends_on:
+      - concierge
+    restart: always
