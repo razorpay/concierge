@@ -26,14 +26,16 @@ before_install:
 
 script:
   - mkdir -p build/logs
-  - php vendor/bin/phpunit tests/ --coverage-clover build/logs/clover.xml
   - php vendor/bin/phpcbf --standard=ruleset.xml app/
   - php vendor/bin/phpcs --standard=ruleset.xml app/
   - echo "Testing Docker"
+  - sed -i "s/DB_HOST=127.0.0.1/DB_HOST=concierge-db/" .env
+  - sed -i "s/3306:3306/33066:3306/" .env
   - docker-compose build
   - docker-compose up -d
   - docker images
   - docker ps
+  - docker logs concierge
 
 
 after_script:
