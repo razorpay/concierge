@@ -30,7 +30,7 @@ script:
   - php vendor/bin/phpcs --standard=ruleset.xml app/
   - echo "Testing Docker"
   - sed -i "s/DB_HOST=127.0.0.1/DB_HOST=concierge-db/" .env
-  - sed -i "s/3306:3306/33066:3306/" .env
+  - sed -i "s/3306:3306/33066:3306/" docker-compose.yml
   - docker-compose build
   - docker-compose up -d
   - docker images
