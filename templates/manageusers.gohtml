@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{ template "header" }}
+</head>
+
+<body>
+    {{ template "flashmessage" .message}}
+
+    {{ template "navbar" .user}}
+    {{ $admin := .user.Admin}}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 modal-outer noPad">
+                <h2>Site Users</h2>
+                <h4 class="pull-right"><a href="/users/add">Create New User</a></h4>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Active Ingress Leases</th>
+                        <th>Total Leases Created <span title="Includes Terminated & Expired Leases" class="glyphicon glyphicon-question-sign"></span></th>
+                        <th>Actions</th>
+                        </tr>
+                    </thead>
+                    
+                    {{if .data}}
+
+                    <tbody>
+                        {{ range .data }}
+                        <tr>
+                            <td>{{.Name}}</td>
+                            <td>{{.Email}}</td>
+                            <td>{{.Username}}</td>
+                            <td>
+                                {{if .Admin}}
+                                Admin
+                                {{else}}
+                                Standard User
+                                {{end}}
+                            </td>
+                            <td></td>
+                            <td></td>
+                        <td>                        
+                        {{if $admin}}
+                            <form method="post" action="">
+                                <a href="/users/{{.ID}}/edit">
+                                    <span title="Edit User" class="glyphicon glyphicon-edit"></span>
+                                </a>
+
+                                <input type="hidden" name="user_id" value="{{.ID}}" />
+                                <a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to delete this user (All his active leases/invites will be terminated?')) {parentNode.submit();} return false;">
+                                    <span title="Delete User" class="glyphicon glyphicon-minus-sign"></span>
+                                </a>
+                            </form>
+                        {{end}}
+                        </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                    {{end}}
+                </table>    
+            </div>
+        </div>
+    </div>
+    {{ template "footer" }}
+</body>
+
+</html>

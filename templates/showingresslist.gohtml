@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{ template "header" }}
+</head>
+
+<body>
+    {{ template "flashmessage" .message}}
+
+    {{ template "navbar" .user}}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 modal-outer noPad">
+                <h2>All Ingress List</h2>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Namespace</th>
+                            <th>Ingress Name</th>
+                            <th>Host</th>
+                            <th>Ingress Class</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .data}}
+                        <tr>
+                            <td>{{.Namespace}}</td>
+                            <td><a href="/ingress/{{.Namespace}}/{{.Name}}">{{.Name}}</a></td>
+                            <td><a href="{{.Host}}">{{.Host}}</a></td>
+                            <td>{{.Class}}</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    {{ template "footer" }}
+</body>
+</html>
