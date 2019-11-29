@@ -1,9 +1,11 @@
 package main
 
 import (
+	"concierge/config"
 	"concierge/database"
 	"concierge/models"
 	"concierge/routes"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -15,6 +17,7 @@ import (
 var router *gin.Engine
 
 func main() {
+	config.LoadConfig()
 	migrations()
 	seeding()
 	// Start the router
@@ -26,8 +29,8 @@ func main() {
 
 	// Initialize the routes
 	routes.InitializeRoutes(router)
-
-	router.Run(":8990")
+	listenPort := os.Getenv("APP_PORT")
+	router.Run(":" + listenPort)
 
 }
 
