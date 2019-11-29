@@ -30,7 +30,7 @@ func main() {
 	// Initialize the routes
 	routes.InitializeRoutes(router)
 	listenPort := os.Getenv("APP_PORT")
-	router.Run(":" + listenPort)
+	router.Run("0.0.0.0:" + listenPort)
 
 }
 
