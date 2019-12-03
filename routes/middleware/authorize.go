@@ -28,6 +28,7 @@ func Authorize(c *gin.Context) {
 	if res.RecordNotFound() {
 		log.Info("Record not found")
 		c.AbortWithStatusJSON(404, "Not Found")
+		return
 	}
 	c.Set("User", getUser)
 	c.Next()

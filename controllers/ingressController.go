@@ -217,6 +217,7 @@ func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 }
 
 //ClearExpiredLeases ...
-func ClearExpiredLeases() {
+func ClearExpiredLeases(c *gin.Context) {
 	GetActiveLeases("", "")
+	c.String(200, "Done")
 }

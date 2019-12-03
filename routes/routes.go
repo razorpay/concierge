@@ -33,4 +33,10 @@ func InitializeRoutes(router *gin.Engine) {
 			c.Redirect(302, "http://"+c.Request.Host+"/")
 		})
 	}
+
+	cron := router.Group("/cron")
+	cron.Use(middleware.Cron)
+	{
+		cron.POST("/", controllers.ClearExpiredLeases)
+	}
 }
