@@ -54,10 +54,10 @@
                 <label for="admin" class="col-sm-4 control-label">Role</label>
                 <div class="col-sm-6">
                 <label class="radio-inline">
-                  <input type="radio" name="admin" value="0">Standard User
+                  <input type="radio" name="admin" value="0" {{ if .data.ID }}{{ if eq .data.Admin 0}}checked {{end}} {{end}}>Standard User
                 </label>
                 <label class="radio-inline">
-                  <input type="radio" name="admin" value="1">Admin User
+                  <input type="radio" name="admin" value="1" {{ if .data.ID }}{{ if eq .data.Admin 1}}checked {{end}} {{end}}>Admin User
                 </label>
                 </div>
               </div>

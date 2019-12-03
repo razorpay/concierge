@@ -25,6 +25,9 @@ func InitializeRoutes(router *gin.Engine) {
 		authorized.GET("/users", controllers.GetUsers)
 		authorized.GET("/users/add", controllers.AddUsersForm)
 		authorized.POST("/users/add", controllers.AddUsers)
+		authorized.GET("/users/edit/:id", controllers.UpdateUsersForm)
+		authorized.POST("/users/edit/:id", controllers.UpdateUser)
+		authorized.POST("/users/delete", controllers.DeleteUser)
 		authorized.GET("/logout", func(c *gin.Context) {
 			c.SetCookie("_oauth2_proxy", "", -1, "/", "https://"+c.Request.Host+"/", false, true)
 			c.Redirect(302, "http://"+c.Request.Host+"/")
