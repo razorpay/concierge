@@ -16,7 +16,6 @@ func Authorize(c *gin.Context) {
 		log.Error("Error", err)
 	}
 	defer db.Close()
-	log.Info(c.GetHeader("X-Forwarded-User"))
 	username := c.GetHeader("X-Forwarded-User")
 	email := c.GetHeader("X-Forwarded-Email")
 	user := models.Users{
