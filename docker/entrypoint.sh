@@ -11,6 +11,9 @@ ouath2Server() {
 
 if [ "$1" == "start" ]
 then
+    # Waiting for DB
+    chmod +x ./docker/wait_for_db.sh
+    ./docker/wait_for_db.sh
     conciergeServer
     ouath2Server 
 else
