@@ -46,16 +46,5 @@ func migrations() {
 }
 
 func seeding() {
-	var db *gorm.DB
-	db, err := database.Conn()
-	if err != nil {
-		log.Error(err)
-	}
-	db.FirstOrCreate(&models.Users{}, &models.Users{
-		Name:     "Ankit Jain",
-		Username: "ankit.infra",
-		Email:    "ankit.infra@razorpay.com",
-		Admin:    1,
-	})
-	defer db.Close()
+	database.Seeding()
 }

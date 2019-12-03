@@ -4,6 +4,7 @@ import (
 	"concierge/database"
 	"concierge/models"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -68,7 +69,7 @@ func AddUsers(c *gin.Context) {
 	defer db.Close()
 	split := strings.Split(newUser.Email, "@")
 	username := split[0]
-	if split[1] != "razorpay.com" {
+	if split[1] != os.Getenv("COMPANY_DOMAIN") {
 		c.HTML(http.StatusOK, "addusers.gohtml", gin.H{
 			"user": User,
 			"message": map[string]string{
@@ -125,7 +126,7 @@ func UpdateUser(c *gin.Context) {
 	defer db.Close()
 	split := strings.Split(updateUser.Email, "@")
 	username := split[0]
-	if split[1] != "razorpay.com" {
+	if split[1] != os.Getenv("COMPANY_DOMAIN") {
 		c.HTML(http.StatusOK, "addusers.gohtml", gin.H{
 			"user": User,
 			"message": map[string]string{
