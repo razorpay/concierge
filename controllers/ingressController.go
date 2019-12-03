@@ -1,22 +1,16 @@
 package controllers
 
 import (
+	"concierge/config"
 	"concierge/database"
 	"concierge/models"
-	"flag"
 	"net/http"
-	"path/filepath"
 	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/homedir"
 )
-
-var kubeconfig *string
 
 const (
 	layout = "2006-01-02 15:04:05 -0700 MST"
@@ -27,26 +21,9 @@ type info struct {
 	Leaseinfo models.Leases
 }
 
-func init() {
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
-	flag.Parse()
-}
-
 //ShowAllowedIngress ...
 func ShowAllowedIngress(c *gin.Context) {
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		log.Error(err)
-	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Error(err)
-	}
-
+	clientset := config.KubeClient.ClientSet
 	User, _ := c.Get("User")
 
 	myclientset := myClientSet{clientset}
@@ -65,14 +42,8 @@ func ShowAllowedIngress(c *gin.Context) {
 
 //WhiteListIP ...
 func WhiteListIP(c *gin.Context) {
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		log.Error(err)
-	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Error(err)
-	}
+	clientset := config.KubeClient.ClientSet
+
 	User, _ := c.Get("User")
 	myclientset := myClientSet{clientset}
 	ns := c.Param("ns")
@@ -132,14 +103,8 @@ func WhiteListIP(c *gin.Context) {
 
 //DeleteIPFromIngress ...
 func DeleteIPFromIngress(c *gin.Context) {
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		log.Error(err)
-	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Error(err)
-	}
+	clientset := config.KubeClient.ClientSet
+
 	User, _ := c.Get("User")
 
 	myclientset := myClientSet{clientset}
@@ -174,14 +139,8 @@ func DeleteIPFromIngress(c *gin.Context) {
 
 //IngressDetails ...
 func IngressDetails(c *gin.Context) {
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		log.Error(err)
-	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Error(err)
-	}
+	clientset := config.KubeClient.ClientSet
+
 	User, _ := c.Get("User")
 	myclientset := myClientSet{clientset}
 	ns := c.Param("ns")
@@ -241,14 +200,8 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 
 //DeleteLeases ...
 func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
-	if err != nil {
-		log.Error(err)
-	}
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		log.Error(err)
-	}
+	clientset := config.KubeClient.ClientSet
+
 	myclientset := myClientSet{clientset}
 	db, err := database.Conn()
 	if err != nil {
