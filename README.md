@@ -11,18 +11,21 @@ It allows us to create leases for incoming connections to Kubernetes Ingress Obj
 3. Get the source code on your machine via git.
 
     ```shell
-    git clone --branch ingress-concierge https://github.com/razorpay/concierge.git
+    $ git clone --branch ingress-concierge https://github.com/razorpay/concierge.git
     ```
 
 4. Rename file `.env.example` to `.env` and change credentials.
 
     ```shell
-    mv .env.example .env
+    $ mv .env.example .env
     ```
 
 5. Rename file `oauth2_proxy.example.cfg` to `oauth2_proxy.cfg` in `oauth2_proxy` dir and add the following values obtained from Google OAuth
 
     ```text
+    $ mv oauth2_proxy/oauth2_proxy.example.cfg oauth2_proxy/oauth2_proxy.cfg
+    
+    $ vi oauth2_proxy/oauth2_proxy.cfg
     client_id =
     client_secret =
     ```
@@ -32,13 +35,13 @@ It allows us to create leases for incoming connections to Kubernetes Ingress Obj
 7. Run docker-compose command to run the application.
 
     ```shell
-    docker-compose up -d
+    $ docker-compose up -d
     ```
 
 8. Check for the running application.
 
     ```shell
-    docker ps
+    $ docker ps
     ```
 
-9. Access the application on [127.0.0.1:4180](127.0.0.1:4180)
+9. Access the application on [http://127.0.0.1:4180](http://127.0.0.1:4180)
