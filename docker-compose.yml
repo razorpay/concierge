@@ -23,11 +23,6 @@ services:
       MYSQL_DATABASE: '${DB_DATABASE}'
       MYSQL_USER: '${DB_USERNAME}'
       MYSQL_PASSWORD: '${DB_PASSWORD}'
-    healthcheck:
-      test: ["CMD-SHELL", 'mysqladmin ping']
-      interval: 10s
-      timeout: 2s
-      retries: 10
 
   concierge:
     build:
