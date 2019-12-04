@@ -18,7 +18,7 @@ func Conn() (*gorm.DB, error) {
 	dbconnURI := dbconfig.DBUsername + ":" + dbconfig.DBPassword + "@tcp(" + dbconfig.Host + ":" + dbconfig.DBPort + ")/" + dbconfig.DBDatabase
 	db, err = gorm.Open("mysql", dbconnURI+"?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
 	}
 	return db, nil
 }
