@@ -9,7 +9,7 @@ RUN go build -o concierge main.go
 ENTRYPOINT ["docker/entrypoint.sh"]
 
 
-FROM razorpay/onggi:base-3.7
+FROM alpine:3.10
 WORKDIR /app
 
 COPY --from=concierge /concierge/concierge concierge
