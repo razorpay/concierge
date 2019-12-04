@@ -6,7 +6,6 @@ RUN go mod download
 RUN export GO111MODULE=on && go get github.com/pusher/oauth2_proxy && export GO111MODULE=auto
 COPY . .
 RUN go build -o concierge main.go 
-ENTRYPOINT ["docker/entrypoint.sh"]
 
 
 FROM alpine:3.10
