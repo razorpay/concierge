@@ -29,8 +29,7 @@ func InitializeRoutes(router *gin.Engine) {
 		authorized.POST("/users/edit/:id", controllers.UpdateUser)
 		authorized.POST("/users/delete", controllers.DeleteUser)
 		authorized.GET("/logout", func(c *gin.Context) {
-			c.SetCookie("_oauth2_proxy", "", -1, "/", "https://"+c.Request.Host+"/", false, true)
-			c.Redirect(302, "http://"+c.Request.Host+"/")
+			c.Redirect(302, "http://"+c.Request.Host+"/oauth2/sign_in")
 		})
 	}
 
