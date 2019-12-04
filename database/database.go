@@ -15,8 +15,8 @@ func Conn() (*gorm.DB, error) {
 
 	dbconfig := config.DBConfig
 
-	dbconnURI := dbconfig.DBUsername + ":" + dbconfig.DBPassword + "@tcp(" + dbconfig.Host + ":" + dbconfig.DBPort + ")"
-	db, err = gorm.Open("mysql", dbconnURI+"/concierge?charset=utf8&parseTime=True&loc=Local")
+	dbconnURI := dbconfig.DBUsername + ":" + dbconfig.DBPassword + "@tcp(" + dbconfig.Host + ":" + dbconfig.DBPort + ")/" + dbconfig.DBDatabase
+	db, err = gorm.Open("mysql", dbconnURI+"?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		log.Error(err)
 	}

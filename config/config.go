@@ -37,6 +37,7 @@ func initilizeDBConfig() {
 		DBUsername: os.Getenv("DB_USERNAME"),
 		DBPassword: os.Getenv("DB_PASSWORD"),
 		DBPort:     os.Getenv("DB_PORT"),
+		DBDatabase: os.Getenv("DB_DATABASE"),
 	}
 }
 

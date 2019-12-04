@@ -7,4 +7,5 @@ type DatabaseConfig struct {
 	DBUsername string
 	DBPassword string
 	DBPort     string
+	DBDatabase string
 }
