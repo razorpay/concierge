@@ -6,6 +6,7 @@ import (
 	"concierge/models"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -54,7 +55,8 @@ func WhiteListIP(c *gin.Context) {
 		log.Error("Error", err)
 		return
 	}
-	ip := c.Request.Header["X-Forwarded-For"][0]
+	ips := c.Request.Header["X-Forwarded-For"][0]
+	ip := strings.Split(ips, ",")[0]
 	updateStatus, err := myclientset.whiteListIP(ns, name, ip)
 	var leases []models.Leases
 	if updateStatus {
@@ -117,7 +119,9 @@ func DeleteIPFromIngress(c *gin.Context) {
 		log.Error("Error", err)
 		return
 	}
-	updateStatus, err := DeleteLeases(ns, name, c.Request.Header["X-Forwarded-For"][0], ID)
+	ips := c.Request.Header["X-Forwarded-For"][0]
+	ip := strings.Split(ips, ",")[0]
+	updateStatus, err := DeleteLeases(ns, name, ip, ID)
 	leases := GetActiveLeases(ns, name)
 	if updateStatus {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
