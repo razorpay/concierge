@@ -34,10 +34,10 @@ func InitializeRoutes(router *gin.Engine) {
 		})
 	}
 
+	router.GET("/cron", controllers.ClearExpiredLeases)
 	cron := router.Group("/cron")
 	cron.Use(middleware.Cron)
 	{
 		cron.POST("/", controllers.ClearExpiredLeases)
 	}
-	cron.GET("/", controllers.ClearExpiredLeases)
 }
