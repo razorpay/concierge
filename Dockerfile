@@ -1,5 +1,4 @@
 FROM golang:1.12-alpine3.9 as concierge
-RUN apk add git
 WORKDIR /concierge
 COPY go.mod go.sum ./
 RUN go mod download

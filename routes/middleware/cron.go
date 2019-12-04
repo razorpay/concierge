@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
 //Cron ...
@@ -19,8 +18,6 @@ func Cron(c *gin.Context) {
 	}
 	payload, _ := base64.StdEncoding.DecodeString(auth[1])
 	pair := strings.SplitN(string(payload), ":", 2)
-	log.Info(c.Request.Header.Get("Authorization"))
-
 	username := pair[0]
 	password := pair[1]
 	if username != os.Getenv("CRON_USERNAME") {
