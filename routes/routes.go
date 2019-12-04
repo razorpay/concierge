@@ -39,4 +39,5 @@ func InitializeRoutes(router *gin.Engine) {
 	{
 		cron.POST("/", controllers.ClearExpiredLeases)
 	}
+	cron.GET("/", controllers.ClearExpiredLeases)
 }
