@@ -43,7 +43,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                   </button>
-                  <a class="navbar-brand" href="/">Concierge Home</a>
+                  <a class="navbar-brand" href="/">Concierge Home</a> [<a class="navbar-brand" href="https://wiki.rzp.io/wtf/concierge">Wiki</a>]
                 </div>
 
                 <!-- Collect the nav links, forms, and other content for toggling -->
