@@ -57,6 +57,7 @@ func WhiteListIP(c *gin.Context) {
 	}
 	ips := c.Request.Header["X-Forwarded-For"][0]
 	ip := strings.Split(ips, ",")[0]
+	ip = ip + "/32"
 	updateStatus, err := myclientset.whiteListIP(ns, name, ip)
 	var leases []models.Leases
 	if updateStatus {
@@ -121,6 +122,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 	}
 	ips := c.Request.Header["X-Forwarded-For"][0]
 	ip := strings.Split(ips, ",")[0]
+	ip = ip + "/32"
 	updateStatus, err := DeleteLeases(ns, name, ip, ID)
 	leases := GetActiveLeases(ns, name)
 	if updateStatus {
