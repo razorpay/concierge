@@ -8,7 +8,7 @@ COPY . .
 RUN go build -o concierge main.go 
 
 
-FROM alpine:3.10
+FROM razorpay/onggi:base-3.7
 WORKDIR /app
 
 COPY --from=concierge /concierge/concierge concierge
