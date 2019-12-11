@@ -236,6 +236,10 @@ func ClearExpiredLeases(c *gin.Context) {
 }
 
 func slackNotification(msg string, user string) {
+	slackWebhookURL := os.Getenv("SLACK_WEBHOOK_URL")
+	if slackWebhookURL == "" {
+		return
+	}
 	payload := pkg.Payload{
 		Title:      "Concierge",
 		Pretext:    msg,
@@ -253,5 +257,5 @@ func slackNotification(msg string, user string) {
 			},
 		},
 	}
-	payloads.SlackNotification(os.Getenv("SLACK_WEBHOOK_URL"))
+	payloads.SlackNotification(slackWebhookURL)
 }
