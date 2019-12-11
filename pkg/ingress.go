@@ -1,4 +1,4 @@
-package controllers
+package pkg
 
 import (
 	"strings"
@@ -16,13 +16,14 @@ type ingressList struct {
 	WhitelistedIps []string
 }
 
-type myClientSet struct {
-	clientset *kubernetes.Clientset
+//MyClientSet ...
+type MyClientSet struct {
+	Clientset *kubernetes.Clientset
 }
 
-func (c myClientSet) getIngresses(ns string) (map[int]ingressList, error) {
-	ingressClient := c.clientset.ExtensionsV1beta1().Ingresses(ns)
-	log.Infof("Listing ingress in namespace %s:\n", ns)
+//GetIngresses ...
+func (c MyClientSet) GetIngresses(ns string) (map[int]ingressList, error) {
+	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingressLists, err := ingressClient.List(metav1.ListOptions{})
 	if err != nil {
@@ -53,9 +54,9 @@ func (c myClientSet) getIngresses(ns string) (map[int]ingressList, error) {
 	return myIngress, nil
 }
 
-func (c myClientSet) removeIngressIP(ns string, ingressName string, ip string) (bool, error) {
-	ingressClient := c.clientset.ExtensionsV1beta1().Ingresses(ns)
-	log.Infof("Removing IP %s from ingress %s in namespace %s:\n", ip, ingressName, ns)
+//RemoveIngressIP ...
+func (c MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (bool, error) {
+	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
 	if err != nil {
@@ -85,9 +86,9 @@ func (c myClientSet) removeIngressIP(ns string, ingressName string, ip string) (
 	return false, nil
 }
 
-func (c myClientSet) whiteListIP(ns string, ingressName string, ip string) (bool, error) {
-	ingressClient := c.clientset.ExtensionsV1beta1().Ingresses(ns)
-	log.Infof("Whitelisting IP %s to ingress %s in namespace %s:\n", ip, ingressName, ns)
+//WhiteListIP ...
+func (c MyClientSet) WhiteListIP(ns string, ingressName string, ip string) (bool, error) {
+	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
 	if err != nil {
@@ -123,8 +124,9 @@ func (c myClientSet) whiteListIP(ns string, ingressName string, ip string) (bool
 	return false, nil
 }
 
-func (c myClientSet) getIngress(ns string, ingressName string) (ingressList, error) {
-	ingressClient := c.clientset.ExtensionsV1beta1().Ingresses(ns)
+//GetIngress ...
+func (c MyClientSet) GetIngress(ns string, ingressName string) (ingressList, error) {
+	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
 	if err != nil {
 		return ingressList{}, err

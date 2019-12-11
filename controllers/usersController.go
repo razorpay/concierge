@@ -85,6 +85,7 @@ func AddUsers(c *gin.Context) {
 		Email:    newUser.Email,
 	}
 	newUser.Username = username
+	newUser.Name = username
 	res := db.Where(myUser).First(&models.Users{})
 	if res.RecordNotFound() {
 		db.Create(&newUser)
@@ -142,6 +143,7 @@ func UpdateUser(c *gin.Context) {
 		Email:    updateUser.Email,
 	}
 	updateUser.Username = username
+	updateUser.Name = username
 	res := db.Where(myUser).Where("id != ?", ID).First(&models.Users{})
 	if res.RecordNotFound() {
 		log.Info(updateUser)

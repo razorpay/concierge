@@ -15,7 +15,7 @@ func Seeding() {
 		log.Error(err)
 	}
 	db.FirstOrCreate(&models.Users{}, &models.Users{
-		Name:     "Ankit Jain",
+		Name:     "ankit.infra",
 		Username: "ankit.infra",
 		Email:    "ankit.infra@razorpay.com",
 		Admin:    1,

@@ -4,17 +4,15 @@ import (
 	"concierge/config"
 	"concierge/database"
 	"concierge/models"
+	"concierge/pkg"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-)
-
-const (
-	layout = "2006-01-02 15:04:05 -0700 MST"
 )
 
 type info struct {
@@ -27,10 +25,11 @@ func ShowAllowedIngress(c *gin.Context) {
 	clientset := config.KubeClient.ClientSet
 	User, _ := c.Get("User")
 
-	myclientset := myClientSet{clientset}
+	myclientset := pkg.MyClientSet{clientset}
 	ns := ""
 	ns = c.Query("ns")
-	data, err := myclientset.getIngresses(ns)
+	log.Infof("Listing ingress in namespace %s for user %s\n", ns, User.(*models.Users).Email)
+	data, err := myclientset.GetIngresses(ns)
 	if err != nil {
 		log.Error("Error", err)
 		return
@@ -46,11 +45,11 @@ func WhiteListIP(c *gin.Context) {
 	clientset := config.KubeClient.ClientSet
 
 	User, _ := c.Get("User")
-	myclientset := myClientSet{clientset}
+	myclientset := pkg.MyClientSet{clientset}
 	ns := c.Param("ns")
 	name := c.Param("name")
 	expiry, _ := strconv.Atoi(c.PostForm("expiry"))
-	data, err := myclientset.getIngress(ns, name)
+	data, err := myclientset.GetIngress(ns, name)
 	if err != nil {
 		log.Error("Error", err)
 		return
@@ -58,9 +57,12 @@ func WhiteListIP(c *gin.Context) {
 	ips := c.Request.Header["X-Forwarded-For"][0]
 	ip := strings.Split(ips, ",")[0]
 	ip = ip + "/32"
-	updateStatus, err := myclientset.whiteListIP(ns, name, ip)
+	updateStatus, err := myclientset.WhiteListIP(ns, name, ip)
 	var leases []models.Leases
 	if updateStatus {
+		msgInfo := "Whitelisted IP " + ip + " to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+		slackNotification(msgInfo, User.(*models.Users).Email)
+		log.Info(msgInfo)
 		db, err := database.Conn()
 		if err != nil {
 			log.Error("Error", err)
@@ -77,6 +79,7 @@ func WhiteListIP(c *gin.Context) {
 
 		db.Create(&lease)
 		leases = GetActiveLeases(ns, name)
+
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 			"data": data,
 			"user": User,
@@ -110,12 +113,12 @@ func DeleteIPFromIngress(c *gin.Context) {
 
 	User, _ := c.Get("User")
 
-	myclientset := myClientSet{clientset}
+	myclientset := pkg.MyClientSet{clientset}
 	ns := c.Param("ns")
 	name := c.Param("name")
 	leaseID, err := strconv.Atoi(c.Param("id"))
 	ID := uint(leaseID)
-	data, err := myclientset.getIngress(ns, name)
+	data, err := myclientset.GetIngress(ns, name)
 	if err != nil {
 		log.Error("Error", err)
 		return
@@ -126,6 +129,9 @@ func DeleteIPFromIngress(c *gin.Context) {
 	updateStatus, err := DeleteLeases(ns, name, ip, ID)
 	leases := GetActiveLeases(ns, name)
 	if updateStatus {
+		msgInfo := "Removed IP " + ip + " from ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+		slackNotification(msgInfo, User.(*models.Users).Email)
+		log.Info(msgInfo)
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 			"data":         data,
 			"user":         User,
@@ -148,11 +154,11 @@ func IngressDetails(c *gin.Context) {
 	clientset := config.KubeClient.ClientSet
 
 	User, _ := c.Get("User")
-	myclientset := myClientSet{clientset}
+	myclientset := pkg.MyClientSet{clientset}
 	ns := c.Param("ns")
 	name := c.Param("name")
 	leases := GetActiveLeases(ns, name)
-	data, err := myclientset.getIngress(ns, name)
+	data, err := myclientset.GetIngress(ns, name)
 	if err != nil {
 		log.Error("Error", err)
 		c.HTML(http.StatusNotFound, "manageingress.gohtml", gin.H{
@@ -196,6 +202,7 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 		if t < uint(time.Now().Unix()) {
 			leases[i].Expiry = uint(0)
 			DeleteLeases(ns, name, lease.LeaseIP, lease.ID)
+			log.Infof("Removed expired IP %s from ingress %s in namespace %s for User %s\n", lease.LeaseIP, name, ns, lease.User.Email)
 		} else {
 			leases[i].Expiry = t - uint(time.Now().Unix())
 			myleases = append(myleases, leases[i])
@@ -208,7 +215,7 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 	clientset := config.KubeClient.ClientSet
 
-	myclientset := myClientSet{clientset}
+	myclientset := pkg.MyClientSet{clientset}
 	db, err := database.Conn()
 	if err != nil {
 		log.Error("Error", err)
@@ -218,7 +225,7 @@ func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 	db.Delete(models.Leases{
 		ID: ID,
 	})
-	updateStatus, err := myclientset.removeIngressIP(ns, name, ip)
+	updateStatus, err := myclientset.RemoveIngressIP(ns, name, ip)
 	return updateStatus, err
 }
 
@@ -226,4 +233,25 @@ func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 func ClearExpiredLeases(c *gin.Context) {
 	GetActiveLeases("", "")
 	c.String(200, "Done")
+}
+
+func slackNotification(msg string, user string) {
+	payload := pkg.Payload{
+		Title:      "Concierge",
+		Pretext:    msg,
+		Text:       msg,
+		Color:      "#36a64f",
+		AuthorName: user,
+		TitleLink:  "",
+		Footer:     "Concierge",
+		Timestamp:  strconv.FormatInt(time.Now().Unix(), 10),
+	}
+	payloads := pkg.Payloads{
+		Attachments: map[string][]pkg.Payload{
+			"attachments": []pkg.Payload{
+				payload,
+			},
+		},
+	}
+	payloads.SlackNotification(os.Getenv("SLACK_WEBHOOK_URL"))
 }
