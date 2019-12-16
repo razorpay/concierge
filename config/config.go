@@ -45,8 +45,6 @@ func initilizeKubeConfig() {
 	var err error
 	var config *rest.Config
 	var clientset *kubernetes.Clientset
-
-	log.Info(os.Getenv("APP_ENV"))
 	if os.Getenv("APP_ENV") == "dev" {
 		var kubeconfig *string
 		if home := homedir.HomeDir(); home != "" {
