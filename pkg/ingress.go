@@ -9,7 +9,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-type ingressList struct {
+//IngressList ...
+type IngressList struct {
 	Name           string
 	Namespace      string
 	Host           string
@@ -23,7 +24,7 @@ type MyClientSet struct {
 }
 
 //GetIngresses ...
-func (c MyClientSet) GetIngresses(ns string) (map[int]ingressList, error) {
+func (c MyClientSet) GetIngresses(ns string) (map[int]IngressList, error) {
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingressLists, err := ingressClient.List(metav1.ListOptions{})
@@ -31,7 +32,7 @@ func (c MyClientSet) GetIngresses(ns string) (map[int]ingressList, error) {
 		return nil, err
 	}
 
-	myIngress := make(map[int]ingressList)
+	myIngress := make(map[int]IngressList)
 
 	for index, ingress := range ingressLists.Items {
 		if _, ok := ingress.Annotations["concierge"]; ok && ingress.Annotations["concierge"] == "true" {
@@ -43,7 +44,7 @@ func (c MyClientSet) GetIngresses(ns string) (map[int]ingressList, error) {
 					ingressHosts = hosts.Host
 				}
 			}
-			myIngress[index] = ingressList{
+			myIngress[index] = IngressList{
 				ingress.Name,
 				ingress.Namespace,
 				ingressHosts,
@@ -87,7 +88,7 @@ func (c MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (
 			return true, nil
 		}
 	}
-	return false, nil
+	return false, errors.New("Ingress Annotation not found")
 }
 
 //WhiteListIP ...
@@ -128,15 +129,15 @@ func (c MyClientSet) WhiteListIP(ns string, ingressName string, ip string) (bool
 			return false, nil
 		}
 	}
-	return false, nil
+	return false, errors.New("Ingress Annotation not found")
 }
 
 //GetIngress ...
-func (c MyClientSet) GetIngress(ns string, ingressName string) (ingressList, error) {
+func (c MyClientSet) GetIngress(ns string, ingressName string) (IngressList, error) {
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
 	if err != nil {
-		return ingressList{}, err
+		return IngressList{}, err
 	}
 	if _, ok := ingress.Annotations["concierge"]; ok && ingress.Annotations["concierge"] == "true" {
 		var ingressHosts string
@@ -147,7 +148,7 @@ func (c MyClientSet) GetIngress(ns string, ingressName string) (ingressList, err
 				ingressHosts = hosts.Host
 			}
 		}
-		myIngress := ingressList{
+		myIngress := IngressList{
 			ingress.Name,
 			ingress.Namespace,
 			ingressHosts,
@@ -156,6 +157,6 @@ func (c MyClientSet) GetIngress(ns string, ingressName string) (ingressList, err
 		}
 		return myIngress, nil
 	}
-	return ingressList{}, errors.New("Ingress not found")
+	return IngressList{}, errors.New("Ingress Annotation not found")
 
 }

@@ -32,6 +32,14 @@ func ShowAllowedIngress(c *gin.Context) {
 	data, err := myclientset.GetIngresses(ns)
 	if err != nil {
 		log.Error("Error", err)
+		c.HTML(http.StatusOK, "showingresslist.gohtml", gin.H{
+			"data": data,
+			"user": User,
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": err.Error(),
+			},
+		})
 		return
 	}
 	c.HTML(http.StatusOK, "showingresslist.gohtml", gin.H{
@@ -49,16 +57,40 @@ func WhiteListIP(c *gin.Context) {
 	ns := c.Param("ns")
 	name := c.Param("name")
 	expiry, _ := strconv.Atoi(c.PostForm("expiry"))
+	var leases []models.Leases
+	leases = GetActiveLeases(ns, name)
 	data, err := myclientset.GetIngress(ns, name)
 	if err != nil {
 		log.Error("Error", err)
+		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
+			"data": data,
+			"user": User,
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": err.Error(),
+			},
+			"activeLeases": leases,
+		})
 		return
 	}
 	ips := c.Request.Header["X-Forwarded-For"][0]
 	ip := strings.Split(ips, ",")[0]
 	ip = ip + "/32"
 	updateStatus, err := myclientset.WhiteListIP(ns, name, ip)
-	var leases []models.Leases
+
+	if err != nil {
+		log.Error("Error", err)
+		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
+			"data": data,
+			"user": User,
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": err.Error(),
+			},
+			"activeLeases": leases,
+		})
+		return
+	}
 	if updateStatus {
 		msgInfo := "Whitelisted IP " + ip + " to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
@@ -91,11 +123,7 @@ func WhiteListIP(c *gin.Context) {
 		})
 		return
 	}
-	if err != nil {
-		log.Error("Error", err)
-		return
-	}
-	leases = GetActiveLeases(ns, name)
+
 	c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 		"data": data,
 		"user": User,
@@ -118,20 +146,44 @@ func DeleteIPFromIngress(c *gin.Context) {
 	name := c.Param("name")
 	leaseID, err := strconv.Atoi(c.Param("id"))
 	ID := uint(leaseID)
+	leases := GetActiveLeases(ns, name)
+
 	data, err := myclientset.GetIngress(ns, name)
 	if err != nil {
 		log.Error("Error", err)
+		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
+			"data": data,
+			"user": User,
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": err.Error(),
+			},
+			"activeLeases": leases,
+		})
 		return
 	}
 	ips := c.Request.Header["X-Forwarded-For"][0]
 	ip := strings.Split(ips, ",")[0]
 	ip = ip + "/32"
 	updateStatus, err := DeleteLeases(ns, name, ip, ID)
-	leases := GetActiveLeases(ns, name)
+	if err != nil {
+		log.Error("Error", err)
+		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
+			"data": data,
+			"user": User,
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": err.Error(),
+			},
+			"activeLeases": leases,
+		})
+		return
+	}
 	if updateStatus {
 		msgInfo := "Removed IP " + ip + " from ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
+		leases = GetActiveLeases(ns, name)
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 			"data":         data,
 			"user":         User,
@@ -141,10 +193,6 @@ func DeleteIPFromIngress(c *gin.Context) {
 				"message": "Lease is successfully deleted",
 			},
 		})
-		return
-	}
-	if err != nil {
-		log.Error("Error", err)
 		return
 	}
 }
