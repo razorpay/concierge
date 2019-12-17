@@ -3,6 +3,7 @@ package pkg
 import (
 	"errors"
 	"strings"
+	"sync"
 
 	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,6 +22,7 @@ type IngressList struct {
 //MyClientSet ...
 type MyClientSet struct {
 	Clientset *kubernetes.Clientset
+	sync.RWMutex
 }
 
 //GetIngresses ...
@@ -58,6 +60,8 @@ func (c MyClientSet) GetIngresses(ns string) (map[int]IngressList, error) {
 
 //RemoveIngressIP ...
 func (c MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (bool, error) {
+	c.Lock()
+	defer c.Unlock()
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
@@ -93,6 +97,8 @@ func (c MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (
 
 //WhiteListIP ...
 func (c MyClientSet) WhiteListIP(ns string, ingressName string, ip string) (bool, error) {
+	c.Lock()
+	defer c.Unlock()
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})

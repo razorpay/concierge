@@ -25,7 +25,7 @@ func ShowAllowedIngress(c *gin.Context) {
 	clientset := config.KubeClient.ClientSet
 	User, _ := c.Get("User")
 
-	myclientset := pkg.MyClientSet{clientset}
+	myclientset := pkg.MyClientSet{Clientset: clientset}
 	ns := ""
 	ns = c.Query("ns")
 	log.Infof("Listing ingress in namespace %s for user %s\n", ns, User.(*models.Users).Email)
@@ -53,7 +53,7 @@ func WhiteListIP(c *gin.Context) {
 	clientset := config.KubeClient.ClientSet
 
 	User, _ := c.Get("User")
-	myclientset := pkg.MyClientSet{clientset}
+	myclientset := pkg.MyClientSet{Clientset: clientset}
 	ns := c.Param("ns")
 	name := c.Param("name")
 	expiry, _ := strconv.Atoi(c.PostForm("expiry"))
@@ -141,7 +141,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 
 	User, _ := c.Get("User")
 
-	myclientset := pkg.MyClientSet{clientset}
+	myclientset := pkg.MyClientSet{Clientset: clientset}
 	ns := c.Param("ns")
 	name := c.Param("name")
 	leaseID, err := strconv.Atoi(c.Param("id"))
@@ -202,7 +202,7 @@ func IngressDetails(c *gin.Context) {
 	clientset := config.KubeClient.ClientSet
 
 	User, _ := c.Get("User")
-	myclientset := pkg.MyClientSet{clientset}
+	myclientset := pkg.MyClientSet{Clientset: clientset}
 	ns := c.Param("ns")
 	name := c.Param("name")
 	leases := GetActiveLeases(ns, name)
@@ -263,7 +263,7 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 	clientset := config.KubeClient.ClientSet
 
-	myclientset := pkg.MyClientSet{clientset}
+	myclientset := pkg.MyClientSet{Clientset: clientset}
 	db, err := database.Conn()
 	if err != nil {
 		log.Error("Error", err)
