@@ -9,10 +9,10 @@ type Users struct {
 	ID              uint `gorm:"type:bigint(20) unsigned auto_increment;primary_key"`
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
-	DeletedAt       *time.Time `gorm:"unique_index:users_email_username_deleted_at_unique"`
+	DeletedAt       *time.Time `gorm:"unique_index:users_username_deleted_at_unique,users_email_deleted_at_unique"`
 	Name            string     `gorm:"column:name;type:varchar(255);not null" form:"name" binding:"required,min=3,max=100"`
-	Username        string     `gorm:"column:username;type:varchar(255);not null;unique_index:users_email_username_deleted_at_unique,users_username_unique"`
-	Email           string     `gorm:"column:email;type:varchar(255);not null;unique_index:users_email_username_deleted_at_unique" form:"email" binding:"required,email"`
+	Username        string     `gorm:"column:username;type:varchar(255);not null;unique_index:users_username_deleted_at_unique"`
+	Email           string     `gorm:"column:email;type:varchar(255);not null;unique_index:users_email_deleted_at_unique" form:"email" binding:"required,email"`
 	EmailVerifiedAt time.Time  `gorm:"column:email_verified_at;type:timestamp;default:null"`
 	Admin           int        `gorm:"column:admin;type:tinyint(4);default:null" form:"admin"`
 	GoogleID        string     `gorm:"column:google_id;type:varchar(255);not null;default:''"`
