@@ -19,8 +19,8 @@ func Conn() {
 	dbconnURI := dbconfig.DBUsername + ":" + dbconfig.DBPassword + "@tcp(" + dbconfig.Host + ":" + dbconfig.DBPort + ")/" + dbconfig.DBDatabase
 	DB, err = gorm.Open("mysql", dbconnURI+"?charset=utf8&parseTime=True&loc=Local")
 
-	DB.DB().SetMaxIdleConns(10)
-	DB.DB().SetMaxOpenConns(8)
+	DB.DB().SetMaxIdleConns(dbconfig.MaxIdleConns)
+	DB.DB().SetMaxOpenConns(dbconfig.MaxOpenConns)
 	if err != nil {
 		log.Fatal(err)
 	}

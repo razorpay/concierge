@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
@@ -31,13 +32,17 @@ func LoadConfig() {
 }
 
 func initilizeDBConfig() {
+	maxidleconns, _ := strconv.Atoi(os.Getenv("DB_MAX_IDLE_CONN"))
+	maxopenconns, _ := strconv.Atoi(os.Getenv("DB_MAX_OPEN_CONN"))
 	DBConfig = DatabaseConfig{
-		Host:       os.Getenv("DB_HOST"),
-		DBName:     os.Getenv("DB_DATABASE"),
-		DBUsername: os.Getenv("DB_USERNAME"),
-		DBPassword: os.Getenv("DB_PASSWORD"),
-		DBPort:     os.Getenv("DB_PORT"),
-		DBDatabase: os.Getenv("DB_DATABASE"),
+		Host:         os.Getenv("DB_HOST"),
+		DBName:       os.Getenv("DB_DATABASE"),
+		DBUsername:   os.Getenv("DB_USERNAME"),
+		DBPassword:   os.Getenv("DB_PASSWORD"),
+		DBPort:       os.Getenv("DB_PORT"),
+		DBDatabase:   os.Getenv("DB_DATABASE"),
+		MaxIdleConns: maxidleconns,
+		MaxOpenConns: maxopenconns,
 	}
 }
 
