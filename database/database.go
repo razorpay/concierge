@@ -7,18 +7,29 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var db *gorm.DB
+//DB ...
+var DB *gorm.DB
 var err error
 
 //Conn ...
-func Conn() (*gorm.DB, error) {
-
+func Conn() {
+	log.Info("Creating Connection")
 	dbconfig := config.DBConfig
 
 	dbconnURI := dbconfig.DBUsername + ":" + dbconfig.DBPassword + "@tcp(" + dbconfig.Host + ":" + dbconfig.DBPort + ")/" + dbconfig.DBDatabase
-	db, err = gorm.Open("mysql", dbconnURI+"?charset=utf8&parseTime=True&loc=Local")
+	DB, err = gorm.Open("mysql", dbconnURI+"?charset=utf8&parseTime=True&loc=Local")
+
+	DB.DB().SetMaxIdleConns(10)
+	DB.DB().SetMaxOpenConns(8)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return db, nil
+}
+
+//CloseDB ...
+func CloseDB() {
+	err := DB.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

@@ -95,11 +95,9 @@ func WhiteListIP(c *gin.Context) {
 		msgInfo := "Whitelisted IP " + ip + " to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
-		db, err := database.Conn()
-		if err != nil {
-			log.Error("Error", err)
+		if database.DB == nil {
+			database.Conn()
 		}
-		defer db.Close()
 
 		lease := models.Leases{
 			UserID:    User.(*models.Users).ID,
@@ -109,7 +107,7 @@ func WhiteListIP(c *gin.Context) {
 			Expiry:    uint(expiry),
 		}
 
-		db.Create(&lease)
+		database.DB.Create(&lease)
 		leases = GetActiveLeases(ns, name)
 
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
@@ -228,18 +226,17 @@ func IngressDetails(c *gin.Context) {
 
 //GetActiveLeases ...
 func GetActiveLeases(ns string, name string) []models.Leases {
-	db, err := database.Conn()
-	if err != nil {
-		log.Error("Error", err)
+	if database.DB == nil {
+		database.Conn()
 	}
-	defer db.Close()
+
 	leases := []models.Leases{}
 	if ns == "" && name == "" {
-		db.Preload("User").Where(models.Leases{
+		database.DB.Preload("User").Where(models.Leases{
 			LeaseType: "Ingress",
 		}).Find(&leases)
 	} else {
-		db.Preload("User").Where(models.Leases{
+		database.DB.Preload("User").Where(models.Leases{
 			LeaseType: "Ingress",
 			GroupID:   ns + ":" + name,
 		}).Find(&leases)
@@ -264,13 +261,11 @@ func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 	clientset := config.KubeClient.ClientSet
 
 	myclientset := pkg.MyClientSet{Clientset: clientset}
-	db, err := database.Conn()
-	if err != nil {
-		log.Error("Error", err)
+	if database.DB == nil {
+		database.Conn()
 	}
-	defer db.Close()
 
-	db.Delete(models.Leases{
+	database.DB.Delete(models.Leases{
 		ID: ID,
 	})
 	updateStatus, err := myclientset.RemoveIngressIP(ns, name, ip)

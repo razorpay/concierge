@@ -9,20 +9,17 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
 //GetUsers ...
 func GetUsers(c *gin.Context) {
 	User, _ := c.Get("User")
-	db, err := database.Conn()
-	if err != nil {
-		log.Error("Error", err)
+	if database.DB == nil {
+		database.Conn()
 	}
-	defer db.Close()
 
 	users := []models.Users{}
-	db.Find(&users)
+	database.DB.Find(&users)
 	c.HTML(http.StatusOK, "manageusers.gohtml", gin.H{
 		"data": users,
 		"user": User,
@@ -41,13 +38,11 @@ func AddUsersForm(c *gin.Context) {
 func UpdateUsersForm(c *gin.Context) {
 	User, _ := c.Get("User")
 	ID := c.Param("id")
-	db, err := database.Conn()
-	if err != nil {
-		log.Error("Error", err)
+	if database.DB == nil {
+		database.Conn()
 	}
-	defer db.Close()
 	editUser := models.Users{}
-	db.Find(&editUser, ID)
+	database.DB.Find(&editUser, ID)
 	c.HTML(http.StatusOK, "addusers.gohtml", gin.H{
 		"user": User,
 		"data": editUser,
@@ -62,11 +57,9 @@ func AddUsers(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	db, err := database.Conn()
-	if err != nil {
-		log.Error("Error", err)
+	if database.DB == nil {
+		database.Conn()
 	}
-	defer db.Close()
 	split := strings.Split(newUser.Email, "@")
 	username := split[0]
 	if split[1] != os.Getenv("COMPANY_DOMAIN") {
@@ -86,9 +79,9 @@ func AddUsers(c *gin.Context) {
 	}
 	newUser.Username = username
 	newUser.Name = username
-	res := db.Where(myUser).First(&models.Users{})
+	res := database.DB.Where(myUser).First(&models.Users{})
 	if res.RecordNotFound() {
-		db.Create(&newUser)
+		database.DB.Create(&newUser)
 		c.HTML(http.StatusOK, "addusers.gohtml", gin.H{
 			"user": User,
 			"message": map[string]string{
@@ -120,11 +113,9 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	updateUser.ID = ID
-	db, err := database.Conn()
-	if err != nil {
-		log.Error("Error", err)
+	if database.DB == nil {
+		database.Conn()
 	}
-	defer db.Close()
 	split := strings.Split(updateUser.Email, "@")
 	username := split[0]
 	if split[1] != os.Getenv("COMPANY_DOMAIN") {
@@ -144,10 +135,9 @@ func UpdateUser(c *gin.Context) {
 	}
 	updateUser.Username = username
 	updateUser.Name = username
-	res := db.Where(myUser).Where("id != ?", ID).First(&models.Users{})
+	res := database.DB.Where(myUser).Where("id != ?", ID).First(&models.Users{})
 	if res.RecordNotFound() {
-		log.Info(updateUser)
-		db.Model(&updateUser).Updates(updateUser)
+		database.DB.Model(&updateUser).Updates(updateUser)
 		c.HTML(http.StatusOK, "addusers.gohtml", gin.H{
 			"user": User,
 			"message": map[string]string{
@@ -173,14 +163,12 @@ func DeleteUser(c *gin.Context) {
 	User, _ := c.Get("User")
 	id, _ := strconv.ParseUint(c.PostForm("ID"), 10, 64)
 	ID := uint(id)
-	db, err := database.Conn()
-	if err != nil {
-		log.Error("Error", err)
+	if database.DB == nil {
+		database.Conn()
 	}
-	defer db.Close()
 
 	users := []models.Users{}
-	db.Find(&users)
+	database.DB.Find(&users)
 	if User.(*models.Users).ID == ID {
 		c.HTML(http.StatusOK, "manageusers.gohtml", gin.H{
 			"user": User,
@@ -193,7 +181,7 @@ func DeleteUser(c *gin.Context) {
 		return
 	}
 
-	res := db.First(&models.Users{}, ID)
+	res := database.DB.First(&models.Users{}, ID)
 	if res.RecordNotFound() {
 		c.HTML(http.StatusOK, "manageusers.gohtml", gin.H{
 			"user": User,
@@ -205,8 +193,8 @@ func DeleteUser(c *gin.Context) {
 		})
 		return
 	}
-	db.Delete(models.Users{}, "id = ?", ID)
-	db.Find(&users)
+	database.DB.Delete(models.Users{}, "id = ?", ID)
+	database.DB.Find(&users)
 	c.HTML(http.StatusOK, "manageusers.gohtml", gin.H{
 		"user": User,
 		"message": map[string]string{

@@ -7,17 +7,14 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
 )
 
 //Authorize ...
 func Authorize(c *gin.Context) {
 	// Disable user groups and enable user email
-	db, err := database.Conn()
-	if err != nil {
-		log.Error("Error", err)
+	if database.DB == nil {
+		database.Conn()
 	}
-	defer db.Close()
 	username := c.GetHeader("X-Forwarded-User")
 	email := c.GetHeader("X-Forwarded-Email")
 	split := strings.Split(email, "@")
@@ -31,7 +28,7 @@ func Authorize(c *gin.Context) {
 		Email:    email,
 	}
 	getUser := &models.Users{}
-	db.FirstOrCreate(getUser, user)
+	database.DB.FirstOrCreate(getUser, user)
 	c.Set("User", getUser)
 	c.Next()
 }

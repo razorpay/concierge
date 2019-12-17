@@ -8,9 +8,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	log "github.com/sirupsen/logrus"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
 )
 
@@ -18,6 +16,8 @@ var router *gin.Engine
 
 func main() {
 	config.LoadConfig()
+	database.Conn()
+	defer database.CloseDB()
 	migrations()
 	seeding()
 	// Start the router
@@ -35,14 +35,11 @@ func main() {
 }
 
 func migrations() {
-	var db *gorm.DB
-	db, err := database.Conn()
-	if err != nil {
-		log.Error(err)
+	if database.DB == nil {
+		database.Conn()
 	}
-	db.AutoMigrate(&models.Users{}, &models.Leases{})
-	db.Model(&models.Leases{}).AddForeignKey("user_id", "users(id)", "CASCADE", "RESTRICT")
-	defer db.Close()
+	database.DB.AutoMigrate(&models.Users{}, &models.Leases{})
+	database.DB.Model(&models.Leases{}).AddForeignKey("user_id", "users(id)", "CASCADE", "RESTRICT")
 }
 
 func seeding() {
