@@ -26,7 +26,7 @@ type MyClientSet struct {
 }
 
 //GetIngresses ...
-func (c MyClientSet) GetIngresses(ns string) (map[int]IngressList, error) {
+func (c MyClientSet) GetIngresses(ns string) ([]IngressList, error) {
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingressLists, err := ingressClient.List(metav1.ListOptions{})
@@ -34,9 +34,9 @@ func (c MyClientSet) GetIngresses(ns string) (map[int]IngressList, error) {
 		return nil, err
 	}
 
-	myIngress := make(map[int]IngressList)
+	var myIngress []IngressList
 
-	for index, ingress := range ingressLists.Items {
+	for _, ingress := range ingressLists.Items {
 		if _, ok := ingress.Annotations["concierge"]; ok && ingress.Annotations["concierge"] == "true" {
 			var ingressHosts string
 			for _, hosts := range ingress.Spec.Rules {
@@ -46,13 +46,14 @@ func (c MyClientSet) GetIngresses(ns string) (map[int]IngressList, error) {
 					ingressHosts = hosts.Host
 				}
 			}
-			myIngress[index] = IngressList{
+
+			myIngress = append(myIngress, IngressList{
 				ingress.Name,
 				ingress.Namespace,
 				ingressHosts,
 				ingress.Annotations["kubernetes.io/ingress.class"],
 				strings.Split(ingress.Annotations["traefik.ingress.kubernetes.io/whitelist-source-range"], ","),
-			}
+			})
 		}
 	}
 	return myIngress, nil
