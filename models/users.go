@@ -6,7 +6,7 @@ import (
 
 //Users ...
 type Users struct {
-	ID              uint `gorm:"type:int(20) unsigned auto_increment;primary_key"`
+	ID              uint `gorm:"type:int(10) unsigned auto_increment;primary_key"`
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 	DeletedAt       *time.Time `gorm:"unique_index:users_username_deleted_at_unique,users_email_deleted_at_unique"`
