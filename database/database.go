@@ -24,6 +24,8 @@ func Conn() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	DB.LogMode(false)
 }
 
 //CloseDB ...

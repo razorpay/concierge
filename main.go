@@ -38,7 +38,8 @@ func migrations() {
 	if database.DB == nil {
 		database.Conn()
 	}
-	database.DB.AutoMigrate(&models.Users{}, &models.Leases{})
+
+	database.DB.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci").AutoMigrate(&models.Users{}, &models.Leases{})
 	database.DB.Model(&models.Leases{}).AddForeignKey("user_id", "users(id)", "CASCADE", "RESTRICT")
 }
 
