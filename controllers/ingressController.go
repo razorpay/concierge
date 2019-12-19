@@ -246,7 +246,7 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 		t := uint(lease.CreatedAt.Unix()) + lease.Expiry
 		if t < uint(time.Now().Unix()) {
 			leases[i].Expiry = uint(0)
-			updateStatus, err := DeleteLeases(ns, name, lease.LeaseIP, lease.ID)
+			_, err := DeleteLeases(ns, name, lease.LeaseIP, lease.ID)
 			if err != nil {
 				log.Error("Error", err)
 			}
