@@ -243,6 +243,9 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 	}
 	myleases := []models.Leases{}
 	for i, lease := range leases {
+		splitGroupID := strings.Split(lease.GroupID, ":")
+		ns = splitGroupID[0]
+		name = splitGroupID[1]
 		t := uint(lease.CreatedAt.Unix()) + lease.Expiry
 		if t < uint(time.Now().Unix()) {
 			leases[i].Expiry = uint(0)
