@@ -23,12 +23,13 @@ func Authorize(c *gin.Context) {
 		return
 	}
 	user := models.Users{
-		Username: username,
-		Name:     username,
-		Email:    email,
+		Email: email,
 	}
 	getUser := &models.Users{}
 	database.DB.FirstOrCreate(getUser, user)
+	getUser.Username = username
+	getUser.Name = username
+	database.DB.Model(&models.Users{}).Updates(getUser)
 	c.Set("User", getUser)
 	c.Next()
 }
