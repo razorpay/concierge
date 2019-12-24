@@ -160,9 +160,15 @@ func DeleteIPFromIngress(c *gin.Context) {
 		})
 		return
 	}
-	ips := c.Request.Header["X-Forwarded-For"][0]
-	ip := strings.Split(ips, ",")[0]
-	ip = ip + "/32"
+	if database.DB == nil {
+		database.Conn()
+	}
+	myCurrentLease := models.Leases{}
+	database.DB.Where(models.Leases{
+		ID: ID,
+	}).Find(&myCurrentLease)
+
+	ip := myCurrentLease.LeaseIP
 	updateStatus, err := DeleteLeases(ns, name, ip, ID)
 	if err != nil {
 		log.Error("Error", err)
@@ -275,7 +281,7 @@ func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 		database.DB.Delete(models.Leases{
 			ID: ID,
 		})
-		log.Infof("Removing expired IP %s from database\n", ip)
+		log.Infof("Removing IP %s from database\n", ip)
 	}
 	return updateStatus, err
 }
