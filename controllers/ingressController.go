@@ -275,6 +275,7 @@ func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 		database.DB.Delete(models.Leases{
 			ID: ID,
 		})
+		log.Infof("Removing expired IP %s from database\n", ip)
 	}
 	return updateStatus, err
 }
