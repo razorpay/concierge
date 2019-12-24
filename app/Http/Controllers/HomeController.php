@@ -119,7 +119,7 @@ class HomeController extends BaseController
         $security_groups = $security_groups['SecurityGroups'];
 
         //Get all active leases
-        $leases = Models\Lease::get();
+        $leases = Models\Lease::where('lease_type', 'aws')->get();
 
         //get all active Invites
         $invites = Models\Invite::get();
@@ -225,6 +225,7 @@ class HomeController extends BaseController
                 'user_id'  => Auth::User()->id,
                 'group_id' => $group_id,
                 'lease_ip' => $this->getClientIp().'/32',
+                'lease_type' => 'aws',
                 'protocol' => $protocol,
                 'port_from'=> $port_from,
                 'port_to'  => $port_to,
@@ -235,6 +236,7 @@ class HomeController extends BaseController
                                     ->where('group_id', '=', $lease['group_id'])
                                     ->where('protocol', '=', $lease['protocol'])
                                     ->where('port_from', '=', $lease['port_from'])
+                                    ->where('lease_type', '=', $lease['lease_type'])
                                     ->where('port_to', '=', $lease['port_to']);
 
             if ($existingLease->count() > 0) {
@@ -363,7 +365,7 @@ class HomeController extends BaseController
     public function cleanLeases()
     {
         $messages = [];
-        $leases = Models\Lease::get();
+        $leases = Models\Lease::where('lease_type', 'aws')->get();
         foreach ($leases as $lease) {
             $time_left = strtotime($lease->created_at) + $lease->expiry - time();
             if ($time_left <= 0) {
