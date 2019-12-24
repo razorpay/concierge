@@ -270,11 +270,12 @@ func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 	if database.DB == nil {
 		database.Conn()
 	}
-
-	database.DB.Delete(models.Leases{
-		ID: ID,
-	})
 	updateStatus, err := myclientset.RemoveIngressIP(ns, name, ip)
+	if updateStatus {
+		database.DB.Delete(models.Leases{
+			ID: ID,
+		})
+	}
 	return updateStatus, err
 }
 
