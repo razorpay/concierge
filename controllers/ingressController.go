@@ -5,6 +5,7 @@ import (
 	"concierge/database"
 	"concierge/models"
 	"concierge/pkg"
+	"errors"
 	"net/http"
 	"os"
 	"strconv"
@@ -31,7 +32,7 @@ func ShowAllowedIngress(c *gin.Context) {
 	log.Infof("Listing ingress in namespace %s for user %s\n", ns, User.(*models.Users).Email)
 	data, err := myclientset.GetIngresses(ns)
 	if err != nil {
-		log.Error("Error", err)
+		log.Error("Error: ", err)
 		c.HTML(http.StatusOK, "showingresslist.gohtml", gin.H{
 			"data": data,
 			"user": User,
@@ -61,7 +62,7 @@ func WhiteListIP(c *gin.Context) {
 	leases = GetActiveLeases(ns, name)
 	data, err := myclientset.GetIngress(ns, name)
 	if err != nil {
-		log.Error("Error", err)
+		log.Error("Error: ", err)
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 			"data": data,
 			"user": User,
@@ -79,7 +80,7 @@ func WhiteListIP(c *gin.Context) {
 	updateStatus, err := myclientset.WhiteListIP(ns, name, ip)
 
 	if err != nil {
-		log.Error("Error", err)
+		log.Error("Error: ", err)
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 			"data": data,
 			"user": User,
@@ -148,7 +149,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 
 	data, err := myclientset.GetIngress(ns, name)
 	if err != nil {
-		log.Error("Error", err)
+		log.Error("Error: ", err)
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 			"data": data,
 			"user": User,
@@ -167,11 +168,24 @@ func DeleteIPFromIngress(c *gin.Context) {
 	database.DB.Where(models.Leases{
 		ID: ID,
 	}).Find(&myCurrentLease)
-
+	if myCurrentLease.UserID != User.(*models.Users).ID {
+		err := errors.New("Unauthorized, Trying to delete a lease of other user")
+		log.Error("Error: ", err)
+		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
+			"data": data,
+			"user": User,
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": err.Error(),
+			},
+			"activeLeases": leases,
+		})
+		return
+	}
 	ip := myCurrentLease.LeaseIP
 	updateStatus, err := DeleteLeases(ns, name, ip, ID)
 	if err != nil {
-		log.Error("Error", err)
+		log.Error("Error: ", err)
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 			"data": data,
 			"user": User,
@@ -212,7 +226,7 @@ func IngressDetails(c *gin.Context) {
 	leases := GetActiveLeases(ns, name)
 	data, err := myclientset.GetIngress(ns, name)
 	if err != nil {
-		log.Error("Error", err)
+		log.Error("Error: ", err)
 		c.HTML(http.StatusNotFound, "manageingress.gohtml", gin.H{
 			"message": map[string]string{
 				"class":   "Danger",
@@ -257,7 +271,7 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 			leases[i].Expiry = uint(0)
 			_, err := DeleteLeases(ns, name, lease.LeaseIP, lease.ID)
 			if err != nil {
-				log.Error("Error", err)
+				log.Error("Error: ", err)
 			}
 			log.Infof("Removed expired IP %s from ingress %s in namespace %s for User %s\n", lease.LeaseIP, name, ns, lease.User.Email)
 		} else {

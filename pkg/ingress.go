@@ -39,11 +39,15 @@ func (c MyClientSet) GetIngresses(ns string) ([]IngressList, error) {
 	for _, ingress := range ingressLists.Items {
 		if _, ok := ingress.Annotations["concierge"]; ok && ingress.Annotations["concierge"] == "true" {
 			var ingressHosts string
-			for _, hosts := range ingress.Spec.Rules {
-				if ingressHosts != "" {
-					ingressHosts = ingressHosts + ", " + hosts.Host
-				} else {
-					ingressHosts = hosts.Host
+			if _, ok := ingress.Annotations["concierge-url"]; ok {
+				ingressHosts = ingress.Annotations["concierge-url"]
+			} else {
+				for _, hosts := range ingress.Spec.Rules {
+					if ingressHosts != "" {
+						ingressHosts = ingressHosts + ", " + hosts.Host
+					} else {
+						ingressHosts = hosts.Host
+					}
 				}
 			}
 
@@ -148,11 +152,15 @@ func (c MyClientSet) GetIngress(ns string, ingressName string) (IngressList, err
 	}
 	if _, ok := ingress.Annotations["concierge"]; ok && ingress.Annotations["concierge"] == "true" {
 		var ingressHosts string
-		for _, hosts := range ingress.Spec.Rules {
-			if ingressHosts != "" {
-				ingressHosts = ingressHosts + ", " + hosts.Host
-			} else {
-				ingressHosts = hosts.Host
+		if _, ok := ingress.Annotations["concierge-url"]; ok {
+			ingressHosts = ingress.Annotations["concierge-url"]
+		} else {
+			for _, hosts := range ingress.Spec.Rules {
+				if ingressHosts != "" {
+					ingressHosts = ingressHosts + ", " + hosts.Host
+				} else {
+					ingressHosts = hosts.Host
+				}
 			}
 		}
 		myIngress := IngressList{

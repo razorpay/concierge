@@ -46,6 +46,7 @@
                     <tbody>
                         {{$ns:=.data.Namespace}}
                         {{$name:=.data.Name}}
+                        {{$user_id:=.user.ID}}
                         {{range .activeLeases}}
                         <tr>
                             <td>{{.User.Username}}</td>
@@ -53,6 +54,7 @@
                             <td class="time" >{{.Expiry}}</td>
                             <td>{{.LeaseType}}</td>
                             <td>
+                            {{ if eq .User.ID $user_id}}
                                 <form method="post" action="/ingress/{{$ns}}/{{$name}}/{{.ID}}">
                                     <input type="hidden" name="lease_id" value="{{.ID}}" />
                                     <input type="hidden" name="_method" value="DELETE">
@@ -61,6 +63,7 @@
                                         <span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
                                     </a>
                                 </form>
+                            {{end}}
                             </td>
                         </tr>
                         {{end}}
