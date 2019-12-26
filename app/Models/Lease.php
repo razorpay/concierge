@@ -26,7 +26,8 @@ class Lease extends Model
      */
     public static function getByGroupId($group_id)
     {
-        $leases = self::where('group_id', $group_id)->get();
+        $leases = Self::where('group_id', $group_id)
+            ->where('lease_type', 'aws')->get();
 
         return $leases;
     }
