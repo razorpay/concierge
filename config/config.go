@@ -18,8 +18,11 @@ import (
 //DBConfig ...
 var DBConfig DatabaseConfig
 
-//KubeClient ...
-var KubeClient KubenetesClientSet
+//KubeClients ...
+var KubeClients map[string]KubenetesClientSet
+
+//KubeConfig ...
+var KubeConfig *string
 
 //LoadConfig ...
 func LoadConfig() {
@@ -28,7 +31,8 @@ func LoadConfig() {
 		log.Error("Error loading .env file")
 	}
 	initilizeDBConfig()
-	initilizeKubeConfig()
+	initilizeKubeConfigFromFile()
+	InitilizeKubeConfig()
 }
 
 func initilizeDBConfig() {
@@ -46,33 +50,71 @@ func initilizeDBConfig() {
 	}
 }
 
-func initilizeKubeConfig() {
+//InitilizeKubeConfig ...
+func InitilizeKubeConfig() {
 	var err error
 	var config *rest.Config
 	var clientset *kubernetes.Clientset
+	var contexts = []string{"prod-green", "prod-blue", "stage-white"}
+	KubeClients = make(map[string]KubenetesClientSet)
+
 	if os.Getenv("APP_ENV") == "dev" {
-		var kubeconfig *string
-		if home := homedir.HomeDir(); home != "" {
-			kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-		} else {
-			kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+		for _, context := range contexts {
+			log.Info(context)
+			config, err = customBuildConfigFromFlags(context, *KubeConfig)
+			if err != nil {
+				log.Error(err)
+			}
+			clientset, _ = kubernetes.NewForConfig(config)
+			kubeclient := KubenetesClientSet{
+				ClientSet: clientset,
+			}
+			log.Info(kubeclient)
+			KubeClients[context] = kubeclient
 		}
-		flag.Parse()
-		config, err = clientcmd.BuildConfigFromFlags("", *kubeconfig)
-		if err != nil {
-			log.Error(err)
-		}
+
 	} else {
-		config, err = rest.InClusterConfig()
+		config = initilizeKubeConfigFromServiceAccount()
+		clientset, err = kubernetes.NewForConfig(config)
 		if err != nil {
 			log.Error(err)
+		}
+		kubeclient := KubenetesClientSet{
+			ClientSet: clientset,
+		}
+		KubeClients = map[string]KubenetesClientSet{
+			"prod-green": kubeclient,
 		}
 	}
-	clientset, err = kubernetes.NewForConfig(config)
+}
+
+func initilizeKubeConfigFromFile() {
+	var kubeconfig *string
+	if home := homedir.HomeDir(); home != "" {
+		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+	} else {
+		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	}
+	flag.Parse()
+	KubeConfig = kubeconfig
+	// config, _ := clientcmd.LoadFromFile("/Users/ankitjain/.kube/config")
+	// log.Info(config)
+}
+
+func initilizeKubeConfigFromServiceAccount() *rest.Config {
+	var err error
+	var config *rest.Config
+	config, err = rest.InClusterConfig()
 	if err != nil {
 		log.Error(err)
 	}
-	KubeClient = KubenetesClientSet{
-		ClientSet: clientset,
-	}
+	return config
+}
+
+func customBuildConfigFromFlags(context, kubeconfigPath string) (*rest.Config, error) {
+	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeconfigPath},
+		&clientcmd.ConfigOverrides{
+			CurrentContext: context,
+		}).ClientConfig()
 }

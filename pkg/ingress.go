@@ -14,6 +14,7 @@ import (
 type IngressList struct {
 	Name           string
 	Namespace      string
+	Context        string
 	Host           string
 	Class          string
 	WhitelistedIps []string
@@ -26,11 +27,12 @@ type MyClientSet struct {
 }
 
 //GetIngresses ...
-func (c MyClientSet) GetIngresses(ns string) ([]IngressList, error) {
+func (c MyClientSet) GetIngresses(context string, ns string) ([]IngressList, error) {
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingressLists, err := ingressClient.List(metav1.ListOptions{})
 	if err != nil {
+		log.Error("Error: ", err)
 		return nil, err
 	}
 
@@ -54,6 +56,7 @@ func (c MyClientSet) GetIngresses(ns string) ([]IngressList, error) {
 			myIngress = append(myIngress, IngressList{
 				ingress.Name,
 				ingress.Namespace,
+				context,
 				ingressHosts,
 				ingress.Annotations["kubernetes.io/ingress.class"],
 				strings.Split(ingress.Annotations["traefik.ingress.kubernetes.io/whitelist-source-range"], ","),
@@ -64,14 +67,15 @@ func (c MyClientSet) GetIngresses(ns string) ([]IngressList, error) {
 }
 
 //RemoveIngressIP ...
-func (c MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (bool, error) {
+func (c MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (bool, bool, error) {
 	c.Lock()
 	defer c.Unlock()
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
 	if err != nil {
-		return false, err
+		log.Error("Error: ", err)
+		return false, false, err
 	}
 	if _, ok := ingress.Annotations["concierge"]; ok && ingress.Annotations["concierge"] == "true" {
 
@@ -92,12 +96,15 @@ func (c MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (
 			_, updateErr := ingressClient.Update(ingress)
 
 			if updateErr != nil {
-				return false, updateErr
+				log.Error("Error: ", updateErr)
+				return false, true, updateErr
 			}
-			return true, nil
+			return true, false, nil
 		}
 	}
-	return false, errors.New("Ingress Annotation not found")
+	err = errors.New("Ingress Annotation not found")
+	log.Error("Error: ", err)
+	return false, false, err
 }
 
 //WhiteListIP ...
@@ -108,6 +115,7 @@ func (c MyClientSet) WhiteListIP(ns string, ingressName string, ip string) (bool
 
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
 	if err != nil {
+		log.Error("Error: ", err)
 		return false, err
 	}
 	if _, ok := ingress.Annotations["concierge"]; ok && ingress.Annotations["concierge"] == "true" {
@@ -133,6 +141,7 @@ func (c MyClientSet) WhiteListIP(ns string, ingressName string, ip string) (bool
 				_, updateErr := ingressClient.Update(ingress)
 
 				if updateErr != nil {
+					log.Error("Error: ", updateErr)
 					return false, updateErr
 				}
 				return true, nil
@@ -140,15 +149,18 @@ func (c MyClientSet) WhiteListIP(ns string, ingressName string, ip string) (bool
 			return false, nil
 		}
 	}
-	return false, errors.New("Ingress Annotation not found")
+	err = errors.New("Ingress Annotation not found")
+	log.Error("Error: ", err)
+	return false, err
 }
 
 //GetIngress ...
-func (c MyClientSet) GetIngress(ns string, ingressName string) (IngressList, error) {
+func (c MyClientSet) GetIngress(context string, ns string, ingressName string) (IngressList, error) {
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
 	if err != nil {
-		return IngressList{}, err
+		log.Error("Error: ", err)
+		return IngressList{}, nil
 	}
 	if _, ok := ingress.Annotations["concierge"]; ok && ingress.Annotations["concierge"] == "true" {
 		var ingressHosts string
@@ -166,12 +178,13 @@ func (c MyClientSet) GetIngress(ns string, ingressName string) (IngressList, err
 		myIngress := IngressList{
 			ingress.Name,
 			ingress.Namespace,
+			context,
 			ingressHosts,
 			ingress.Annotations["kubernetes.io/ingress.class"],
 			[]string{},
 		}
 		return myIngress, nil
 	}
-	return IngressList{}, errors.New("Ingress Annotation not found")
-
+	log.Error("Error: ", "Ingress Annotation not found")
+	return IngressList{}, nil
 }
