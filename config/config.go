@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
@@ -24,15 +25,20 @@ var KubeClients map[string]KubenetesClientSet
 //KubeConfig ...
 var KubeConfig *string
 
+//Contexts ...
+var Contexts = []string{}
+
 //LoadConfig ...
 func LoadConfig() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Error("Error loading .env file")
 	}
+
 	initilizeDBConfig()
+	initilizeKubeContext()
 	initilizeKubeConfigFromFile()
-	InitilizeKubeConfig()
+	initilizeKubeConfig()
 }
 
 func initilizeDBConfig() {
@@ -50,16 +56,21 @@ func initilizeDBConfig() {
 	}
 }
 
-//InitilizeKubeConfig ...
-func InitilizeKubeConfig() {
+func initilizeKubeContext() {
+	k8sContexts := strings.Split(os.Getenv("KUBE_CONTEXTS"), ",")
+	for _, context := range k8sContexts {
+		Contexts = append(Contexts, context)
+	}
+}
+
+func initilizeKubeConfig() {
 	var err error
 	var config *rest.Config
 	var clientset *kubernetes.Clientset
-	var contexts = []string{"prod-green", "prod-blue", "stage-white"}
 	KubeClients = make(map[string]KubenetesClientSet)
 
 	if os.Getenv("AUTH_TYPE") == "KUBECONFIG" {
-		for _, context := range contexts {
+		for _, context := range Contexts {
 			config, err = customBuildConfigFromFlags(context, *KubeConfig)
 			if err != nil {
 				log.Error(err)
