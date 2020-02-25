@@ -58,9 +58,8 @@ func InitilizeKubeConfig() {
 	var contexts = []string{"prod-green", "prod-blue", "stage-white"}
 	KubeClients = make(map[string]KubenetesClientSet)
 
-	if os.Getenv("APP_ENV") == "dev" {
+	if os.Getenv("AUTH_TYPE") == "KUBECONFIG" {
 		for _, context := range contexts {
-			log.Info(context)
 			config, err = customBuildConfigFromFlags(context, *KubeConfig)
 			if err != nil {
 				log.Error(err)
@@ -69,7 +68,6 @@ func InitilizeKubeConfig() {
 			kubeclient := KubenetesClientSet{
 				ClientSet: clientset,
 			}
-			log.Info(kubeclient)
 			KubeClients[context] = kubeclient
 		}
 
@@ -83,7 +81,7 @@ func InitilizeKubeConfig() {
 			ClientSet: clientset,
 		}
 		KubeClients = map[string]KubenetesClientSet{
-			"prod-green": kubeclient,
+			"context": kubeclient,
 		}
 	}
 }
@@ -97,8 +95,6 @@ func initilizeKubeConfigFromFile() {
 	}
 	flag.Parse()
 	KubeConfig = kubeconfig
-	// config, _ := clientcmd.LoadFromFile("/Users/ankitjain/.kube/config")
-	// log.Info(config)
 }
 
 func initilizeKubeConfigFromServiceAccount() *rest.Config {
