@@ -160,7 +160,7 @@ func (c MyClientSet) GetIngress(context string, ns string, ingressName string) (
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
 	if err != nil {
 		log.Error("Error: ", err)
-		return IngressList{}, nil
+		return IngressList{}, err
 	}
 	if _, ok := ingress.Annotations["concierge"]; ok && ingress.Annotations["concierge"] == "true" {
 		var ingressHosts string
@@ -185,6 +185,7 @@ func (c MyClientSet) GetIngress(context string, ns string, ingressName string) (
 		}
 		return myIngress, nil
 	}
-	log.Error("Error: ", "Ingress Annotation not found")
-	return IngressList{}, nil
+	err = errors.New("Ingress Annotation not found")
+	log.Error("Error: ", err)
+	return IngressList{}, err
 }
