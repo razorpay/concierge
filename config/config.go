@@ -73,9 +73,12 @@ func initilizeKubeConfig() {
 		for _, context := range Contexts {
 			config, err = customBuildConfigFromFlags(context, *KubeConfig)
 			if err != nil {
-				log.Error(err)
+				log.Fatal(err)
 			}
-			clientset, _ = kubernetes.NewForConfig(config)
+			clientset, err = kubernetes.NewForConfig(config)
+			if err != nil {
+				log.Fatal(err)
+			}
 			kubeclient := KubenetesClientSet{
 				ClientSet: clientset,
 			}
