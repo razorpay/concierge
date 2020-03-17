@@ -3,6 +3,7 @@ module concierge
 go 1.12
 
 require (
+	github.com/Azure/go-autorest v11.1.2+incompatible // indirect
 	github.com/gin-gonic/gin v1.5.0
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/googleapis/gnostic v0.3.1 // indirect
@@ -20,8 +21,7 @@ require (
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/go-playground/validator.v9 v9.30.2 // indirect
 	gopkg.in/yaml.v2 v2.2.7 // indirect
-	k8s.io/api v0.0.0-20191121015604-11707872ac1c // indirect
-	k8s.io/apimachinery v0.0.0-20191123233150-4c4803ed55e3
-	k8s.io/client-go v0.0.0-20190620085101-78d2af792bab
+	k8s.io/apimachinery v0.17.0
+	k8s.io/client-go v0.17.0
 	k8s.io/utils v0.0.0-20191114200735-6ca3b61696b6 // indirect
 )
