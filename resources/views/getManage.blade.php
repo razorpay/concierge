@@ -33,122 +33,6 @@
 			  @endif
 			  </div>
 			</div>
-			<h2>Active Leases</h2>
-			<table class="table table-hover table-bordered">
-	        <thead>
-	          <tr>
-	            <th>Creator</th>
-	            <th>Leased IP</th>
-	            <th>Protocol</th>
-	            <th>Port(s)</th>
-	            <th>Time Left</th>
-	            <th>Type</th>
-	            <th>Terminate?</th>
-                <th>Renew?</th>
-	          </tr>
-	        </thead>
-	        <tbody>
-	        	@foreach($leases as $lease)
-	        	<tr>
-	        		<td>{{{$lease->user->name}}}</td>
-	        		<td>{{{$lease->lease_ip}}}</td>
-	        		<td>{{{$lease->protocol}}}</td>
-	        		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
-	        		<td>
-	        		<div class="time" id="{{{$lease->id}}}">
-	        		{{{strtotime($lease->created_at)+$lease->expiry-time()}}}
-    				</div>
-    				</td>
-    				<td>
-	    			@if($lease->invite_email)
-	    			 	@if("URL"==$lease->invite_email)
-	    			 		URL Invite
-	    			 	@elseif("DEPLOY"==$lease->invite_email)
-	    			 		Deploy Invite
-	    			 	@else
-	    			 		Email Invite: {{{$lease->invite_email}}}
-	    			 	@endif
-	    			@else
-	    					Self Access
-	    			@endif
-	    			</td>
-    				<td>
-	    				<form method="post" action="{{url('/manage')}}/{{$lease->group_id}}/terminate">
-	    				<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
-	    				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
-	    				<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
-	    					<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
-	    				</a>
-	    				</form>
-    				</td>
-                    <td>
-                        <form method="post" action="{{url('/manage')}}/{{$lease->group_id}}/renew">
-                        <input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
-                        <input type="hidden" name="_token" value="{{{csrf_token()}}}">
-                        <a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to renew this lease?')) {parentNode.submit();} return false;">
-                            <span title="Renew Lease" class="glyphicon glyphicon-repeat"></span>
-                        </a>
-                        </form>
-                    </td>
-	        	</tr>
-	        	@endforeach
-	        	@if(!$leases->count())
-		       	<tr><td colspan="8" style="text-align:center">No Active Leases</td></tr>
-		       	@endif
-	        </tbody>
-	        </table>
-
-	        <h2>Active Invites</h2>
-			<table class="table table-hover table-bordered">
-	        <thead>
-	          <tr>
-	            <th>Creator</th>
-	            <th>Protocol</th>
-	            <th>Port(s)</th>
-	            <th>Expiry</th>
-	            <th>Type</th>
-	            <th>Terminate?</th>
-	          </tr>
-	        </thead>
-	        <tbody>
-	        	@foreach($invites as $invite)
-	        	<tr>
-	        		<td>{{{$invite->user->username}}}</td>
-	        		<td>{{{$invite->protocol}}}</td>
-	        		<td>{{{$invite->port_from}}}-{{{$invite->port_to}}}</td>
-	        		<td>
-	        		<?php
-	        		    //Calculating Time to Expiry in Hours and minutes
-    					$hours=intval(floor($invite->expiry/3600));
-    					$minutes=intval(floor(($invite->expiry-$hours*3600)/60));
-    					echo "$hours hours $minutes minutes";
-    				?>
-    				</td>
-    				<td>
-    				@if($invite->email == 'DEPLOY')
-    					Deploy Invite
-    				@elseif($invite->email)
-    					Email: {{{$invite->email}}}
-    				@else
-    					URL Invite
-    				@endif
-    				</td>
-    				<td>
-	    				<form method="post" action="{{url('/manage')}}/{{$invite->group_id}}/terminate">
-	    				<input type="hidden" name="invite_id" value="{{{$invite->id}}}" />
-	    				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
-	    				<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this invite?')) {parentNode.submit();} return false;">
-	    					<span title="Terminate Invite" class="glyphicon glyphicon-minus-sign"></span>
-	    				</a>
-	    				</form>
-    				</td>
-	        	</tr>
-	        	@endforeach
-	        	@if(!$invites->count())
-		       	<tr><td colspan="6" style="text-align:center">No Active Invites</td></tr>
-		       	@endif
-	        </tbody>
-	        </table>
 
 	        <h2>Create Access On this Group</h2>
 		    <div>
@@ -284,7 +168,124 @@
 				  		<button type="submit" class="btn btn-default">Get Access</button>
 				  	</div>
 			  	</div>
-		    </form>
+            </form>
+
+            <h2>Active Leases</h2>
+			<table class="table table-hover table-bordered">
+	        <thead>
+	          <tr>
+	            <th>Creator</th>
+	            <th>Leased IP</th>
+	            <th>Protocol</th>
+	            <th>Port(s)</th>
+	            <th>Time Left</th>
+	            <th>Type</th>
+	            <th>Terminate?</th>
+                <th>Renew?</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	        	@foreach($leases as $lease)
+	        	<tr>
+	        		<td>{{{$lease->user->name}}}</td>
+	        		<td>{{{$lease->lease_ip}}}</td>
+	        		<td>{{{$lease->protocol}}}</td>
+	        		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
+	        		<td>
+	        		<div class="time" id="{{{$lease->id}}}">
+	        		{{{strtotime($lease->created_at)+$lease->expiry-time()}}}
+    				</div>
+    				</td>
+    				<td>
+	    			@if($lease->invite_email)
+	    			 	@if("URL"==$lease->invite_email)
+	    			 		URL Invite
+	    			 	@elseif("DEPLOY"==$lease->invite_email)
+	    			 		Deploy Invite
+	    			 	@else
+	    			 		Email Invite: {{{$lease->invite_email}}}
+	    			 	@endif
+	    			@else
+	    					Self Access
+	    			@endif
+	    			</td>
+    				<td>
+	    				<form method="post" action="{{url('/manage')}}/{{$lease->group_id}}/terminate">
+	    				<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
+	    				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
+	    				<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
+	    					<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
+	    				</a>
+	    				</form>
+    				</td>
+                    <td>
+                        <form method="post" action="{{url('/manage')}}/{{$lease->group_id}}/renew">
+                        <input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
+                        <input type="hidden" name="_token" value="{{{csrf_token()}}}">
+                        <a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to renew this lease?')) {parentNode.submit();} return false;">
+                            <span title="Renew Lease" class="glyphicon glyphicon-repeat"></span>
+                        </a>
+                        </form>
+                    </td>
+	        	</tr>
+	        	@endforeach
+	        	@if(!$leases->count())
+		       	<tr><td colspan="8" style="text-align:center">No Active Leases</td></tr>
+		       	@endif
+	        </tbody>
+	        </table>
+
+	        <h2>Active Invites</h2>
+			<table class="table table-hover table-bordered">
+	        <thead>
+	          <tr>
+	            <th>Creator</th>
+	            <th>Protocol</th>
+	            <th>Port(s)</th>
+	            <th>Expiry</th>
+	            <th>Type</th>
+	            <th>Terminate?</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	        	@foreach($invites as $invite)
+	        	<tr>
+	        		<td>{{{$invite->user->username}}}</td>
+	        		<td>{{{$invite->protocol}}}</td>
+	        		<td>{{{$invite->port_from}}}-{{{$invite->port_to}}}</td>
+	        		<td>
+	        		<?php
+	        		    //Calculating Time to Expiry in Hours and minutes
+    					$hours=intval(floor($invite->expiry/3600));
+    					$minutes=intval(floor(($invite->expiry-$hours*3600)/60));
+    					echo "$hours hours $minutes minutes";
+    				?>
+    				</td>
+    				<td>
+    				@if($invite->email == 'DEPLOY')
+    					Deploy Invite
+    				@elseif($invite->email)
+    					Email: {{{$invite->email}}}
+    				@else
+    					URL Invite
+    				@endif
+    				</td>
+    				<td>
+	    				<form method="post" action="{{url('/manage')}}/{{$invite->group_id}}/terminate">
+	    				<input type="hidden" name="invite_id" value="{{{$invite->id}}}" />
+	    				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
+	    				<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this invite?')) {parentNode.submit();} return false;">
+	    					<span title="Terminate Invite" class="glyphicon glyphicon-minus-sign"></span>
+	    				</a>
+	    				</form>
+    				</td>
+	        	</tr>
+	        	@endforeach
+	        	@if(!$invites->count())
+		       	<tr><td colspan="6" style="text-align:center">No Active Invites</td></tr>
+		       	@endif
+	        </tbody>
+	        </table>
 
 			<h2>Security Group Rules</h2>
             Inbound Rules:
