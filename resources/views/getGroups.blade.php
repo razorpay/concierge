@@ -3,7 +3,41 @@
 @section('content')
      <div class="row">
         <div class="col-md-6 col-md-offset-3 modal-outer noPad">
-	        <h2>Active Leases</h2>
+	        <h2>Security Groups</h2>
+ 			<table class="table table-hover table-bordered">
+		    <thead>
+		        <tr>
+		        <th>Name</th>
+		        <th>ID</th>
+		        <th>Description</th>
+		        <th>VPC</th>
+		        <th>Name Tag</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+			@foreach($security_groups as $security_group)
+			<tr>
+			<td><a href="/manage/{{{$security_group['GroupId']}}}">{{{$security_group['GroupName']}}}</a></td>
+			<td>{{{$security_group['GroupId']}}}</td>
+			<td>{{{$security_group['Description']}}}</td>
+			<td>
+			{{-- Display The VPC ID if it exists --}}
+			@if(isset($security_group['VpcId']))
+			{{{$security_group['VpcId']}}}
+			@endif
+			</td>
+			<td>
+			{{-- Display The Name Tag if it exists --}}
+			@if(isset($security_group['Tags']['0']['Value']))
+			{{{$security_group['Tags']['0']['Value']}}}
+			@endif
+			</td>
+			</tr>
+			@endforeach
+			</tbody>
+            </table>
+
+            <h2>Active Leases</h2>
 	        <table class="table table-hover table-bordered">
 		    <thead>
 		        <tr>
@@ -124,40 +158,6 @@
 		       	@endif
 	        </tbody>
 	        </table>
-
- 			<h2>Security Groups</h2>
- 			<table class="table table-hover table-bordered">
-		    <thead>
-		        <tr>
-		        <th>Name</th>
-		        <th>ID</th>
-		        <th>Description</th>
-		        <th>VPC</th>
-		        <th>Name Tag</th>
-		        </tr>
-		    </thead>
-		    <tbody>
-			@foreach($security_groups as $security_group)
-			<tr>
-			<td><a href="/manage/{{{$security_group['GroupId']}}}">{{{$security_group['GroupName']}}}</a></td>
-			<td>{{{$security_group['GroupId']}}}</td>
-			<td>{{{$security_group['Description']}}}</td>
-			<td>
-			{{-- Display The VPC ID if it exists --}}
-			@if(isset($security_group['VpcId']))
-			{{{$security_group['VpcId']}}}
-			@endif
-			</td>
-			<td>
-			{{-- Display The Name Tag if it exists --}}
-			@if(isset($security_group['Tags']['0']['Value']))
-			{{{$security_group['Tags']['0']['Value']}}}
-			@endif
-			</td>
-			</tr>
-			@endforeach
-			</tbody>
-			</table>
 		</div>
 	</div>
 @stop
