@@ -44,6 +44,7 @@ func LoadConfig() {
 func initilizeDBConfig() {
 	maxidleconns, _ := strconv.Atoi(os.Getenv("DB_MAX_IDLE_CONN"))
 	maxopenconns, _ := strconv.Atoi(os.Getenv("DB_MAX_OPEN_CONN"))
+	dblogmode, _ := strconv.ParseBool(os.Getenv("DB_LOG_MODE"))
 	DBConfig = DatabaseConfig{
 		Host:         os.Getenv("DB_HOST"),
 		DBName:       os.Getenv("DB_DATABASE"),
@@ -53,6 +54,7 @@ func initilizeDBConfig() {
 		DBDatabase:   os.Getenv("DB_DATABASE"),
 		MaxIdleConns: maxidleconns,
 		MaxOpenConns: maxopenconns,
+		DBLogMode:    dblogmode,
 	}
 }
 
