@@ -25,7 +25,7 @@ func Conn() {
 		log.Fatal(err)
 	}
 
-	DB.LogMode(false)
+	DB.LogMode(dbconfig.DBLogMode)
 }
 
 //CloseDB ...

@@ -10,4 +10,5 @@ type DatabaseConfig struct {
 	DBDatabase   string
 	MaxIdleConns int
 	MaxOpenConns int
+	DBLogMode    bool
 }
