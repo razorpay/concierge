@@ -39,6 +39,7 @@ func LoadConfig() {
 	initilizeKubeContext()
 	initilizeKubeConfigFromFile()
 	initilizeKubeConfig()
+	initilizeLogging()
 }
 
 func initilizeDBConfig() {
@@ -129,4 +130,16 @@ func customBuildConfigFromFlags(context, kubeconfigPath string) (*rest.Config, e
 		&clientcmd.ConfigOverrides{
 			CurrentContext: context,
 		}).ClientConfig()
+}
+
+func initilizeLogging() {
+	log.SetFormatter(&log.JSONFormatter{})
+	loglevel := os.Getenv("LOG_LEVEL")
+	if loglevel == "debug" {
+		log.SetLevel(log.DebugLevel)
+
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
+	log.Debug("Logging in debug mode.")
 }
