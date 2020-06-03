@@ -1,4 +1,6 @@
 #!/bin/sh
 
+# Branch modification
+BRANCH=`echo $SOURCE_BRANCH  | tr -s ' ' | sed -e 's/\./_/g;s/\//_/g;s/-/_/g'`
 docker tag $IMAGE_NAME $DOCKER_REPO:$SOURCE_BRANCH-$SOURCE_COMMIT
 docker push $DOCKER_REPO:$SOURCE_BRANCH-$SOURCE_COMMIT
