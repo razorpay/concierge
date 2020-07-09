@@ -137,4 +137,5 @@ return [
 
     'secure' => env('SECURE_SESSION', true),
 
+    'encrypt' => env('ENCRYPT_COOKIE', true),
 ];
