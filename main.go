@@ -5,6 +5,7 @@ import (
 	"concierge/database"
 	"concierge/models"
 	"concierge/routes"
+	"concierge/routes/middleware"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +21,17 @@ func main() {
 	defer database.CloseDB()
 	migrations()
 	seeding()
-	// Start the router
-	router = gin.Default()
+	// Creates a router without any middleware by default
+	router := gin.New()
+
+	// Global middleware
+	// Logger middleware will write the logs to gin.DefaultWriter even if you set with GIN_MODE=release.
+	// By default gin.DefaultWriter = os.Stdout
+	router.Use(gin.Logger())
+
+	// Recovery middleware recovers from any panics and writes a 500 if there was one.
+	router.Use(middleware.Recovery)
+
 	// Serving static files
 	router.Static("/assets", "./assets")
 
