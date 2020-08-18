@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/csrf"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -47,8 +48,9 @@ func ShowAllowedIngress(c *gin.Context) {
 		}
 	}
 	c.HTML(http.StatusOK, "showingresslist.gohtml", gin.H{
-		"data": myIngress,
-		"user": User,
+		"data":  myIngress,
+		"user":  User,
+		"token": csrf.Token(c.Request),
 	})
 }
 
@@ -64,6 +66,11 @@ func WhiteListIP(c *gin.Context) {
 	name := c.Param("name")
 
 	expiry, _ := strconv.Atoi(c.PostForm("expiry"))
+	if expiry > config.AppCfg.MaxExpiry {
+		c.SetCookie("message", "Expiry time is incorrect", 10, "/", "", config.AppCfg.CookieSecure, config.AppCfg.CookieHTTPOnly)
+		c.Redirect(http.StatusFound, "/ingress/"+ns+"/"+name)
+		return
+	}
 	leases = GetActiveLeases(ns, name)
 	for kubeContext, kubeClient := range config.KubeClients {
 		clientset := kubeClient.ClientSet
@@ -87,6 +94,7 @@ func WhiteListIP(c *gin.Context) {
 				"message": err.Error(),
 			},
 			"activeLeases": leases,
+			"token":        csrf.Token(c.Request),
 		})
 		return
 	}
@@ -115,6 +123,7 @@ func WhiteListIP(c *gin.Context) {
 				"message": "Your IP is already there",
 			},
 			"activeLeases": leases,
+			"token":        csrf.Token(c.Request),
 		})
 		return
 	}
@@ -145,6 +154,7 @@ func WhiteListIP(c *gin.Context) {
 				"message": "Lease is successfully taken",
 			},
 			"activeLeases": leases,
+			"token":        csrf.Token(c.Request),
 		})
 		return
 	}
@@ -157,6 +167,7 @@ func WhiteListIP(c *gin.Context) {
 			"message": "Your IP is already present",
 		},
 		"activeLeases": leases,
+		"token":        csrf.Token(c.Request),
 	})
 }
 
@@ -195,6 +206,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 				"message": err.Error(),
 			},
 			"activeLeases": leases,
+			"token":        csrf.Token(c.Request),
 		})
 		return
 	}
@@ -217,6 +229,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 				"message": err.Error(),
 			},
 			"activeLeases": leases,
+			"token":        csrf.Token(c.Request),
 		})
 		return
 	}
@@ -232,6 +245,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 				"message": err.Error(),
 			},
 			"activeLeases": leases,
+			"token":        csrf.Token(c.Request),
 		})
 		return
 	}
@@ -248,6 +262,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 				"class":   "Success",
 				"message": "Lease is successfully deleted",
 			},
+			"token": csrf.Token(c.Request),
 		})
 		return
 	}
@@ -259,6 +274,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 			"message": "There is some error in deleting your IP, Try again or contact admin",
 		},
 		"activeLeases": leases,
+		"token":        csrf.Token(c.Request),
 	})
 }
 
@@ -294,6 +310,21 @@ func IngressDetails(c *gin.Context) {
 			},
 			"user":         User,
 			"activeLeases": leases,
+			"token":        csrf.Token(c.Request),
+		})
+		return
+	}
+	message, cookieErr := c.Cookie("message")
+	if cookieErr == nil {
+		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
+			"data":         myIngress,
+			"user":         User,
+			"activeLeases": leases,
+			"token":        csrf.Token(c.Request),
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": message,
+			},
 		})
 		return
 	}
@@ -301,6 +332,7 @@ func IngressDetails(c *gin.Context) {
 		"data":         myIngress,
 		"user":         User,
 		"activeLeases": leases,
+		"token":        csrf.Token(c.Request),
 	})
 }
 

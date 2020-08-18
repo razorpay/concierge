@@ -6,7 +6,6 @@ import (
 	"concierge/models"
 	"concierge/routes"
 	"concierge/routes/middleware"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -31,6 +30,8 @@ func main() {
 
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
 	router.Use(middleware.Recovery)
+	router.Use(middleware.CSRF())
+	router.Use(middleware.SetCustomHeaders())
 
 	// Serving static files
 	router.Static("/assets", "./assets")
@@ -39,8 +40,7 @@ func main() {
 
 	// Initialize the routes
 	routes.InitializeRoutes(router)
-	listenPort := os.Getenv("APP_PORT")
-	router.Run("0.0.0.0:" + listenPort)
+	router.Run(config.AppCfg.ListenIP + ":" + config.AppCfg.ListenPort)
 
 }
 
@@ -54,5 +54,7 @@ func migrations() {
 }
 
 func seeding() {
-	database.Seeding()
+	if config.AppCfg.Mode == "dev" {
+		database.Seeding()
+	}
 }

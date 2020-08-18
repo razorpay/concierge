@@ -8,13 +8,18 @@ volumes:
   concierge-data:
 
 services:
+  redis:
+    image: redis
+    container_name: concierge-redis
+    networks:
+      - internal
+    restart: always
+
   mysql:
     image: mysql:8.0
     container_name: concierge-db
     volumes:
       - db-data:/var/lib/mysql
-    ports:
-      - 3306:3306
     networks:
       - internal
     restart: always
@@ -42,4 +47,5 @@ services:
     env_file: .env
     depends_on:
       - mysql
+      - redis
     restart: always
