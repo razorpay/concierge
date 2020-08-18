@@ -10,9 +10,9 @@ func Seeding() {
 		Conn()
 	}
 	DB.FirstOrCreate(&models.Users{}, &models.Users{
-		Name:     "ankit.infra",
-		Username: "ankit.infra",
-		Email:    "ankit.infra@razorpay.com",
+		Name:     "admin",
+		Username: "admin",
+		Email:    "admin@razorpay.com",
 		Admin:    1,
 	})
 }

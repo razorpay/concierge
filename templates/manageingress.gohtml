@@ -9,7 +9,7 @@
     {{ template "flashmessage" .message}}
 
     {{ template "navbar" .user}}
-
+    {{$token:=.token}}
     <div class="container">
         <div class="row">
             <div class="col-md-6 col-md-offset-3 modal-outer noPad">
@@ -44,6 +44,7 @@
                                     <option value="32400">9 hours</option>
                                 </select>
                             </div>
+                            <input type="hidden" name="_token" value="{{ $token }}">
                             <input class="col-sm-2" type="submit" name="Access" value="Access" />
                         </div>
                     </form>
@@ -65,10 +66,17 @@
                         {{$ns:=.data.Namespace}}
                         {{$name:=.data.Name}}
                         {{$user_id:=.user.ID}}
+                        {{$admin:=.user.Admin}}
                         {{range .activeLeases}}
                         <tr>
                             <td>{{.User.Username}}</td>
+                            {{ if eq .User.ID $user_id}}
                             <td>{{.LeaseIP}}</td>
+                            {{ else if $admin }}
+                            <td>{{.LeaseIP}}</td>
+                            {{ else }}
+                            <td></td>
+                            {{ end }}
                             <td class="time" >{{.Expiry}}</td>
                             <td>{{.LeaseType}}</td>
                             <td>
@@ -76,6 +84,7 @@
                                 <form method="post" action="/ingress/{{$ns}}/{{$name}}/{{.ID}}">
                                     <input type="hidden" name="lease_id" value="{{.ID}}" />
                                     <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_token" value="{{ $token }}">
                                     <a href="" style="color: #ff0000;"
                                         onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
                                         <span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>

@@ -28,6 +28,12 @@ var KubeConfig *string
 //Contexts ...
 var Contexts = []string{}
 
+//CSRFConfig ...
+var CSRFConfig CSRF
+
+//AppCfg ...
+var AppCfg Application
+
 //LoadConfig ...
 func LoadConfig() {
 	err := godotenv.Load()
@@ -40,6 +46,8 @@ func LoadConfig() {
 	initilizeKubeConfigFromFile()
 	initilizeKubeConfig()
 	initilizeLogging()
+	initilizeCSRFConfig()
+	initilizeAppConfig()
 }
 
 func initilizeDBConfig() {
@@ -142,4 +150,48 @@ func initilizeLogging() {
 		log.SetLevel(log.InfoLevel)
 	}
 	log.Debug("Logging in debug mode.")
+}
+
+func initilizeCSRFConfig() {
+	secure := getEnv(os.Getenv("CSRF_SECURE"), false).(bool)
+	CSRFConfig = CSRF{
+		AuthKey: os.Getenv("CSRF_AUTH_KEY"),
+		Secure:  secure,
+	}
+}
+
+func initilizeAppConfig() {
+	maxExpiry := getEnv(os.Getenv("APP_MAX_EXPIRY"), 32400).(int)
+	cookieSecure := getEnv(os.Getenv("COOKIE_SECURE"), false).(bool)
+	cookieHTTPOnly := getEnv(os.Getenv("COOKIE_HTTPONLY"), true).(bool)
+	appPort := getEnv(os.Getenv("APP_PORT"), "8990").(string)
+	appIP := getEnv(os.Getenv("APP_IP"), "0.0.0.0").(string)
+	AppCfg = Application{
+		Name:           os.Getenv("NAME"),
+		Mode:           os.Getenv("APP_ENV"),
+		ListenIP:       appIP,
+		ListenPort:     appPort,
+		MaxExpiry:      maxExpiry,
+		CookieHTTPOnly: cookieHTTPOnly,
+		CookieSecure:   cookieSecure,
+	}
+}
+
+func getEnv(value string, x interface{}) interface{} {
+	if value != "" {
+		switch v := x.(type) {
+		case string:
+			return value
+		case bool:
+			val, _ := strconv.ParseBool(value)
+			return val
+		case int:
+			val, _ := strconv.Atoi(value)
+			return val
+		default:
+			return v
+		}
+
+	}
+	return x
 }
