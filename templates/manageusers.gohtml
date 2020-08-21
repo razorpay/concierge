@@ -10,11 +10,15 @@
 
     {{ template "navbar" .user}}
     {{ $admin := .user.Admin}}
+    {{$token:=.token}}
+
     <div class="container">
         <div class="row">
             <div class="col-md-12 modal-outer noPad">
                 <h2>Site Users</h2>
+                {{ if $admin}}
                 <h4 class="pull-right"><a href="/users/add">Create New User</a></h4>
+                {{end}}
                 <table class="table table-hover table-bordered">
                     <thead>
                         <tr>
@@ -53,6 +57,7 @@
                                 </a>
 
                                 <input type="hidden" name="ID" value="{{.ID}}" />
+                                <input type="hidden" name="_token" value="{{ $token }}">
                                 <a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to delete this user (All his active leases/invites will be terminated?')) {parentNode.submit();} return false;">
                                     <span title="Delete User" class="glyphicon glyphicon-minus-sign"></span>
                                 </a>
