@@ -15,9 +15,10 @@ func Authorize(c *gin.Context) {
 	if database.DB == nil {
 		database.Conn()
 	}
-	username := c.GetHeader("X-Forwarded-User")
+	// user := c.GetHeader("X-Forwarded-User")
 	email := c.GetHeader("X-Forwarded-Email")
 	split := strings.Split(email, "@")
+	username := split[0]
 	if split[1] != os.Getenv("COMPANY_DOMAIN") {
 		c.AbortWithStatusJSON(404, "Invalid Organization Email")
 		return

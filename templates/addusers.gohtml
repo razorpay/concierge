@@ -61,6 +61,7 @@
                 </label>
                 </div>
               </div>
+              <input type="hidden" name="_token" value="{{ .token }}">
              
               <div class="form-group">
                 <div class="col-sm-offset-4 col-sm-6">
@@ -71,6 +72,7 @@
             <h4>Notes:</h4>
             <ul>
             <li>Admin Users can add/remove other users (including other admin users)</li>
+            <li>Adding/Updating User as admin won't demote it to standard user later (Limitation of GORM, Need to be done manually by MySQL query)
             </ul>
          </div>
     </div>

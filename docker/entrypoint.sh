@@ -6,7 +6,7 @@ conciergeServer() {
 }
 
 ouath2Server() {
-    /usr/local/bin/oauth2_proxy --config=/app/oauth2_proxy/oauth2_proxy.cfg
+    /usr/local/bin/oauth2-proxy --config=/app/oauth2_proxy/oauth2_proxy.cfg
 }
 
 if [ "$1" == "start" ]

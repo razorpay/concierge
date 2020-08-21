@@ -9,34 +9,62 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/csrf"
 )
 
 //GetUsers ...
 func GetUsers(c *gin.Context) {
 	User, _ := c.Get("User")
+
 	if database.DB == nil {
 		database.Conn()
 	}
-
 	users := []models.Users{}
 	database.DB.Find(&users)
 	c.HTML(http.StatusOK, "manageusers.gohtml", gin.H{
-		"data": users,
-		"user": User,
+		"data":  users,
+		"user":  User,
+		"token": csrf.Token(c.Request),
 	})
 }
 
 //AddUsersForm ...
 func AddUsersForm(c *gin.Context) {
 	User, _ := c.Get("User")
+	if database.DB == nil {
+		database.Conn()
+	}
+	users := []models.Users{}
+	database.DB.Find(&users)
+
+	if User.(*models.Users).Admin == 0 {
+		c.HTML(http.StatusOK, "manageusers.gohtml", gin.H{
+			"data": users,
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": "You don't have permission to add new users",
+			},
+			"user":  User,
+			"token": csrf.Token(c.Request),
+		})
+		return
+	}
+
 	c.HTML(http.StatusOK, "addusers.gohtml", gin.H{
-		"user": User,
+		"user":  User,
+		"token": csrf.Token(c.Request),
 	})
 }
 
 //UpdateUsersForm ...
 func UpdateUsersForm(c *gin.Context) {
 	User, _ := c.Get("User")
+	if User.(*models.Users).Admin == 0 {
+		c.JSON(403, gin.H{
+			"message": "You don't have permission to update users",
+		})
+		return
+	}
 	ID := c.Param("id")
 	if database.DB == nil {
 		database.Conn()
@@ -44,14 +72,26 @@ func UpdateUsersForm(c *gin.Context) {
 	editUser := models.Users{}
 	database.DB.Find(&editUser, ID)
 	c.HTML(http.StatusOK, "addusers.gohtml", gin.H{
-		"user": User,
-		"data": editUser,
+		"user":  User,
+		"data":  editUser,
+		"token": csrf.Token(c.Request),
 	})
 }
 
 //AddUsers ...
 func AddUsers(c *gin.Context) {
 	User, _ := c.Get("User")
+	if User.(*models.Users).Admin == 0 {
+		c.HTML(http.StatusOK, "addusers.gohtml", gin.H{
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": "You don't have permission to add new users",
+			},
+			"user":  User,
+			"token": csrf.Token(c.Request),
+		})
+		return
+	}
 	var newUser models.Users
 	if err := c.ShouldBind(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -69,7 +109,8 @@ func AddUsers(c *gin.Context) {
 				"class":   "Danger",
 				"message": "Invalid Organization Email",
 			},
-			"data": newUser,
+			"data":  newUser,
+			"token": csrf.Token(c.Request),
 		})
 		return
 	}
@@ -88,7 +129,8 @@ func AddUsers(c *gin.Context) {
 				"class":   "Success",
 				"message": "User is successfully created",
 			},
-			"data": newUser,
+			"data":  newUser,
+			"token": csrf.Token(c.Request),
 		})
 		return
 	}
@@ -98,13 +140,20 @@ func AddUsers(c *gin.Context) {
 			"class":   "Warning",
 			"message": "User is already present",
 		},
-		"data": newUser,
+		"data":  newUser,
+		"token": csrf.Token(c.Request),
 	})
 }
 
 //UpdateUser ...
 func UpdateUser(c *gin.Context) {
 	User, _ := c.Get("User")
+	if User.(*models.Users).Admin == 0 {
+		c.JSON(403, gin.H{
+			"message": "You don't have permission to update user",
+		})
+		return
+	}
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 	ID := uint(id)
 	var updateUser models.Users
@@ -125,7 +174,8 @@ func UpdateUser(c *gin.Context) {
 				"class":   "Danger",
 				"message": "Invalid Organization Email",
 			},
-			"data": updateUser,
+			"data":  updateUser,
+			"token": csrf.Token(c.Request),
 		})
 		return
 	}
@@ -142,9 +192,10 @@ func UpdateUser(c *gin.Context) {
 			"user": User,
 			"message": map[string]string{
 				"class":   "Success",
-				"message": "User is updated created",
+				"message": "User is updated successfully",
 			},
-			"data": updateUser,
+			"data":  updateUser,
+			"token": csrf.Token(c.Request),
 		})
 		return
 	}
@@ -154,13 +205,20 @@ func UpdateUser(c *gin.Context) {
 			"class":   "Warning",
 			"message": "User is already present",
 		},
-		"data": updateUser,
+		"data":  updateUser,
+		"token": csrf.Token(c.Request),
 	})
 }
 
 //DeleteUser ...
 func DeleteUser(c *gin.Context) {
 	User, _ := c.Get("User")
+	if User.(*models.Users).Admin == 0 {
+		c.JSON(403, gin.H{
+			"message": "You don't have permission to delete user",
+		})
+		return
+	}
 	id, _ := strconv.ParseUint(c.PostForm("ID"), 10, 64)
 	ID := uint(id)
 	if database.DB == nil {
@@ -176,7 +234,8 @@ func DeleteUser(c *gin.Context) {
 				"class":   "Warning",
 				"message": "You can't delete yourself",
 			},
-			"data": users,
+			"data":  users,
+			"token": csrf.Token(c.Request),
 		})
 		return
 	}
@@ -189,7 +248,8 @@ func DeleteUser(c *gin.Context) {
 				"class":   "Danger",
 				"message": "User is not found",
 			},
-			"data": users,
+			"data":  users,
+			"token": csrf.Token(c.Request),
 		})
 		return
 	}
@@ -201,6 +261,7 @@ func DeleteUser(c *gin.Context) {
 			"class":   "Success",
 			"message": "User is deleted successfully",
 		},
-		"data": users,
+		"data":  users,
+		"token": csrf.Token(c.Request),
 	})
 }
