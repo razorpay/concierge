@@ -79,22 +79,45 @@ func WhiteListIP(c *gin.Context) {
 	}
 	leases = GetActiveLeases(ns, name)
 
-	req := ingress_driver.EnableUserRequest{
+	{
+		showIngressDetailsRequest := ingress_driver.ShowIngressDetailsRequest{
+			Namespace: ns,
+			Name:      name,
+		}
+
+		showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).ShowIngressDetails(showIngressDetailsRequest)
+
+		if err != nil {
+			c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
+				"data": showIngressDetailsResponse.Ingress,
+				"user": User,
+				"message": map[string]string{
+					"class":   "Danger",
+					"message": err.Error(),
+				},
+				"activeLeases": leases,
+				"token":        csrf.Token(c.Request),
+			})
+			return
+		}
+	}
+
+	enableUserRequest := ingress_driver.EnableUserRequest{
 		Namespace:  ns,
 		Name:       name,
 		GinContext: c,
 		User:       User.(*models.Users),
 	}
 
-	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).EnableUser(req)
+	enableUserResponse, enableUserErr := ingress_driver.GetIngressDriverForNamespace(ns).EnableUser(enableUserRequest)
 
-	if err != nil {
+	if enableUserErr != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": resp.Ingress,
+			"data": enableUserResponse.Ingress,
 			"user": User,
 			"message": map[string]string{
 				"class":   "Danger",
-				"message": err.Error(),
+				"message": enableUserErr.Error(),
 			},
 			"activeLeases": leases,
 			"token":        csrf.Token(c.Request),
@@ -102,8 +125,8 @@ func WhiteListIP(c *gin.Context) {
 		return
 	}
 
-	if resp.UpdateStatusFlag {
-		msgInfo := "Whitelisted" + resp.IdentifierType + " " + "resp.Identifier  " + "to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+	if enableUserResponse.UpdateStatusFlag {
+		msgInfo := "Whitelisted" + enableUserResponse.IdentifierType + " " + "resp.Identifier  " + "to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
 		if database.DB == nil {
@@ -112,8 +135,8 @@ func WhiteListIP(c *gin.Context) {
 
 		lease := models.Leases{
 			UserID:    User.(*models.Users).ID,
-			LeaseIP:   resp.Identifier,
-			LeaseType: resp.IdentifierType,
+			LeaseIP:   enableUserResponse.Identifier,
+			LeaseType: enableUserResponse.IdentifierType,
 			GroupID:   ns + ":" + name,
 			Expiry:    uint(expiry),
 		}
@@ -123,7 +146,7 @@ func WhiteListIP(c *gin.Context) {
 		leases = GetActiveLeases(ns, name)
 
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": resp.Ingress,
+			"data": enableUserResponse.Ingress,
 			"user": User,
 			"message": map[string]string{
 				"class":   "Success",
@@ -136,7 +159,7 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-		"data": resp.Ingress,
+		"data": enableUserResponse.Ingress,
 		"user": User,
 		"message": map[string]string{
 			"class":   "Danger",

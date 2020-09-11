@@ -29,25 +29,11 @@ func (k *KubeIngressDriver) ShowAllowedIngress(req ShowAllowedIngressRequest) (S
 }
 
 func (k *KubeIngressDriver) EnableUser(req EnableUserRequest) (EnableUserResponse, error) {
-	var data pkg.IngressList
 	var err error
 	var resp EnableUserResponse
 	updateStatus := false
 
 	errs := 0
-
-	for kubeContext, kubeClient := range config.KubeClients {
-		clientset := kubeClient.ClientSet
-		myclientset := pkg.MyClientSet{Clientset: clientset}
-		data, err = myclientset.GetIngress(kubeContext, req.Namespace, req.Name)
-		if err != nil {
-			errs = errs + 1
-		}
-		if data.Name != "" {
-			resp.Ingress = data
-			break
-		}
-	}
 
 	if errs >= len(config.KubeClients) {
 		return EnableUserResponse{}, err

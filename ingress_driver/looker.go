@@ -15,6 +15,9 @@ func (k *LookerIngressDriver) ShowAllowedIngress(ShowAllowedIngressRequest) (Sho
 
 func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserResponse, error) {
 	log.Infof("Received EnableUserRequest %v", req.User.Name)
+
+	// todo make call
+
 	return EnableUserResponse{
 		UpdateStatusFlag: true,
 		Ingress:          k.ingress,
