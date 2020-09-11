@@ -51,9 +51,13 @@ type EnableUserResponse struct {
 }
 
 type DisableUserRequest struct {
+	Namespace       string
+	Name            string
+	LeaseIdentifier string
 }
 
 type DisableUserResponse struct {
+	UpdateStatusFlag bool
 }
 
 type ShowIngressDetailsRequest struct {
