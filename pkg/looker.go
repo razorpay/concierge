@@ -1,10 +1,10 @@
 package pkg
 
 import (
-	"bytes"
 	"concierge/config"
 	"encoding/json"
 	"fmt"
+	"github.com/parnurzeal/gorequest"
 	"net/http"
 	"net/url"
 	"time"
@@ -18,6 +18,7 @@ type LookerClient struct {
 	baseUrl             string
 	clientId            string
 	clientSecret        string
+	httpClient          *http.Client
 }
 
 type LookerPatchUserRequest struct {
@@ -45,6 +46,7 @@ func GetLookerClient() *LookerClient {
 			baseUrl:             config.LookerConfig.BaseUrl,
 			clientId:            config.LookerConfig.ClientId,
 			clientSecret:        config.LookerConfig.ClientSecret,
+			httpClient:          &http.Client{},
 		}
 	}
 	return client
@@ -94,17 +96,19 @@ func (c *LookerClient) isAccessTokenExpired() bool {
 }
 
 func (c *LookerClient) setAccessToken() error {
-	path := "login"
-	method := http.MethodPost
-	body := struct {
+	requestBody := struct {
 		ClientId     string `json:"client_id"`
 		ClientSecret string `json:"client_string"`
 	}{c.clientId, c.clientSecret}
 
-	httpResponse, httpErr := c.makeRequestAndResponse(path, method, body, nil)
+	httpResponse, _, errs := gorequest.New().
+		Post(c.baseUrl+"login").
+		Send(requestBody).
+		SetBasicAuth(c.clientId, c.clientSecret).
+		End()
 
-	if httpErr != nil {
-		return httpErr
+	if errs != nil {
+		return errs[0]
 	}
 
 	response := struct {
@@ -123,38 +127,32 @@ func (c *LookerClient) setAccessToken() error {
 }
 
 func (c *LookerClient) executeRequest(path string, method string, body interface{}) (*http.Response, error) {
-
 	if c.isAccessTokenExpired() {
 		if err := c.setAccessToken(); err != nil {
 			return nil, err
 		}
 	}
 
-	headers := map[string]string{
-		"Authoriziation": "Bearer token " + c.accessToken,
-	}
-
-	return c.makeRequestAndResponse(path, method, body, headers)
-}
-
-func (c *LookerClient) makeRequestAndResponse(path string, method string, body interface{}, headers map[string]string) (*http.Response, error) {
 	url := c.baseUrl + path
 
+	req := gorequest.New()
+
 	switch method {
-	case http.MethodPost:
-		fallthrough
-	case http.MethodPatch:
-		var bodyJson []byte
-		bodyJson, err := json.Marshal(body)
-		if err != nil {
-			return nil, err
-		}
-
-		return http.Post(url, "application/json", bytes.NewReader(bodyJson))
 	case http.MethodGet:
-		return http.Get(url)
-
+		req = req.Get(url)
+	case http.MethodPatch:
+		req = req.Patch(url).Send(body)
+	case http.MethodPost:
+		req = req.Post(url).Send(body)
 	}
 
-	return nil, nil
+	req.Header.Set("Authorization", "Bearer token "+c.accessToken)
+
+	resp, _, errs := req.End()
+
+	if len(errs) > 0 {
+		return nil, errs[0]
+	}
+	return resp, nil
+
 }
