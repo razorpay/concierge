@@ -34,6 +34,9 @@ var CSRFConfig CSRF
 //AppCfg ...
 var AppCfg Application
 
+//LookerConfig
+var LookerConfig Looker
+
 //LoadConfig ...
 func LoadConfig() {
 	err := godotenv.Load()
@@ -48,6 +51,7 @@ func LoadConfig() {
 	initilizeLogging()
 	initilizeCSRFConfig()
 	initilizeAppConfig()
+	initializeLookerConfig()
 }
 
 func initilizeDBConfig() {
@@ -174,6 +178,18 @@ func initilizeAppConfig() {
 		MaxExpiry:      maxExpiry,
 		CookieHTTPOnly: cookieHTTPOnly,
 		CookieSecure:   cookieSecure,
+	}
+}
+
+func initializeLookerConfig() {
+	baseUrl := getEnv(os.Getenv("LOOKER_CLIENT_ID"), "https://looker.razorpay.com:19999/").(string)
+	clientId := getEnv(os.Getenv("LOOKER_CLIENT_ID"), "").(string)
+	clientSecret := getEnv(os.Getenv("LOOKER_CLIENT_SECRET"), "").(string)
+
+	LookerConfig = Looker{
+		BaseUrl:      baseUrl,
+		ClientId:     clientId,
+		ClientSecret: clientSecret,
 	}
 }
 
