@@ -1,6 +1,9 @@
 package ingress_driver
 
-import "concierge/pkg"
+import (
+	"concierge/pkg"
+	log "github.com/sirupsen/logrus"
+)
 
 func (k *LookerIngressDriver) ShowAllowedIngress(ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error) {
 	resp := ShowAllowedIngressResponse{
@@ -10,12 +13,20 @@ func (k *LookerIngressDriver) ShowAllowedIngress(ShowAllowedIngressRequest) (Sho
 	return resp, nil
 }
 
-func (k *LookerIngressDriver) Whitelist() {
-
+func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserResponse, error) {
+	log.Infof("Received EnableUserRequest %v", req.User.Name)
+	return EnableUserResponse{
+		UpdateStatusFlag: true,
+		Ingress:          k.ingress,
+		IdentifierType:   "user",
+		Identifier:       req.User.Name,
+	}, nil
 }
-func (k *LookerIngressDriver) Terminate() {
 
+func (k *LookerIngressDriver) DisableUser(req DisableUserRequest) (DisableUserResponse, error) {
+	return DisableUserResponse{}, nil
 }
+
 func (k *LookerIngressDriver) ShowIngressDetails(ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error) {
 	return ShowIngressDetailsResponse{Ingress: k.ingress}, nil
 }
