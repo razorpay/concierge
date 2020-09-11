@@ -3,6 +3,7 @@ package controllers
 import (
 	"concierge/config"
 	"concierge/database"
+	"concierge/ingress_driver"
 	"concierge/models"
 	"concierge/pkg"
 	"errors"
@@ -31,22 +32,30 @@ func ShowAllowedIngress(c *gin.Context) {
 	ns = c.Query("ns")
 	var myIngress []pkg.IngressList
 	namespaces := make(map[string]int)
+	data := []pkg.IngressList{}
 
-	log.Infof("Listing ingress in namespace %s for user %s\n", ns, User.(*models.Users).Email)
-	for kubeContext, kubeClient := range config.KubeClients {
-		clientset := kubeClient.ClientSet
-		myclientset := pkg.MyClientSet{Clientset: clientset}
-		data, _ := myclientset.GetIngresses(kubeContext, ns)
-		for _, ingress := range data {
-			if val, ok := namespaces[ingress.Namespace+":"+ingress.Name]; ok {
-				myIngress[val].Context = myIngress[val].Context + "," + ingress.Context
-				continue
-			}
-			namespaces[ingress.Namespace+":"+ingress.Name] = count
-			myIngress = append(myIngress, ingress)
-			count = count + 1
-		}
+	req := ingress_driver.ShowAllowedIngressRequest{
+		User:      User.(*models.Users),
+		Namespace: ns,
 	}
+	for _, driver := range ingress_driver.GetIngressDrivers() {
+		response, err := driver.ShowAllowedIngress(req)
+		if err != nil {
+			log.Errorf("Error listing ingresses for driver %s for user %s ", driver.GetName(), req.User)
+		}
+		data = append(data, response.Ingresses...)
+	}
+
+	for _, ingress := range data {
+		if val, ok := namespaces[ingress.Namespace+":"+ingress.Name]; ok {
+			myIngress[val].Context = myIngress[val].Context + "," + ingress.Context
+			continue
+		}
+		namespaces[ingress.Namespace+":"+ingress.Name] = count
+		myIngress = append(myIngress, ingress)
+		count = count + 1
+	}
+
 	c.HTML(http.StatusOK, "showingresslist.gohtml", gin.H{
 		"data":  myIngress,
 		"user":  User,
