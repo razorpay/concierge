@@ -182,7 +182,7 @@ func initilizeAppConfig() {
 }
 
 func initializeLookerConfig() {
-	baseUrl := getEnv(os.Getenv("LOOKER_CLIENT_ID"), "https://looker.razorpay.com:19999/").(string)
+	baseUrl := getEnv(os.Getenv("LOOKER_BASE_URL"), "https://looker.razorpay.com:19999/").(string)
 	clientId := getEnv(os.Getenv("LOOKER_CLIENT_ID"), "").(string)
 	clientSecret := getEnv(os.Getenv("LOOKER_CLIENT_SECRET"), "").(string)
 
