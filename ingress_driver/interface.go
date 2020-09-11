@@ -58,6 +58,7 @@ type DisableUserRequest struct {
 
 type DisableUserResponse struct {
 	UpdateStatusFlag bool
+	Ingress          pkg.IngressList
 }
 
 type ShowIngressDetailsRequest struct {
