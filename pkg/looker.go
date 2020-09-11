@@ -3,6 +3,7 @@ package pkg
 import (
 	"concierge/config"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/parnurzeal/gorequest"
 	"net/http"
@@ -98,17 +99,25 @@ func (c *LookerClient) isAccessTokenExpired() bool {
 func (c *LookerClient) setAccessToken() error {
 	requestBody := struct {
 		ClientId     string `json:"client_id"`
-		ClientSecret string `json:"client_string"`
+		ClientSecret string `json:"client_secret"`
 	}{c.clientId, c.clientSecret}
 
+	requestJson, _ := json.Marshal(&requestBody)
+
+	requestString := string(requestJson)
+
 	httpResponse, _, errs := gorequest.New().
-		Post(c.baseUrl+"login").
-		Send(requestBody).
-		SetBasicAuth(c.clientId, c.clientSecret).
+		Post(c.baseUrl + "login").
+		Type(gorequest.TypeForm).
+		Send(requestString).
 		End()
 
 	if errs != nil {
 		return errs[0]
+	}
+
+	if httpResponse.StatusCode >= 400 {
+		return errors.New("failed to enable user on looker")
 	}
 
 	response := struct {

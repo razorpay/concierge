@@ -25,6 +25,10 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 
 	users, searchErr := client.SearchUser(pkg.LookerSearchUserRequest{Email: req.User.Email})
 
+	if searchErr != nil {
+		return resp, searchErr
+	}
+
 	if len(users) == 0 {
 		return resp, errors.New("You dont have a looker account. Please contact Looker admins")
 	}
