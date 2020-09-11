@@ -136,7 +136,7 @@ func WhiteListIP(c *gin.Context) {
 		lease := models.Leases{
 			UserID:    User.(*models.Users).ID,
 			LeaseIP:   enableUserResponse.Identifier,
-			LeaseType: "ingress",
+			LeaseType: "Ingress",
 			GroupID:   ns + ":" + name,
 			Expiry:    uint(expiry),
 		}
@@ -172,7 +172,6 @@ func WhiteListIP(c *gin.Context) {
 
 //DeleteIPFromIngress ...
 func DeleteIPFromIngress(c *gin.Context) {
-	errs := 0
 	var err error
 	updateStatusflag := false
 	User, _ := c.Get("User")
@@ -230,8 +229,8 @@ func DeleteIPFromIngress(c *gin.Context) {
 	}
 	ip := myCurrentLease.LeaseIP
 
-	updateStatusflag, errs, err = DeleteLeases(ns, name, ip, ID)
-	if errs >= len(config.KubeClients) {
+	updateStatusflag, err = DeleteLeases(ns, name, ip, ID)
+	if err != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 			"data": myIngress,
 			"user": User,
@@ -347,7 +346,7 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 		t := uint(lease.CreatedAt.Unix()) + lease.Expiry
 		if t < uint(time.Now().Unix()) {
 			leases[i].Expiry = uint(0)
-			updateStatusflag, _, err := DeleteLeases(ns, name, lease.LeaseIP, lease.ID)
+			updateStatusflag, err := DeleteLeases(ns, name, lease.LeaseIP, lease.ID)
 
 			if updateStatusflag {
 				log.Infof("Removed expired IP %s from ingress %s in namespace %s for User %s\n", lease.LeaseIP, name, ns, lease.User.Email)
@@ -363,33 +362,26 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 }
 
 //DeleteLeases ...
-func DeleteLeases(ns string, name string, ip string, ID uint) (bool, int, error) {
-	updateStatusflag, dbflag := true, false
-	var err error
-	errs := 0
+func DeleteLeases(ns string, name string, ip string, ID uint) (bool, error) {
 	if database.DB == nil {
 		database.Conn()
 	}
 
-	for _, kubeClient := range config.KubeClients {
-		clientset := kubeClient.ClientSet
-		myclientset := pkg.MyClientSet{Clientset: clientset}
-		_, dbflag, err = myclientset.RemoveIngressIP(ns, name, ip)
-		if err != nil {
-			errs = errs + 1
-		}
-		if dbflag {
-			updateStatusflag = false
-		}
+	req := ingress_driver.DisableUserRequest{
+		Namespace:       ns,
+		Name:            name,
+		LeaseIdentifier: ip,
 	}
 
-	if updateStatusflag {
+	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).DisableUser(req)
+
+	if resp.UpdateStatusFlag {
 		database.DB.Delete(models.Leases{
 			ID: ID,
 		})
 		log.Infof("Removing IP %s from database\n", ip)
 	}
-	return updateStatusflag, errs, err
+	return resp.UpdateStatusFlag, err
 }
 
 //ClearExpiredLeases ...

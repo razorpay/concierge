@@ -67,7 +67,28 @@ func (k *KubeIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespons
 }
 
 func (k *KubeIngressDriver) DisableUser(req DisableUserRequest) (DisableUserResponse, error) {
-	return DisableUserResponse{}, nil
+	dbflag := false
+	resp := DisableUserResponse{}
+	var err error
+	errs := 0
+
+	for _, kubeClient := range config.KubeClients {
+		clientset := kubeClient.ClientSet
+		myclientset := pkg.MyClientSet{Clientset: clientset}
+		_, dbflag, err = myclientset.RemoveIngressIP(req.Namespace, req.Name, req.LeaseIdentifier)
+		if err != nil {
+			errs = errs + 1
+		}
+		if dbflag {
+			resp.UpdateStatusFlag = false
+		}
+	}
+
+	if errs >= len(config.KubeClients) {
+		return resp, err
+	} else {
+		return resp, nil
+	}
 }
 
 func (k *KubeIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error) {

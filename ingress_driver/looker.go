@@ -26,7 +26,9 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 }
 
 func (k *LookerIngressDriver) DisableUser(req DisableUserRequest) (DisableUserResponse, error) {
-	return DisableUserResponse{}, nil
+	return DisableUserResponse{
+		UpdateStatusFlag: true,
+	}, nil
 }
 
 func (k *LookerIngressDriver) ShowIngressDetails(ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error) {
