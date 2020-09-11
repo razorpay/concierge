@@ -126,7 +126,7 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	if enableUserResponse.UpdateStatusFlag {
-		msgInfo := "Whitelisted" + enableUserResponse.IdentifierType + " " + "resp.Identifier  " + "to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+		msgInfo := "Whitelisted" + enableUserResponse.Identifier + "to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
 		if database.DB == nil {
@@ -136,7 +136,7 @@ func WhiteListIP(c *gin.Context) {
 		lease := models.Leases{
 			UserID:    User.(*models.Users).ID,
 			LeaseIP:   enableUserResponse.Identifier,
-			LeaseType: enableUserResponse.IdentifierType,
+			LeaseType: "ingress",
 			GroupID:   ns + ":" + name,
 			Expiry:    uint(expiry),
 		}
@@ -181,33 +181,29 @@ func DeleteIPFromIngress(c *gin.Context) {
 	leaseID, err := strconv.Atoi(c.Param("id"))
 	ID := uint(leaseID)
 	leases := GetActiveLeases(ns, name)
-	var myIngress, data pkg.IngressList
+	var myIngress pkg.IngressList
 
-	for kubeContext, kubeClient := range config.KubeClients {
-		clientset := kubeClient.ClientSet
-		myclientset := pkg.MyClientSet{Clientset: clientset}
-		data, err = myclientset.GetIngress(kubeContext, ns, name)
+	{
+		showIngressDetailsRequest := ingress_driver.ShowIngressDetailsRequest{
+			Namespace: ns,
+			Name:      name,
+		}
+
+		showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).ShowIngressDetails(showIngressDetailsRequest)
+
 		if err != nil {
-			errs = errs + 1
+			c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
+				"data": showIngressDetailsResponse.Ingress,
+				"user": User,
+				"message": map[string]string{
+					"class":   "Danger",
+					"message": err.Error(),
+				},
+				"activeLeases": leases,
+				"token":        csrf.Token(c.Request),
+			})
+			return
 		}
-		if data.Name != "" {
-			myIngress = data
-			break
-		}
-	}
-
-	if errs >= len(config.KubeClients) {
-		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": myIngress,
-			"user": User,
-			"message": map[string]string{
-				"class":   "Danger",
-				"message": err.Error(),
-			},
-			"activeLeases": leases,
-			"token":        csrf.Token(c.Request),
-		})
-		return
 	}
 
 	if database.DB == nil {

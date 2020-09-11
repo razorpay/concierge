@@ -56,7 +56,7 @@ func (k *KubeIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespons
 
 		}
 	}
-	resp.IdentifierType = "Ingress"
+
 	resp.Identifier = ip
 
 	if errs >= len(config.KubeClients) {

@@ -47,7 +47,6 @@ type EnableUserRequest struct {
 type EnableUserResponse struct {
 	UpdateStatusFlag bool
 	Ingress          pkg.IngressList
-	IdentifierType   string
 	Identifier       string
 }
 

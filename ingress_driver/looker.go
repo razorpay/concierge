@@ -21,8 +21,7 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 	return EnableUserResponse{
 		UpdateStatusFlag: true,
 		Ingress:          k.ingress,
-		IdentifierType:   "user",
-		Identifier:       req.User.Name,
+		Identifier:       req.User.Email,
 	}, nil
 }
 
