@@ -15,7 +15,7 @@ func (k *LookerIngressDriver) ShowAllowedIngress(ShowAllowedIngressRequest) (Sho
 }
 
 func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserResponse, error) {
-	log.Infof("Received EnableUserRequest %v", req.User.Name)
+	log.Infof("Received Looker EnableUserRequest %v", req.User.Name)
 	resp := EnableUserResponse{
 		Ingress:    k.ingress,
 		Identifier: req.User.Email,
@@ -23,10 +23,9 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 
 	client := pkg.GetLookerClient()
 
-	users, err := client.SearchUser(pkg.LookerSearchUserRequest{Email: req.User.Email})
+	users, searchErr := client.SearchUser(pkg.LookerSearchUserRequest{Email: req.User.Email})
 
 	if len(users) == 0 {
-		// todo: add user creation flow here
 		return resp, errors.New("You dont have a looker account. Please contact Looker admins")
 	}
 
@@ -50,20 +49,40 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 
 	resp.UpdateStatusFlag = true
 
-	if err != nil {
-		return resp, err
+	if searchErr != nil {
+		return resp, searchErr
 	}
 
 	return resp, nil
 }
 
 func (k *LookerIngressDriver) DisableUser(req DisableUserRequest) (DisableUserResponse, error) {
+	log.Infof("Received Looker DisableUserRequest %v", req.LeaseIdentifier)
+	response := DisableUserResponse{}
 
-	// todo make call to looker
+	client := pkg.GetLookerClient()
 
-	return DisableUserResponse{
-		UpdateStatusFlag: true,
-	}, nil
+	users, searchErr := client.SearchUser(pkg.LookerSearchUserRequest{Email: req.LeaseIdentifier})
+
+	if searchErr != nil {
+		return DisableUserResponse{Ingress: k.ingress}, searchErr
+	}
+
+	for _, user := range users {
+		if user.IsDisabled {
+			continue
+		}
+
+		patchedUser, patchErr := client.PatchUser(user.Id, pkg.LookerPatchUserRequest{IsDisabled: true})
+
+		if patchErr != nil || patchedUser.IsDisabled == false {
+			return response, errors.New("failed to delete lease. contact looker admin")
+		}
+	}
+
+	response.UpdateStatusFlag = true
+
+	return response, nil
 }
 
 func (k *LookerIngressDriver) ShowIngressDetails(ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error) {
