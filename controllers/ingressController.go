@@ -289,29 +289,20 @@ func DeleteIPFromIngress(c *gin.Context) {
 
 //IngressDetails ...
 func IngressDetails(c *gin.Context) {
-	errs := 0
-	var err error
+
 	User, _ := c.Get("User")
 	ns := c.Param("ns")
 	name := c.Param("name")
 	leases := GetActiveLeases(ns, name)
-	var myIngress, data pkg.IngressList
 
-	for kubeContext, kubeClient := range config.KubeClients {
-		clientset := kubeClient.ClientSet
-		myclientset := pkg.MyClientSet{Clientset: clientset}
-		data, err = myclientset.GetIngress(kubeContext, ns, name)
-
-		if data.Name != "" {
-			myIngress = data
-			break
-		}
-		if err != nil {
-			errs = errs + 1
-		}
+	req := ingress_driver.ShowIngressDetailsRequest{
+		Namespace: ns,
+		Name:      name,
 	}
 
-	if errs >= len(config.KubeClients) {
+	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).ShowIngressDetails(req)
+
+	if err != nil {
 		c.HTML(http.StatusNotFound, "manageingress.gohtml", gin.H{
 			"message": map[string]string{
 				"class":   "Danger",
@@ -326,7 +317,7 @@ func IngressDetails(c *gin.Context) {
 	message, cookieErr := c.Cookie("message")
 	if cookieErr == nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data":         myIngress,
+			"data":         resp.Ingress,
 			"user":         User,
 			"activeLeases": leases,
 			"token":        csrf.Token(c.Request),
@@ -338,7 +329,7 @@ func IngressDetails(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-		"data":         myIngress,
+		"data":         resp.Ingress,
 		"user":         User,
 		"activeLeases": leases,
 		"token":        csrf.Token(c.Request),

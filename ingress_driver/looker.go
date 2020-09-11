@@ -5,8 +5,8 @@ import "concierge/pkg"
 func (k *LookerIngressDriver) ShowAllowedIngress(ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error) {
 	resp := ShowAllowedIngressResponse{
 		Ingresses: []pkg.IngressList{{
-			Name:           "Looker",
-			Namespace:      "Looker",
+			Name:           "looker",
+			Namespace:      "looker",
 			Context:        "default",
 			Host:           "default",
 			Class:          "default",
@@ -23,8 +23,18 @@ func (k *LookerIngressDriver) Whitelist() {
 func (k *LookerIngressDriver) Terminate() {
 
 }
-func (k *LookerIngressDriver) ShowIngressDetails() {
+func (k *LookerIngressDriver) ShowIngressDetails(ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error) {
 
+	return ShowIngressDetailsResponse{
+		Ingress: pkg.IngressList{
+			Name:           "looker",
+			Namespace:      "looker",
+			Context:        "default",
+			Host:           "https://looker.razorpay.com/",
+			Class:          "default",
+			WhitelistedIps: nil,
+		},
+	}, nil
 }
 
 func (k *LookerIngressDriver) GetName() string {
