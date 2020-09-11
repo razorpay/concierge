@@ -3,6 +3,7 @@ package ingress_driver
 import (
 	"concierge/models"
 	"concierge/pkg"
+	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -15,8 +16,8 @@ const (
 
 type IngressDriver interface {
 	ShowAllowedIngress(ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error)
-	Whitelist()
-	Terminate()
+	EnableUser(EnableUserRequest) (EnableUserResponse, error)
+	DisableUser(DisableUserRequest) (DisableUserResponse, error)
 	ShowIngressDetails(req ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error)
 	GetName() string
 }
@@ -34,6 +35,26 @@ type ShowAllowedIngressRequest struct {
 
 type ShowAllowedIngressResponse struct {
 	Ingresses []pkg.IngressList
+}
+
+type EnableUserRequest struct {
+	Namespace  string
+	Name       string
+	GinContext *gin.Context
+	User       *models.Users
+}
+
+type EnableUserResponse struct {
+	UpdateStatusFlag bool
+	Ingress          pkg.IngressList
+	IdentifierType   string
+	Identifier       string
+}
+
+type DisableUserRequest struct {
+}
+
+type DisableUserResponse struct {
 }
 
 type ShowIngressDetailsRequest struct {
@@ -66,5 +87,5 @@ func getLookerIngressDriver() IngressDriver {
 }
 
 func GetIngressDrivers() []IngressDriver {
-	return []IngressDriver{&LookerIngressDriver{}, &KubeIngressDriver{}}
+	return []IngressDriver{getLookerIngressDriver(), &KubeIngressDriver{}}
 }

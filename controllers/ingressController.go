@@ -66,10 +66,7 @@ func ShowAllowedIngress(c *gin.Context) {
 //WhiteListIP ...
 func WhiteListIP(c *gin.Context) {
 	var leases []models.Leases
-	errs := 0
-	var err error
-	var myIngress, data pkg.IngressList
-	updateStatusflag, updateStatus := false, true
+
 	User, _ := c.Get("User")
 	ns := c.Param("ns")
 	name := c.Param("name")
@@ -81,22 +78,19 @@ func WhiteListIP(c *gin.Context) {
 		return
 	}
 	leases = GetActiveLeases(ns, name)
-	for kubeContext, kubeClient := range config.KubeClients {
-		clientset := kubeClient.ClientSet
-		myclientset := pkg.MyClientSet{Clientset: clientset}
-		data, err = myclientset.GetIngress(kubeContext, ns, name)
-		if err != nil {
-			errs = errs + 1
-		}
-		if data.Name != "" {
-			myIngress = data
-			break
-		}
+
+	req := ingress_driver.EnableUserRequest{
+		Namespace:  ns,
+		Name:       name,
+		GinContext: c,
+		User:       User.(*models.Users),
 	}
 
-	if errs >= len(config.KubeClients) {
+	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).EnableUser(req)
+
+	if err != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": myIngress,
+			"data": resp.Ingress,
 			"user": User,
 			"message": map[string]string{
 				"class":   "Danger",
@@ -107,37 +101,9 @@ func WhiteListIP(c *gin.Context) {
 		})
 		return
 	}
-	ips := c.Request.Header["X-Forwarded-For"][0]
-	ip := strings.Split(ips, ",")[0]
-	ip = ip + "/32"
-	errs = 0
-	for _, kubeClient := range config.KubeClients {
-		clientset := kubeClient.ClientSet
-		myclientset := pkg.MyClientSet{Clientset: clientset}
-		updateStatus, err = myclientset.WhiteListIP(ns, name, ip)
-		if err != nil {
-			errs = errs + 1
-		}
-		if updateStatus {
-			updateStatusflag = true
-		}
-	}
 
-	if errs >= len(config.KubeClients) {
-		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": myIngress,
-			"user": User,
-			"message": map[string]string{
-				"class":   "Danger",
-				"message": "Your IP is already there",
-			},
-			"activeLeases": leases,
-			"token":        csrf.Token(c.Request),
-		})
-		return
-	}
-	if updateStatusflag {
-		msgInfo := "Whitelisted IP " + ip + " to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+	if resp.UpdateStatusFlag {
+		msgInfo := "Whitelisted" + resp.IdentifierType + " " + "resp.Identifier  " + "to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
 		if database.DB == nil {
@@ -146,17 +112,18 @@ func WhiteListIP(c *gin.Context) {
 
 		lease := models.Leases{
 			UserID:    User.(*models.Users).ID,
-			LeaseIP:   ip,
-			LeaseType: "Ingress",
+			LeaseIP:   resp.Identifier,
+			LeaseType: resp.IdentifierType,
 			GroupID:   ns + ":" + name,
 			Expiry:    uint(expiry),
 		}
 
 		database.DB.Create(&lease)
+
 		leases = GetActiveLeases(ns, name)
 
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": myIngress,
+			"data": resp.Ingress,
 			"user": User,
 			"message": map[string]string{
 				"class":   "Success",
@@ -169,11 +136,11 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-		"data": myIngress,
+		"data": resp.Ingress,
 		"user": User,
 		"message": map[string]string{
 			"class":   "Danger",
-			"message": "Your IP is already present",
+			"message": "Your IP/User is already present",
 		},
 		"activeLeases": leases,
 		"token":        csrf.Token(c.Request),
