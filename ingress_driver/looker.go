@@ -16,7 +16,7 @@ func (k *LookerIngressDriver) ShowAllowedIngress(ShowAllowedIngressRequest) (Sho
 func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserResponse, error) {
 	log.Infof("Received EnableUserRequest %v", req.User.Name)
 
-	// todo make call
+	// todo make call to looker
 
 	return EnableUserResponse{
 		UpdateStatusFlag: true,
@@ -26,6 +26,9 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 }
 
 func (k *LookerIngressDriver) DisableUser(req DisableUserRequest) (DisableUserResponse, error) {
+
+	// todo make call to looker
+
 	return DisableUserResponse{
 		UpdateStatusFlag: true,
 	}, nil
