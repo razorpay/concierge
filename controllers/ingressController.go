@@ -23,8 +23,6 @@ type info struct {
 	Leaseinfo models.Leases
 }
 
-type ingressess []string
-
 //ShowAllowedIngress ...
 func ShowAllowedIngress(c *gin.Context) {
 	User, _ := c.Get("User")
