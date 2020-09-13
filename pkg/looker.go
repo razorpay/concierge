@@ -160,6 +160,11 @@ func (c *LookerClient) executeRequest(path string, method string, body interface
 	if len(errs) > 0 {
 		return nil, errs[0]
 	}
+
+	if resp.StatusCode >= 400 {
+		return nil, errors.New("request failed. please contact admins")
+	}
+
 	return resp, nil
 
 }
