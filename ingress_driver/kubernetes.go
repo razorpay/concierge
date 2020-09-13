@@ -4,7 +4,6 @@ import (
 	"concierge/config"
 	"concierge/pkg"
 	"errors"
-	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -22,7 +21,6 @@ func getKubernetesIngressDriver() IngressDriver {
 
 func (k *KubeIngressDriver) ShowAllowedIngress(req ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error) {
 	ns := req.Namespace
-	User := req.User
 	count := 0
 
 	namespaces := make(map[string]int)
@@ -30,8 +28,6 @@ func (k *KubeIngressDriver) ShowAllowedIngress(req ShowAllowedIngressRequest) (S
 	resp := ShowAllowedIngressResponse{
 		Ingresses: []pkg.IngressList{},
 	}
-
-	log.Infof("Listing ingress in namespace %s for user %s\n", ns, User.Email)
 
 	for kubeContext, kubeClient := range config.KubeClients {
 		clientset := kubeClient.ClientSet
@@ -56,10 +52,6 @@ func (k *KubeIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespons
 	updateStatus := false
 
 	errs := 0
-
-	if errs >= len(config.KubeClients) {
-		return EnableUserResponse{}, err
-	}
 
 	ips := req.GinContext.Request.Header["X-Forwarded-For"][0]
 	ip := strings.Split(ips, ",")[0]
@@ -142,7 +134,7 @@ func (k *KubeIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (S
 }
 
 func (k *KubeIngressDriver) GetName() string {
-	return "kubeClient"
+	return "kubernetes"
 }
 
 func (k *KubeIngressDriver) isEnabled() bool {

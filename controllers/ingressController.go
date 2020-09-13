@@ -30,14 +30,15 @@ func ShowAllowedIngress(c *gin.Context) {
 	var data []pkg.IngressList
 
 	req := ingress_driver.ShowAllowedIngressRequest{
-		User:      User.(*models.Users),
 		Namespace: ns,
 	}
+
+	log.Infof("Listing ingress in all namespaces %s for user %s\n", ns, User.(*models.Users).Email)
 
 	for _, driver := range ingress_driver.GetEnabledIngressDrivers() {
 		response, err := driver.ShowAllowedIngress(req)
 		if err != nil {
-			log.Errorf("Error listing ingresses for driver %s for user %s ", driver.GetName(), req.User)
+			log.Errorf("Error listing ingresses for driver %s for user %s ", driver.GetName(), User)
 		} else {
 			data = append(data, response.Ingresses...)
 		}
@@ -208,9 +209,9 @@ func DeleteIPFromIngress(c *gin.Context) {
 		})
 		return
 	}
-	ip := myCurrentLease.LeaseIP
+	leaseIdentifier := myCurrentLease.LeaseIP
 
-	resp, respErr := DeleteLeases(ns, name, ip, ID)
+	resp, respErr := DeleteLeases(ns, name, leaseIdentifier, ID)
 	if respErr != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
 			"data": showIngressDetailsResponse.Ingress,
@@ -225,7 +226,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 		return
 	}
 	if resp.UpdateStatusFlag {
-		msgInfo := "Removed IP " + ip + " from ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+		msgInfo := "Removed IP " + leaseIdentifier + " from ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
 		leases = GetActiveLeases(ns, name)

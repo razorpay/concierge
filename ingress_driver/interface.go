@@ -23,7 +23,6 @@ type IngressDriver interface {
 }
 
 type ShowAllowedIngressRequest struct {
-	User      *models.Users
 	Namespace string
 }
 
