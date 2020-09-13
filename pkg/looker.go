@@ -19,7 +19,6 @@ type LookerClient struct {
 	baseUrl             string
 	clientId            string
 	clientSecret        string
-	httpClient          *http.Client
 }
 
 type LookerPatchUserRequest struct {
@@ -47,7 +46,6 @@ func GetLookerClient() *LookerClient {
 			baseUrl:             config.LookerConfig.BaseUrl,
 			clientId:            config.LookerConfig.ClientId,
 			clientSecret:        config.LookerConfig.ClientSecret,
-			httpClient:          &http.Client{},
 		}
 	}
 	return client

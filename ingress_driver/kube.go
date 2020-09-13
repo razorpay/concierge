@@ -11,6 +11,9 @@ import (
 func (k *KubeIngressDriver) ShowAllowedIngress(req ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error) {
 	ns := req.Namespace
 	User := req.User
+	count := 0
+
+	namespaces := make(map[string]int)
 
 	resp := ShowAllowedIngressResponse{
 		Ingresses: []pkg.IngressList{},
@@ -18,12 +21,19 @@ func (k *KubeIngressDriver) ShowAllowedIngress(req ShowAllowedIngressRequest) (S
 
 	log.Infof("Listing ingress in namespace %s for user %s\n", ns, User.Email)
 
-	var data []pkg.IngressList
 	for kubeContext, kubeClient := range config.KubeClients {
 		clientset := kubeClient.ClientSet
 		myclientset := pkg.MyClientSet{Clientset: clientset}
-		d, _ := myclientset.GetIngresses(kubeContext, ns)
-		data = append(data, d...)
+		data, _ := myclientset.GetIngresses(kubeContext, ns)
+		for _, ingress := range data {
+			if val, ok := namespaces[ingress.Namespace+":"+ingress.Name]; ok {
+				resp.Ingresses[val].Context = resp.Ingresses[val].Context + "," + ingress.Context
+				continue
+			}
+			namespaces[ingress.Namespace+":"+ingress.Name] = count
+			resp.Ingresses = append(resp.Ingresses, ingress)
+			count = count + 1
+		}
 	}
 	return resp, nil
 }
@@ -68,7 +78,7 @@ func (k *KubeIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespons
 
 func (k *KubeIngressDriver) DisableUser(req DisableUserRequest) (DisableUserResponse, error) {
 	dbflag := false
-	resp := DisableUserResponse{}
+	resp := DisableUserResponse{UpdateStatusFlag: true}
 	var err error
 	errs := 0
 
