@@ -57,15 +57,15 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 		return resp, errors.New("You dont have a looker account. Please contact Looker admins")
 	}
 
-	for _, u := range users {
-		if u.IsDisabled == false {
-			return resp, errors.New("Looker user already present for user. Please contact admin")
-		}
+	if len(users) > 1 {
+		return resp, errors.New("You have multiple looker accounts. Please contact looker admins")
 	}
 
-	// lets create only for the 0th user. if there are multiple users, its bug on looker side
-	// todo confirm how to handle this
 	user := users[0]
+
+	if user.IsDisabled == false {
+		return resp, errors.New("Looker user already enabled for user. Please visit looker.")
+	}
 
 	patchedUser, patchErr := client.PatchUser(user.Id, pkg.LookerPatchUserRequest{IsDisabled: false})
 
@@ -78,10 +78,6 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 	}
 
 	resp.UpdateStatusFlag = true
-
-	if searchErr != nil {
-		return resp, searchErr
-	}
 
 	return resp, nil
 }
