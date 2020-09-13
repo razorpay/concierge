@@ -40,7 +40,7 @@ func (k *KubeIngressDriver) ShowAllowedIngress(req ShowAllowedIngressRequest) (S
 
 func (k *KubeIngressDriver) EnableUser(req EnableUserRequest) (EnableUserResponse, error) {
 	var err error
-	var resp EnableUserResponse
+	resp := EnableUserResponse{}
 	updateStatus := false
 
 	errs := 0

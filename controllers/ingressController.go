@@ -26,36 +26,25 @@ type info struct {
 //ShowAllowedIngress ...
 func ShowAllowedIngress(c *gin.Context) {
 	User, _ := c.Get("User")
-	ns, count := "", 0
-	ns = c.Query("ns")
-	var myIngress []pkg.IngressList
-	namespaces := make(map[string]int)
-	data := []pkg.IngressList{}
+	ns := c.Query("ns")
+	var data []pkg.IngressList
 
 	req := ingress_driver.ShowAllowedIngressRequest{
 		User:      User.(*models.Users),
 		Namespace: ns,
 	}
+
 	for _, driver := range ingress_driver.GetIngressDrivers() {
 		response, err := driver.ShowAllowedIngress(req)
 		if err != nil {
 			log.Errorf("Error listing ingresses for driver %s for user %s ", driver.GetName(), req.User)
+		} else {
+			data = append(data, response.Ingresses...)
 		}
-		data = append(data, response.Ingresses...)
-	}
-
-	for _, ingress := range data {
-		if val, ok := namespaces[ingress.Namespace+":"+ingress.Name]; ok {
-			myIngress[val].Context = myIngress[val].Context + "," + ingress.Context
-			continue
-		}
-		namespaces[ingress.Namespace+":"+ingress.Name] = count
-		myIngress = append(myIngress, ingress)
-		count = count + 1
 	}
 
 	c.HTML(http.StatusOK, "showingresslist.gohtml", gin.H{
-		"data":  myIngress,
+		"data":  data,
 		"user":  User,
 		"token": csrf.Token(c.Request),
 	})
@@ -77,27 +66,25 @@ func WhiteListIP(c *gin.Context) {
 	}
 	leases = GetActiveLeases(ns, name)
 
-	{
-		showIngressDetailsRequest := ingress_driver.ShowIngressDetailsRequest{
-			Namespace: ns,
-			Name:      name,
-		}
+	showIngressDetailsRequest := ingress_driver.ShowIngressDetailsRequest{
+		Namespace: ns,
+		Name:      name,
+	}
 
-		showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).ShowIngressDetails(showIngressDetailsRequest)
+	showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).ShowIngressDetails(showIngressDetailsRequest)
 
-		if err != nil {
-			c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-				"data": showIngressDetailsResponse.Ingress,
-				"user": User,
-				"message": map[string]string{
-					"class":   "Danger",
-					"message": err.Error(),
-				},
-				"activeLeases": leases,
-				"token":        csrf.Token(c.Request),
-			})
-			return
-		}
+	if err != nil {
+		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
+			"data": showIngressDetailsResponse.Ingress,
+			"user": User,
+			"message": map[string]string{
+				"class":   "Danger",
+				"message": err.Error(),
+			},
+			"activeLeases": leases,
+			"token":        csrf.Token(c.Request),
+		})
+		return
 	}
 
 	enableUserRequest := ingress_driver.EnableUserRequest{
@@ -111,7 +98,7 @@ func WhiteListIP(c *gin.Context) {
 
 	if enableUserErr != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": enableUserResponse.Ingress,
+			"data": showIngressDetailsResponse.Ingress,
 			"user": User,
 			"message": map[string]string{
 				"class":   "Danger",
@@ -144,7 +131,7 @@ func WhiteListIP(c *gin.Context) {
 		leases = GetActiveLeases(ns, name)
 
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": enableUserResponse.Ingress,
+			"data": showIngressDetailsResponse.Ingress,
 			"user": User,
 			"message": map[string]string{
 				"class":   "Success",
@@ -157,7 +144,7 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-		"data": enableUserResponse.Ingress,
+		"data": showIngressDetailsResponse.Ingress,
 		"user": User,
 		"message": map[string]string{
 			"class":   "Danger",
