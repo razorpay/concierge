@@ -30,7 +30,7 @@ func main() {
 
 	// Recovery middleware recovers from any panics and writes a 500 if there was one.
 	router.Use(middleware.Recovery)
-	//router.Use(middleware.CSRF())
+	router.Use(middleware.CSRF())
 	router.Use(middleware.SetCustomHeaders())
 
 	// Serving static files
