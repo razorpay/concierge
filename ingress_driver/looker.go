@@ -1,10 +1,36 @@
 package ingress_driver
 
 import (
+	"concierge/config"
 	"concierge/pkg"
 	"errors"
 	log "github.com/sirupsen/logrus"
+	"os"
+	"strconv"
 )
+
+type LookerIngressDriver struct {
+	ingress pkg.IngressList
+}
+
+var lookerIngressDriver *LookerIngressDriver
+
+func getLookerIngressDriver() IngressDriver {
+	host := config.LookerConfig.BaseUrl
+
+	if lookerIngressDriver == nil {
+		lookerIngressDriver = &LookerIngressDriver{ingress: struct {
+			Name           string
+			Namespace      string
+			Context        string
+			Host           string
+			Class          string
+			WhitelistedIps []string
+		}{Name: Looker, Namespace: Looker, Context: DefaultContext, Host: host, Class: DefaultClass, WhitelistedIps: nil}}
+
+	}
+	return lookerIngressDriver
+}
 
 func (k *LookerIngressDriver) ShowAllowedIngress(ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error) {
 	resp := ShowAllowedIngressResponse{
@@ -39,7 +65,9 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 		}
 	}
 
-	user := users[0] // lets create only for the 0th user. if there are multiple users, its bug on looker side
+	// lets create only for the 0th user. if there are multiple users, its bug on looker side
+	// todo confirm how to handle this
+	user := users[0]
 
 	patchedUser, patchErr := client.PatchUser(user.Id, pkg.LookerPatchUserRequest{IsDisabled: false})
 
@@ -95,4 +123,9 @@ func (k *LookerIngressDriver) ShowIngressDetails(ShowIngressDetailsRequest) (Sho
 
 func (k *LookerIngressDriver) GetName() string {
 	return "looker"
+}
+
+func (k *LookerIngressDriver) isEnabled() bool {
+	parsed, err := strconv.ParseBool(os.Getenv("ENABLE_LOOKER"))
+	return parsed && err == nil
 }

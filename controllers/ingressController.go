@@ -34,7 +34,7 @@ func ShowAllowedIngress(c *gin.Context) {
 		Namespace: ns,
 	}
 
-	for _, driver := range ingress_driver.GetIngressDrivers() {
+	for _, driver := range ingress_driver.GetEnabledIngressDrivers() {
 		response, err := driver.ShowAllowedIngress(req)
 		if err != nil {
 			log.Errorf("Error listing ingresses for driver %s for user %s ", driver.GetName(), req.User)
