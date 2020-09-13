@@ -6,13 +6,14 @@ import (
 
 //Leases ...
 type Leases struct {
-	ID          uint `gorm:"type:int(10) unsigned auto_increment;primary_key;not null"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
-	DeletedAt   *time.Time
-	UserID      uint   `gorm:"column:user_id;type:int(10) unsigned;not null;"`
-	User        Users  `gorm:"foreignkey:UserID"`
-	GroupID     string `gorm:"column:group_id;type:varchar(255);default:null"`
+	ID        uint `gorm:"type:int(10) unsigned auto_increment;primary_key;not null"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt *time.Time
+	UserID    uint   `gorm:"column:user_id;type:int(10) unsigned;not null;"`
+	User      Users  `gorm:"foreignkey:UserID"`
+	GroupID   string `gorm:"column:group_id;type:varchar(255);default:null"`
+	// even though it says IP, we store the lease identifier.(it could be ip address/user email of external account etc)
 	LeaseIP     string `gorm:"column:lease_ip;type:varchar(255);not null"`
 	LeaseType   string `gorm:"column:lease_type;type:varchar(255);not null"`
 	Protocol    string `gorm:"column:protocol;type:varchar(255);default:null"`

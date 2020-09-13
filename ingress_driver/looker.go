@@ -5,8 +5,6 @@ import (
 	"concierge/pkg"
 	"errors"
 	log "github.com/sirupsen/logrus"
-	"os"
-	"strconv"
 )
 
 type LookerIngressDriver struct {
@@ -122,10 +120,9 @@ func (k *LookerIngressDriver) ShowIngressDetails(ShowIngressDetailsRequest) (Sho
 }
 
 func (k *LookerIngressDriver) GetName() string {
-	return "looker"
+	return Looker
 }
 
 func (k *LookerIngressDriver) isEnabled() bool {
-	parsed, err := strconv.ParseBool(os.Getenv("ENABLE_LOOKER"))
-	return parsed && err == nil
+	return config.LookerConfig.IsEnabled
 }
