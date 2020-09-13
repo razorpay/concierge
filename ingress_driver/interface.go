@@ -7,8 +7,7 @@ import (
 )
 
 const (
-	Looker     = "looker"
-	LookerHost = "https://looker.razorpay.com"
+	Looker = "looker"
 
 	DefaultContext = "default"
 	DefaultClass   = "default"
@@ -20,17 +19,17 @@ type IngressDriver interface {
 	DisableUser(DisableUserRequest) (DisableUserResponse, error)
 	ShowIngressDetails(req ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error)
 	GetName() string
-}
-type KubeIngressDriver struct {
+	isEnabled() bool
 }
 
-type LookerIngressDriver struct {
-	ingress pkg.IngressList
+type CommonRequest struct {
+	Namespace string
+	Name      string
 }
 
 type ShowAllowedIngressRequest struct {
-	User      *models.Users
-	Namespace string
+	User *models.Users
+	CommonRequest
 }
 
 type ShowAllowedIngressResponse struct {
@@ -38,8 +37,7 @@ type ShowAllowedIngressResponse struct {
 }
 
 type EnableUserRequest struct {
-	Namespace  string
-	Name       string
+	CommonRequest
 	GinContext *gin.Context
 	User       *models.Users
 }
@@ -51,8 +49,7 @@ type EnableUserResponse struct {
 }
 
 type DisableUserRequest struct {
-	Namespace       string
-	Name            string
+	CommonRequest
 	LeaseIdentifier string
 }
 
@@ -62,8 +59,7 @@ type DisableUserResponse struct {
 }
 
 type ShowIngressDetailsRequest struct {
-	Namespace string
-	Name      string
+	CommonRequest
 }
 
 type ShowIngressDetailsResponse struct {
@@ -79,17 +75,17 @@ func GetIngressDriverForNamespace(ns string) IngressDriver {
 	}
 }
 
-func getLookerIngressDriver() IngressDriver {
-	return &LookerIngressDriver{ingress: struct {
-		Name           string
-		Namespace      string
-		Context        string
-		Host           string
-		Class          string
-		WhitelistedIps []string
-	}{Name: Looker, Namespace: Looker, Context: DefaultContext, Host: LookerHost, Class: DefaultClass, WhitelistedIps: nil}}
+func GetEnabledIngressDrivers() []IngressDriver {
+	var enabledDriverss []IngressDriver
+	for _, driver := range getAllDrivers() {
+		if driver.isEnabled() {
+			enabledDriverss = append(enabledDriverss, driver)
+		}
+	}
+	return enabledDriverss
 }
 
-func GetIngressDrivers() []IngressDriver {
-	return []IngressDriver{getLookerIngressDriver(), &KubeIngressDriver{}}
+func getAllDrivers() []IngressDriver {
+	drivers := []IngressDriver{getLookerIngressDriver(), getKubernetesIngressDriver()}
+	return drivers
 }

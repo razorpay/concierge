@@ -8,6 +8,18 @@ import (
 	"strings"
 )
 
+type KubeIngressDriver struct {
+}
+
+var kubeIngressDriver *KubeIngressDriver
+
+func getKubernetesIngressDriver() IngressDriver {
+	if kubeIngressDriver == nil {
+		kubeIngressDriver = &KubeIngressDriver{}
+	}
+	return kubeIngressDriver
+}
+
 func (k *KubeIngressDriver) ShowAllowedIngress(req ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error) {
 	ns := req.Namespace
 	User := req.User
@@ -131,4 +143,8 @@ func (k *KubeIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (S
 
 func (k *KubeIngressDriver) GetName() string {
 	return "kubeClient"
+}
+
+func (k *KubeIngressDriver) isEnabled() bool {
+	return true
 }
