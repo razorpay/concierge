@@ -22,14 +22,9 @@ type IngressDriver interface {
 	isEnabled() bool
 }
 
-type CommonRequest struct {
-	Namespace string
-	Name      string
-}
-
 type ShowAllowedIngressRequest struct {
-	User *models.Users
-	CommonRequest
+	User      *models.Users
+	Namespace string
 }
 
 type ShowAllowedIngressResponse struct {
@@ -37,7 +32,8 @@ type ShowAllowedIngressResponse struct {
 }
 
 type EnableUserRequest struct {
-	CommonRequest
+	Namespace  string
+	Name       string
 	GinContext *gin.Context
 	User       *models.Users
 }
@@ -49,7 +45,8 @@ type EnableUserResponse struct {
 }
 
 type DisableUserRequest struct {
-	CommonRequest
+	Namespace       string
+	Name            string
 	LeaseIdentifier string
 }
 
@@ -59,7 +56,8 @@ type DisableUserResponse struct {
 }
 
 type ShowIngressDetailsRequest struct {
-	CommonRequest
+	Namespace string
+	Name      string
 }
 
 type ShowIngressDetailsResponse struct {
