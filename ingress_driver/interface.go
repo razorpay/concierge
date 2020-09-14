@@ -68,18 +68,18 @@ func GetIngressDriverForNamespace(ns string) IngressDriver {
 	case Looker:
 		return getLookerIngressDriver()
 	default:
-		return &KubeIngressDriver{}
+		return getKubernetesIngressDriver()
 	}
 }
 
 func GetEnabledIngressDrivers() []IngressDriver {
-	var enabledDriverss []IngressDriver
+	var enabledDrivers []IngressDriver
 	for _, driver := range getAllDrivers() {
 		if driver.isEnabled() {
-			enabledDriverss = append(enabledDriverss, driver)
+			enabledDrivers = append(enabledDrivers, driver)
 		}
 	}
-	return enabledDriverss
+	return enabledDrivers
 }
 
 func getAllDrivers() []IngressDriver {
