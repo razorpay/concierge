@@ -14,7 +14,7 @@ const (
 )
 
 type IngressDriver interface {
-	ShowAllowedIngress(ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error)
+	ShowAllowedIngress() (ShowAllowedIngressResponse, error)
 	EnableLease(EnableLeaseRequest) (EnableLeaseResponse, error)
 	DisableLease(DisableLeaseRequest) (DisableLeaseResponse, error)
 	ShowIngressDetails(req ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error)
@@ -22,16 +22,11 @@ type IngressDriver interface {
 	isEnabled() bool
 }
 
-type ShowAllowedIngressRequest struct {
-	Namespace string
-}
-
 type ShowAllowedIngressResponse struct {
 	Ingresses []pkg.IngressList
 }
 
 type EnableLeaseRequest struct {
-	Namespace  string
 	Name       string
 	GinContext *gin.Context
 	User       *models.Users
@@ -44,7 +39,6 @@ type EnableLeaseResponse struct {
 }
 
 type DisableLeaseRequest struct {
-	Namespace       string
 	Name            string
 	LeaseIdentifier string
 }
@@ -55,8 +49,7 @@ type DisableLeaseResponse struct {
 }
 
 type ShowIngressDetailsRequest struct {
-	Namespace string
-	Name      string
+	Name string
 }
 
 type ShowIngressDetailsResponse struct {
@@ -68,7 +61,7 @@ func GetIngressDriverForNamespace(ns string) IngressDriver {
 	case Looker:
 		return getLookerIngressDriver()
 	default:
-		return getKubernetesIngressDriver()
+		return getKubernetesIngressDriver(ns)
 	}
 }
 
@@ -83,6 +76,6 @@ func GetEnabledIngressDrivers() []IngressDriver {
 }
 
 func getAllDrivers() []IngressDriver {
-	drivers := []IngressDriver{getLookerIngressDriver(), getKubernetesIngressDriver()}
+	drivers := []IngressDriver{getLookerIngressDriver(), getKubernetesIngressDriver("")}
 	return drivers
 }
