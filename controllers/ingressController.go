@@ -88,14 +88,14 @@ func WhiteListIP(c *gin.Context) {
 		return
 	}
 
-	enableUserRequest := ingress_driver.EnableUserRequest{
+	enableUserRequest := ingress_driver.EnableLeaseRequest{
 		Namespace:  ns,
 		Name:       name,
 		GinContext: c,
 		User:       User.(*models.Users),
 	}
 
-	enableUserResponse, enableUserErr := ingress_driver.GetIngressDriverForNamespace(ns).EnableUser(enableUserRequest)
+	enableUserResponse, enableUserErr := ingress_driver.GetIngressDriverForNamespace(ns).EnableLease(enableUserRequest)
 
 	if enableUserErr != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
@@ -344,18 +344,18 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 }
 
 //DeleteLeases ...
-func DeleteLeases(ns string, name string, ip string, ID uint) (ingress_driver.DisableUserResponse, error) {
+func DeleteLeases(ns string, name string, ip string, ID uint) (ingress_driver.DisableLeaseResponse, error) {
 	if database.DB == nil {
 		database.Conn()
 	}
 
-	req := ingress_driver.DisableUserRequest{
+	req := ingress_driver.DisableLeaseRequest{
 		Namespace:       ns,
 		Name:            name,
 		LeaseIdentifier: ip,
 	}
 
-	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).DisableUser(req)
+	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).DisableLease(req)
 
 	if resp.UpdateStatusFlag {
 		database.DB.Delete(models.Leases{

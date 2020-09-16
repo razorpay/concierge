@@ -46,9 +46,9 @@ func (k *KubeIngressDriver) ShowAllowedIngress(req ShowAllowedIngressRequest) (S
 	return resp, nil
 }
 
-func (k *KubeIngressDriver) EnableUser(req EnableUserRequest) (EnableUserResponse, error) {
+func (k *KubeIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResponse, error) {
 	var err error
-	resp := EnableUserResponse{}
+	resp := EnableLeaseResponse{}
 	updateStatus := false
 
 	errs := 0
@@ -74,15 +74,15 @@ func (k *KubeIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespons
 	resp.Identifier = ip
 
 	if errs >= len(config.KubeClients) {
-		return EnableUserResponse{}, errors.New("Your IP is already there")
+		return EnableLeaseResponse{}, errors.New("Your IP is already there")
 	}
 
 	return resp, nil
 }
 
-func (k *KubeIngressDriver) DisableUser(req DisableUserRequest) (DisableUserResponse, error) {
+func (k *KubeIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseResponse, error) {
 	dbflag := false
-	resp := DisableUserResponse{UpdateStatusFlag: true}
+	resp := DisableLeaseResponse{UpdateStatusFlag: true}
 	var err error
 	errs := 0
 

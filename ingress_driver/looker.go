@@ -38,9 +38,9 @@ func (k *LookerIngressDriver) ShowAllowedIngress(ShowAllowedIngressRequest) (Sho
 	return resp, nil
 }
 
-func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserResponse, error) {
-	log.Infof("Received Looker EnableUserRequest %v", req.User.Name)
-	resp := EnableUserResponse{
+func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResponse, error) {
+	log.Infof("Received Looker EnableLeaseRequest %v", req.User.Name)
+	resp := EnableLeaseResponse{
 		Ingress:    k.ingress,
 		Identifier: req.User.Email,
 	}
@@ -82,16 +82,16 @@ func (k *LookerIngressDriver) EnableUser(req EnableUserRequest) (EnableUserRespo
 	return resp, nil
 }
 
-func (k *LookerIngressDriver) DisableUser(req DisableUserRequest) (DisableUserResponse, error) {
-	log.Infof("Received Looker DisableUserRequest %v", req.LeaseIdentifier)
-	response := DisableUserResponse{}
+func (k *LookerIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseResponse, error) {
+	log.Infof("Received Looker DisableLeaseRequest %v", req.LeaseIdentifier)
+	response := DisableLeaseResponse{}
 
 	client := pkg.GetLookerClient()
 
 	users, searchErr := client.SearchUser(pkg.LookerSearchUserRequest{Email: req.LeaseIdentifier})
 
 	if searchErr != nil {
-		return DisableUserResponse{Ingress: k.ingress}, searchErr
+		return DisableLeaseResponse{Ingress: k.ingress}, searchErr
 	}
 
 	for _, user := range users {
