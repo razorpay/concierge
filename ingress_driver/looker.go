@@ -30,7 +30,7 @@ func getLookerIngressDriver() IngressDriver {
 	return lookerIngressDriver
 }
 
-func (k *LookerIngressDriver) ShowAllowedIngress(ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error) {
+func (k *LookerIngressDriver) ShowAllowedIngress() (ShowAllowedIngressResponse, error) {
 	resp := ShowAllowedIngressResponse{
 		Ingresses: []pkg.IngressList{k.ingress},
 	}

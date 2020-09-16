@@ -8,19 +8,15 @@ import (
 )
 
 type KubeIngressDriver struct {
+	Namespace string
 }
 
-var kubeIngressDriver *KubeIngressDriver
-
-func getKubernetesIngressDriver() IngressDriver {
-	if kubeIngressDriver == nil {
-		kubeIngressDriver = &KubeIngressDriver{}
-	}
-	return kubeIngressDriver
+func getKubernetesIngressDriver(namespace string) IngressDriver {
+	return &KubeIngressDriver{namespace}
 }
 
-func (k *KubeIngressDriver) ShowAllowedIngress(req ShowAllowedIngressRequest) (ShowAllowedIngressResponse, error) {
-	ns := req.Namespace
+func (k *KubeIngressDriver) ShowAllowedIngress() (ShowAllowedIngressResponse, error) {
+	ns := k.Namespace
 	count := 0
 
 	namespaces := make(map[string]int)
@@ -61,7 +57,7 @@ func (k *KubeIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResp
 	for _, kubeClient := range config.KubeClients {
 		clientset := kubeClient.ClientSet
 		myclientset := pkg.MyClientSet{Clientset: clientset}
-		updateStatus, err = myclientset.WhiteListIP(req.Namespace, req.Name, ip)
+		updateStatus, err = myclientset.WhiteListIP(k.Namespace, req.Name, ip)
 		if err != nil {
 			errs = errs + 1
 		}
@@ -89,7 +85,7 @@ func (k *KubeIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseR
 	for _, kubeClient := range config.KubeClients {
 		clientset := kubeClient.ClientSet
 		myclientset := pkg.MyClientSet{Clientset: clientset}
-		_, dbflag, err = myclientset.RemoveIngressIP(req.Namespace, req.Name, req.LeaseIdentifier)
+		_, dbflag, err = myclientset.RemoveIngressIP(k.Namespace, req.Name, req.LeaseIdentifier)
 		if err != nil {
 			errs = errs + 1
 		}
@@ -115,7 +111,7 @@ func (k *KubeIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (S
 	for kubeContext, kubeClient := range config.KubeClients {
 		clientset := kubeClient.ClientSet
 		myclientset := pkg.MyClientSet{Clientset: clientset}
-		data, err = myclientset.GetIngress(kubeContext, req.Namespace, req.Name)
+		data, err = myclientset.GetIngress(kubeContext, k.Namespace, req.Name)
 
 		if data.Name != "" {
 			myIngress = data

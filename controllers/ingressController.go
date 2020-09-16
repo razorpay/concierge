@@ -29,14 +29,10 @@ func ShowAllowedIngress(c *gin.Context) {
 	ns := c.Query("ns")
 	var data []pkg.IngressList
 
-	req := ingress_driver.ShowAllowedIngressRequest{
-		Namespace: ns,
-	}
-
 	log.Infof("Listing ingress in all namespaces %s for user %s\n", ns, User.(*models.Users).Email)
 
 	for _, driver := range ingress_driver.GetEnabledIngressDrivers() {
-		response, err := driver.ShowAllowedIngress(req)
+		response, err := driver.ShowAllowedIngress()
 		if err != nil {
 			log.Errorf("Error listing ingresses for driver %s for user %s ", driver.GetName(), User)
 		} else {
@@ -67,12 +63,8 @@ func WhiteListIP(c *gin.Context) {
 	}
 	leases = GetActiveLeases(ns, name)
 
-	showIngressDetailsRequest := ingress_driver.ShowIngressDetailsRequest{
-		Namespace: ns,
-		Name:      name,
-	}
-
-	showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).ShowIngressDetails(showIngressDetailsRequest)
+	showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).
+		ShowIngressDetails(ingress_driver.ShowIngressDetailsRequest{Name: name})
 
 	if err != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
@@ -89,7 +81,6 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	enableUserRequest := ingress_driver.EnableLeaseRequest{
-		Namespace:  ns,
 		Name:       name,
 		GinContext: c,
 		User:       User.(*models.Users),
@@ -166,12 +157,8 @@ func DeleteIPFromIngress(c *gin.Context) {
 	ID := uint(leaseID)
 	leases := GetActiveLeases(ns, name)
 
-	showIngressDetailsRequest := ingress_driver.ShowIngressDetailsRequest{
-		Namespace: ns,
-		Name:      name,
-	}
-
-	showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).ShowIngressDetails(showIngressDetailsRequest)
+	showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).
+		ShowIngressDetails(ingress_driver.ShowIngressDetailsRequest{Name: name})
 
 	if err != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
@@ -262,12 +249,8 @@ func IngressDetails(c *gin.Context) {
 	name := c.Param("name")
 	leases := GetActiveLeases(ns, name)
 
-	req := ingress_driver.ShowIngressDetailsRequest{
-		Namespace: ns,
-		Name:      name,
-	}
-
-	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).ShowIngressDetails(req)
+	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).
+		ShowIngressDetails(ingress_driver.ShowIngressDetailsRequest{Name: name})
 
 	if err != nil {
 		c.HTML(http.StatusNotFound, "manageingress.gohtml", gin.H{
@@ -350,7 +333,6 @@ func DeleteLeases(ns string, name string, ip string, ID uint) (ingress_driver.Di
 	}
 
 	req := ingress_driver.DisableLeaseRequest{
-		Namespace:       ns,
 		Name:            name,
 		LeaseIdentifier: ip,
 	}
