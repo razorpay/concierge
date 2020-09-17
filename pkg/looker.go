@@ -114,8 +114,8 @@ func (c *LookerClient) setAccessToken() error {
 		return errs[0]
 	}
 
-	if httpResponse.StatusCode >= 400 {
-		return errors.New("failed to enable user on looker")
+	if err := getErrorFromResponseIfApplicable(httpResponse); err != nil {
+		return err
 	}
 
 	response := struct {
@@ -161,10 +161,23 @@ func (c *LookerClient) executeRequest(path string, method string, body interface
 		return nil, errs[0]
 	}
 
-	if resp.StatusCode >= 400 {
-		return nil, errors.New("request failed. please contact admins")
+	if err := getErrorFromResponseIfApplicable(resp); err != nil {
+		return nil, err
 	}
 
 	return resp, nil
 
+}
+
+func getErrorFromResponseIfApplicable(response gorequest.Response) error {
+	if response.StatusCode >= 500 {
+		return errors.New("there was an error contacting looker. please try after sometime. If error persists, " +
+			"please contact looker admins")
+	}
+
+	if response.StatusCode >= 400 {
+		return errors.New("failed to perform action on looker. please contact concierge admins")
+	}
+
+	return nil
 }
