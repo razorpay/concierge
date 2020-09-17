@@ -41,8 +41,9 @@ func (k *LookerIngressDriver) ShowAllowedIngress() (ShowAllowedIngressResponse, 
 func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResponse, error) {
 	log.Infof("Received Looker EnableLeaseRequest %v", req.User.Name)
 	resp := EnableLeaseResponse{
-		Ingress:    k.ingress,
-		Identifier: req.User.Email,
+		Ingress:         k.ingress,
+		LeaseIdentifier: req.User.Email,
+		LeaseType:       Looker,
 	}
 
 	client := pkg.GetLookerClient()

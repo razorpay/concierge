@@ -103,7 +103,7 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	if enableUserResponse.UpdateStatusFlag {
-		msgInfo := "Whitelisted" + enableUserResponse.Identifier + "to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+		msgInfo := "Whitelisted" + enableUserResponse.LeaseIdentifier + "to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
 		if database.DB == nil {
@@ -112,8 +112,8 @@ func WhiteListIP(c *gin.Context) {
 
 		lease := models.Leases{
 			UserID:    User.(*models.Users).ID,
-			LeaseIP:   enableUserResponse.Identifier,
-			LeaseType: "Ingress",
+			LeaseIP:   enableUserResponse.LeaseIdentifier,
+			LeaseType: enableUserResponse.LeaseType,
 			GroupID:   ns + ":" + name,
 			Expiry:    uint(expiry),
 		}
@@ -294,13 +294,10 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 
 	leases := []models.Leases{}
 	if ns == "" && name == "" {
-		database.DB.Preload("User").Where(models.Leases{
-			LeaseType: "Ingress",
-		}).Find(&leases)
+		database.DB.Preload("User").Find(&leases)
 	} else {
 		database.DB.Preload("User").Where(models.Leases{
-			LeaseType: "Ingress",
-			GroupID:   ns + ":" + name,
+			GroupID: ns + ":" + name,
 		}).Find(&leases)
 	}
 	myleases := []models.Leases{}
