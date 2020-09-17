@@ -67,7 +67,8 @@ func (k *KubeIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResp
 		}
 	}
 
-	resp.Identifier = ip
+	resp.LeaseIdentifier = ip
+	resp.LeaseType = "Ingress"
 
 	if errs >= len(config.KubeClients) {
 		return EnableLeaseResponse{}, errors.New("Your IP is already there")

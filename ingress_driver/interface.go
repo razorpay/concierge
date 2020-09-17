@@ -35,7 +35,8 @@ type EnableLeaseRequest struct {
 type EnableLeaseResponse struct {
 	UpdateStatusFlag bool
 	Ingress          pkg.IngressList
-	Identifier       string
+	LeaseIdentifier  string
+	LeaseType        string
 }
 
 type DisableLeaseRequest struct {
