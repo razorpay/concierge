@@ -94,7 +94,7 @@ func (c *LookerClient) isAccessTokenExpired() bool {
 	return time.Now().Unix() >= c.accessTokenExpireAt
 }
 
-func (c *LookerClient) setAccessToken() error {
+func (c *LookerClient) refreshAccessToken() error {
 	requestBody := struct {
 		ClientId     string `json:"client_id"`
 		ClientSecret string `json:"client_secret"`
@@ -135,7 +135,7 @@ func (c *LookerClient) setAccessToken() error {
 
 func (c *LookerClient) executeRequest(path string, method string, body interface{}) (*http.Response, error) {
 	if c.isAccessTokenExpired() {
-		if err := c.setAccessToken(); err != nil {
+		if err := c.refreshAccessToken(); err != nil {
 			return nil, err
 		}
 	}
@@ -176,7 +176,7 @@ func getErrorFromResponseIfApplicable(response gorequest.Response) error {
 	}
 
 	if response.StatusCode >= 400 {
-		return errors.New("failed to perform action on looker. please contact concierge admins")
+		return errors.New("failed to perform action on looker. please contact concierge admins if error persists")
 	}
 
 	return nil
