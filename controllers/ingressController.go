@@ -293,10 +293,16 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 	}
 
 	leases := []models.Leases{}
+
+	leaseTypes := ingress_driver.GetLeaseTypes()
+
+	query := database.DB.Preload("User").
+		Where("lease_type in (?)", leaseTypes)
+
 	if ns == "" && name == "" {
-		database.DB.Preload("User").Find(&leases)
+		query.Find(&leases)
 	} else {
-		database.DB.Preload("User").Where(models.Leases{
+		query.Where(models.Leases{
 			GroupID: ns + ":" + name,
 		}).Find(&leases)
 	}

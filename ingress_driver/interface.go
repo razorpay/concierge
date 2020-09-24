@@ -19,6 +19,7 @@ type IngressDriver interface {
 	DisableLease(DisableLeaseRequest) (DisableLeaseResponse, error)
 	ShowIngressDetails(req ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error)
 	GetName() string
+	GetLeaseType() string
 	isEnabled() bool
 }
 
@@ -74,6 +75,15 @@ func GetEnabledIngressDrivers() []IngressDriver {
 		}
 	}
 	return enabledDrivers
+}
+
+func GetLeaseTypes() []string {
+	var leaseTypes []string
+
+	for _, driver := range getAllDrivers() {
+		leaseTypes = append(leaseTypes, driver.GetLeaseType())
+	}
+	return leaseTypes
 }
 
 func getAllDrivers() []IngressDriver {
