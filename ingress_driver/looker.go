@@ -43,7 +43,7 @@ func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseRe
 	resp := EnableLeaseResponse{
 		Ingress:         k.ingress,
 		LeaseIdentifier: req.User.Email,
-		LeaseType:       Looker,
+		LeaseType:       k.GetLeaseType(),
 	}
 
 	client := pkg.GetLookerClient()
@@ -117,6 +117,10 @@ func (k *LookerIngressDriver) ShowIngressDetails(ShowIngressDetailsRequest) (Sho
 }
 
 func (k *LookerIngressDriver) GetName() string {
+	return Looker
+}
+
+func (k *LookerIngressDriver) GetLeaseType() string {
 	return Looker
 }
 

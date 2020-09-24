@@ -68,7 +68,7 @@ func (k *KubeIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResp
 	}
 
 	resp.LeaseIdentifier = ip
-	resp.LeaseType = "Ingress"
+	resp.LeaseType = k.GetLeaseType()
 
 	if errs >= len(config.KubeClients) {
 		return EnableLeaseResponse{}, errors.New("Your IP is already there")
@@ -97,9 +97,9 @@ func (k *KubeIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseR
 
 	if errs >= len(config.KubeClients) {
 		return resp, err
-	} else {
-		return resp, nil
 	}
+
+	return resp, nil
 }
 
 func (k *KubeIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error) {
@@ -132,6 +132,10 @@ func (k *KubeIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (S
 
 func (k *KubeIngressDriver) GetName() string {
 	return "kubernetes"
+}
+
+func (k *KubeIngressDriver) GetLeaseType() string {
+	return "Ingress"
 }
 
 func (k *KubeIngressDriver) isEnabled() bool {
