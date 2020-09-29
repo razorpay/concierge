@@ -71,9 +71,9 @@
                         <tr>
                             <td>{{.User.Username}}</td>
                             {{ if eq .User.ID $user_id}}
-                            <td>{{.LeaseIP}}</td>
+                            <td>{{.LeaseIdentifier}}</td>
                             {{ else if $admin }}
-                            <td>{{.LeaseIP}}</td>
+                            <td>{{.LeaseIdentifier}}</td>
                             {{ else }}
                             <td></td>
                             {{ end }}
