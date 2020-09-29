@@ -58,6 +58,7 @@ type ShowIngressDetailsResponse struct {
 	Ingress pkg.IngressList
 }
 
+//TODO change this parameter from `ns` to `driver`
 func GetIngressDriverForNamespace(ns string) IngressDriver {
 	switch ns {
 	case Looker:
