@@ -13,6 +13,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
+	github.com/parnurzeal/gorequest v0.2.16
 	github.com/sirupsen/logrus v1.4.2
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de // indirect
 	golang.org/x/net v0.0.0-20200813134508-3edf25e44fcc // indirect
@@ -24,4 +25,5 @@ require (
 	k8s.io/apimachinery v0.17.0
 	k8s.io/client-go v0.17.0
 	k8s.io/utils v0.0.0-20191114200735-6ca3b61696b6 // indirect
+	moul.io/http2curl v1.0.0 // indirect
 )
