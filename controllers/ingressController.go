@@ -26,10 +26,9 @@ type info struct {
 //ShowAllowedIngress ...
 func ShowAllowedIngress(c *gin.Context) {
 	User, _ := c.Get("User")
-	ns := c.Query("ns")
 	var data []pkg.IngressList
 
-	log.Infof("Listing ingress in all namespaces %s for user %s\n", ns, User.(*models.Users).Email)
+	log.Infof("Listing ingress in all namespaces for user %s\n", User.(*models.Users).Email)
 
 	for _, driver := range ingress_driver.GetEnabledIngressDrivers() {
 		response, err := driver.ShowAllowedIngress()
@@ -111,11 +110,11 @@ func WhiteListIP(c *gin.Context) {
 		}
 
 		lease := models.Leases{
-			UserID:    User.(*models.Users).ID,
-			LeaseIP:   enableUserResponse.LeaseIdentifier,
-			LeaseType: enableUserResponse.LeaseType,
-			GroupID:   ns + ":" + name,
-			Expiry:    uint(expiry),
+			UserID:          User.(*models.Users).ID,
+			LeaseIdentifier: enableUserResponse.LeaseIdentifier,
+			LeaseType:       enableUserResponse.LeaseType,
+			GroupID:         ns + ":" + name,
+			Expiry:          uint(expiry),
 		}
 
 		database.DB.Create(&lease)
@@ -196,7 +195,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 		})
 		return
 	}
-	leaseIdentifier := myCurrentLease.LeaseIP
+	leaseIdentifier := myCurrentLease.LeaseIdentifier
 
 	resp, respErr := DeleteLeases(ns, name, leaseIdentifier, ID)
 	if respErr != nil {
@@ -314,10 +313,10 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 		t := uint(lease.CreatedAt.Unix()) + lease.Expiry
 		if t < uint(time.Now().Unix()) {
 			leases[i].Expiry = uint(0)
-			resp, err := DeleteLeases(ns, name, lease.LeaseIP, lease.ID)
+			resp, err := DeleteLeases(ns, name, lease.LeaseIdentifier, lease.ID)
 
 			if resp.UpdateStatusFlag {
-				log.Infof("Removed expired IP %s from ingress %s in namespace %s for User %s\n", lease.LeaseIP, name, ns, lease.User.Email)
+				log.Infof("Removed expired IP %s from ingress %s in namespace %s for User %s\n", lease.LeaseIdentifier, name, ns, lease.User.Email)
 			} else {
 				log.Error("Error: ", err)
 			}
@@ -330,14 +329,14 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 }
 
 //DeleteLeases ...
-func DeleteLeases(ns string, name string, ip string, ID uint) (ingress_driver.DisableLeaseResponse, error) {
+func DeleteLeases(ns string, name string, leaseIdentifier string, ID uint) (ingress_driver.DisableLeaseResponse, error) {
 	if database.DB == nil {
 		database.Conn()
 	}
 
 	req := ingress_driver.DisableLeaseRequest{
 		Name:            name,
-		LeaseIdentifier: ip,
+		LeaseIdentifier: leaseIdentifier,
 	}
 
 	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).DisableLease(req)
@@ -346,7 +345,7 @@ func DeleteLeases(ns string, name string, ip string, ID uint) (ingress_driver.Di
 		database.DB.Delete(models.Leases{
 			ID: ID,
 		})
-		log.Infof("Removing IP %s from database\n", ip)
+		log.Infof("Removing IP %s from database\n", leaseIdentifier)
 	}
 	return resp, err
 }
