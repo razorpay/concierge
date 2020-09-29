@@ -51,6 +51,10 @@ func WhiteListIP(c *gin.Context) {
 	var leases []models.Leases
 
 	User, _ := c.Get("User")
+
+	// TODO change this parameter from `ns` to `driver`. Need to refactor in
+	// 1. code(variables/method names)
+	// 2. html templates
 	ns := c.Param("ns")
 	name := c.Param("name")
 

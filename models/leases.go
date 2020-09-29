@@ -13,7 +13,7 @@ type Leases struct {
 	UserID    uint   `gorm:"column:user_id;type:int(10) unsigned;not null;"`
 	User      Users  `gorm:"foreignkey:UserID"`
 	GroupID   string `gorm:"column:group_id;type:varchar(255);default:null"`
-	// even though it says IP, we store the lease identifier.(it could be ip address/user email of external account etc)
+	//TODO even though it says IP, we store the lease identifier.(it could be ip address/user email of external account etc)
 	LeaseIdentifier string `gorm:"column:lease_ip;type:varchar(255);not null"`
 	LeaseType       string `gorm:"column:lease_type;type:varchar(255);not null"`
 	Protocol        string `gorm:"column:protocol;type:varchar(255);default:null"`
