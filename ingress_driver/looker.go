@@ -5,6 +5,7 @@ import (
 	"concierge/pkg"
 	"errors"
 	log "github.com/sirupsen/logrus"
+	"strings"
 )
 
 type LookerIngressDriver struct {
@@ -55,7 +56,19 @@ func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseRe
 	}
 
 	if len(users) == 0 {
-		return resp, errors.New("You dont have a looker account. Please contact Looker admins")
+		createUserResponse, err := k.createUser(req.User.Email)
+
+		if err != nil {
+			return resp, err
+		}
+
+		if createUserResponse.IsDisabled == true {
+			return resp, errors.New("failed to create user on looker. please contact looker admins")
+		}
+
+		resp.UpdateStatusFlag = true
+
+		return resp, nil
 	}
 
 	if len(users) > 1 {
@@ -126,4 +139,47 @@ func (k *LookerIngressDriver) GetLeaseType() string {
 
 func (k *LookerIngressDriver) isEnabled() bool {
 	return config.LookerConfig.IsEnabled
+}
+
+func (k *LookerIngressDriver) createUser(email string) (*pkg.LookerCreateUserResponse, error) {
+
+	client := pkg.GetLookerClient()
+
+	firstName, lastName, err := parseFirstAndLastNameFromEmail(email)
+
+	if err != nil {
+		return nil, err
+	}
+
+	req := pkg.LookerCreateUserRequest{
+		FirstName: firstName,
+		LastName:  lastName,
+		Email:     email,
+	}
+
+	log.Infof("Creating looker account for email %s", email)
+	resp, err := client.CreateUser(req)
+
+	if err != nil {
+		log.Errorf("failed to create looker account for email %s : %s", email, err.Error())
+	} else {
+		log.Infof("created looker account for email %s", email)
+	}
+
+	return resp, err
+}
+
+func parseFirstAndLastNameFromEmail(email string) (string, string, error) {
+	emailSplit := strings.Split(email, "@")
+	username := emailSplit[0]
+	usernameSplit := strings.Split(username, ".")
+
+	switch len(usernameSplit) {
+	case 2: // email of the form "abc.xyz@razorpay.com"
+		return usernameSplit[0], usernameSplit[1], nil
+	case 1: // email of the form "abc@razorpay.com"
+		return usernameSplit[0], "undefined", nil // if we dont send last name, email id doesnt get set on looker
+	default:
+		return "", "", errors.New("no looker account associated with this email id. unable to create a looker account automatically. contact looker admins")
+	}
 }

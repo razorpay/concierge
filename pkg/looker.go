@@ -21,6 +21,16 @@ type LookerClient struct {
 	clientSecret        string
 }
 
+type LookerCreateUserRequest struct {
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+}
+
+type LookerCreateUserResponse struct {
+	IsDisabled bool `json:"is_disabled"`
+}
+
 type LookerPatchUserRequest struct {
 	IsDisabled bool `json:"is_disabled"`
 }
@@ -49,6 +59,24 @@ func GetLookerClient() *LookerClient {
 		}
 	}
 	return client
+}
+
+func (c *LookerClient) CreateUser(req LookerCreateUserRequest) (*LookerCreateUserResponse, error) {
+	path := "api/3.1/users"
+	method := http.MethodPost
+
+	resp := LookerCreateUserResponse{}
+
+	httpResponse, httpErr := c.executeRequest(path, method, req)
+
+	if httpErr != nil {
+		return nil, httpErr
+	}
+
+	if decodeErr := json.NewDecoder(httpResponse.Body).Decode(&resp); decodeErr != nil {
+		return nil, decodeErr
+	}
+	return &resp, nil
 }
 
 func (c *LookerClient) PatchUser(userId int, req LookerPatchUserRequest) (*LookerPatchUserResponse, error) {
