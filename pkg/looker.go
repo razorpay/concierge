@@ -28,7 +28,16 @@ type LookerCreateUserRequest struct {
 }
 
 type LookerCreateUserResponse struct {
+	Id         int  `json:"id"`
 	IsDisabled bool `json:"is_disabled"`
+}
+
+type LookerCreateCredentialsEmailRequest struct {
+	Email string `json:"email"`
+	Type  string `json:"type"`
+}
+
+type LookerCreateCredentialsEmailResponse struct {
 }
 
 type LookerPatchUserRequest struct {
@@ -66,6 +75,24 @@ func (c *LookerClient) CreateUser(req LookerCreateUserRequest) (*LookerCreateUse
 	method := http.MethodPost
 
 	resp := LookerCreateUserResponse{}
+
+	httpResponse, httpErr := c.executeRequest(path, method, req)
+
+	if httpErr != nil {
+		return nil, httpErr
+	}
+
+	if decodeErr := json.NewDecoder(httpResponse.Body).Decode(&resp); decodeErr != nil {
+		return nil, decodeErr
+	}
+	return &resp, nil
+}
+
+func (c *LookerClient) CreateUserCredentialsEmail(userId int, req LookerCreateCredentialsEmailRequest) (*LookerCreateCredentialsEmailResponse, error) {
+	path := fmt.Sprintf("api/3.1/users/%d/credentials_email", userId)
+	method := http.MethodPost
+
+	resp := LookerCreateCredentialsEmailResponse{}
 
 	httpResponse, httpErr := c.executeRequest(path, method, req)
 

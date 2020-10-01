@@ -162,8 +162,20 @@ func (k *LookerIngressDriver) createUser(email string) (*pkg.LookerCreateUserRes
 
 	if err != nil {
 		log.Errorf("failed to create looker account for email %s : %s", email, err.Error())
-	} else {
-		log.Infof("created looker account for email %s", email)
+		return nil, err
+	}
+
+	log.Infof("created looker account for email:%s id:%s", email, resp.Id)
+	log.Infof("creating looker user credentials email for email:%s", email)
+
+	_, createUserCredEmailErr := client.CreateUserCredentialsEmail(resp.Id, pkg.LookerCreateCredentialsEmailRequest{
+		Email: email,
+		Type:  "email",
+	})
+
+	if createUserCredEmailErr != nil {
+		log.Errorf("failed to create looker user credentials email for email %s : %s", email, createUserCredEmailErr.Error())
+		return nil, createUserCredEmailErr
 	}
 
 	return resp, err
