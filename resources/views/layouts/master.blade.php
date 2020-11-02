@@ -45,6 +45,7 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                   <ul class="nav navbar-nav navbar-right">
                     <li><p class="navbar-text">Signed in as {{{Auth::user()->name}}}</p></li>
+                    <li><a href="https://wiki.rzp.io/wtf/concierge" target="_blank">Wiki</a></li>
                     @if(Auth::user()->admin)
                     <li><a href="/users">Manage Users</a></li>
                     @endif
