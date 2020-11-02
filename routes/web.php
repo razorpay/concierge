@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -53,14 +55,11 @@ Route::group(['middleware' => ['web']], function () {
     //Routes for non-logged in user
     Route::group(['middleware' => 'guest'], function () {
         Route::get('/', 'UserController@getIndex')->name('/');
-
-        Route::get('/status', 'UserController@getStatus');
     });
-
-    Route::get('/invite/{token}', 'UserController@getInvite');
 });
 
-// Non-browser routes
+// Global routes
+Route::get('/status', 'GroupController@getStatus');
 Route::group(['middleware' => ['cron']], function () {
     Route::any('/cron', 'GroupController@cleanLeases');
 });

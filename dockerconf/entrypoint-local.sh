@@ -15,13 +15,16 @@ chmod -R 777 storage/
 chmod +x ./dockerconf/wait_for_db.sh
 ./dockerconf/wait_for_db.sh
 
+# Migrating and Seeding DB
+if [[ "${APP_ENV}" == "local" ]]; then
+php artisan migrate
+php artisan db:seed
+fi
+
 if $CRON_ENABLE
 then
     echo "Enabling Cron to remove expired/outdated leases";
     php artisan concierge:cronjob
 fi
 
-chown -R nginx:nginx /app/storage/logs
-
-/usr/sbin/php-fpm7
-/usr/sbin/nginx -g 'daemon off;'
+/usr/local/sbin/php-fpm

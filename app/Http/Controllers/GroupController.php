@@ -6,11 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Lease;
 use Illuminate\Support\Facades\Auth;
 use App;
-use View;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\View;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use AWS;
+use Illuminate\Support\Facades\DB;
 
 class GroupController extends Controller
 {
@@ -271,5 +271,38 @@ class GroupController extends Controller
         return View::make('getManage')
             ->with('security_group', $security_group)
             ->with('leases', $leases);
+    }
+
+    /*
+    * Handles cleaning of expired lease,
+    * @return void
+    */
+
+    public function cleanLeases()
+    {
+        $result = Lease::cleanLeases();
+        if ($result) {
+            Log::info($result);
+        }
+    }
+
+    /*
+    * Give the status of the application
+    */
+    public function getStatus()
+    {
+        try
+        {
+            if (DB::connection()->getPdo())
+            {
+                return response()->json([
+                    'msg' => 'Connected to DB',
+                ]);
+            }
+        }
+        catch(Exception $e)
+        {
+            return response()->json(['error' => 'DB Connection error'], 500);
+        }
     }
 }

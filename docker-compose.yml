@@ -28,6 +28,7 @@ services:
   concierge:
     build:
       context: .
+      dockerfile: Dockerfile.local
     image: razorpay:concierge
     container_name: concierge
     networks:
@@ -47,11 +48,11 @@ services:
     container_name: concierge-webserver
     volumes:
       - concierge-data:/app
-      - ./dockerconf/concierge.nginx.conf:/etc/nginx/conf.d/concierge.conf
+      - ./dockerconf/concierge.local.nginx.conf:/etc/nginx/conf.d/concierge.conf
     networks:
       - external
     ports:
-      - 8090:80
+      - 8000:80
     depends_on:
       - concierge
     restart: always
