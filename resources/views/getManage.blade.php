@@ -157,8 +157,12 @@
 	        <tbody>
 	        	@foreach($leases as $lease)
 	        	<tr>
-	        		<td>{{{$lease->user->name}}}</td>
-	        		<td>{{{$lease->lease_ip}}}</td>
+                    <td>{{{$lease->user->name}}}</td>
+                    @if(Auth::User()->id == $lease->user_id or Auth::User()->admin)
+                    <td>{{{$lease->lease_ip}}}</td>
+                    @else
+                    <td></td>
+                    @endif
 	        		<td>{{{$lease->protocol}}}</td>
 	        		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
 	        		<td>

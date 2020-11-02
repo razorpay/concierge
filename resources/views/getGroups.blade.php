@@ -2,7 +2,7 @@
 
 @section('content')
      <div class="row">
-        <div class="col-md-6 col-md-offset-3 modal-outer noPad">
+        <div class="col-md-8 col-md-offset-2 modal-outer noPad">
 	        <h2>Security Groups</h2>
  			<table class="table table-hover table-bordered">
 		    <thead>
@@ -55,8 +55,12 @@
 		    <tbody>
 		     	@foreach($leases as $lease)
 		      	<tr>
-		       		<td>{{{$lease->user->name}}}</td>
-		       		<td>{{{$lease->lease_ip}}}</td>
+                    <td>{{{$lease->user->name}}}</td>
+                    @if(Auth::User()->id == $lease->user_id or Auth::User()->admin)
+                    <td>{{{$lease->lease_ip}}}</td>
+                    @else
+                    <td></td>
+                    @endif
 		       		<td><a href="/manage/{{{$lease->group_id}}}">{{{$lease->group_id}}}</a></td>
 		       		<td>{{{$lease->protocol}}}</td>
 		       		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
