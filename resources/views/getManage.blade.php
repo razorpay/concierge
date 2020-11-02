@@ -33,52 +33,6 @@
 			  @endif
 			  </div>
 			</div>
-			<h2>Active Leases</h2>
-			<table class="table table-hover table-bordered">
-	        <thead>
-	          <tr>
-	            <th>Creator</th>
-	            <th>Leased IP</th>
-	            <th>Protocol</th>
-	            <th>Port(s)</th>
-	            <th>Time Left</th>
-	            <th>Type</th>
-	            <th>Terminate?</th>
-	          </tr>
-	        </thead>
-	        <tbody>
-	        	@foreach($leases as $lease)
-	        	<tr>
-	        		<td>{{{$lease->user->name}}}</td>
-	        		<td>{{{$lease->lease_ip}}}</td>
-	        		<td>{{{$lease->protocol}}}</td>
-	        		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
-	        		<td>
-	        		<div class="time" id="{{{$lease->id}}}">
-	        		{{{strtotime($lease->created_at)+$lease->expiry-time()}}}
-    				</div>
-    				</td>
-    				<td>
-	    			    Self Access
-	    			</td>
-    				<td>
-	    				<form method="post" action="{{url('/manage')}}/{{$lease->group_id}}/terminate">
-	    				<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
-	    				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
-	    				<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
-	    					<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
-	    				</a>
-	    				</form>
-    				</td>
-	        	</tr>
-	        	@endforeach
-	        	@if(!$leases->count())
-		       	<tr><td colspan="8" style="text-align:center">No Active Leases</td></tr>
-		       	@endif
-	        </tbody>
-	        </table>
-
-
 	        <h2>Create Access On this Group</h2>
 		    <div>
 		    <button type="button" class="btn btn-primary" onclick="javascript: $('#ssh_form').show(); $('#https_form').hide(); $('#custom_form').hide();">SSH</button>
@@ -186,6 +140,52 @@
 				  	</div>
 			  	</div>
 		    </form>
+
+            <h2>Active Leases</h2>
+			<table class="table table-hover table-bordered">
+	        <thead>
+	          <tr>
+	            <th>Creator</th>
+	            <th>Leased IP</th>
+	            <th>Protocol</th>
+	            <th>Port(s)</th>
+	            <th>Time Left</th>
+	            <th>Type</th>
+	            <th>Terminate?</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	        	@foreach($leases as $lease)
+	        	<tr>
+	        		<td>{{{$lease->user->name}}}</td>
+	        		<td>{{{$lease->lease_ip}}}</td>
+	        		<td>{{{$lease->protocol}}}</td>
+	        		<td>{{{$lease->port_from}}}-{{{$lease->port_to}}}</td>
+	        		<td>
+	        		<div class="time" id="{{{$lease->id}}}">
+	        		{{{strtotime($lease->created_at)+$lease->expiry-time()}}}
+    				</div>
+    				</td>
+    				<td>
+	    			    Self Access
+	    			</td>
+    				<td>
+	    				<form method="post" action="{{url('/manage')}}/{{$lease->group_id}}/terminate">
+	    				<input type="hidden" name="lease_id" value="{{{$lease->id}}}" />
+	    				<input type="hidden" name="_token" value="{{{csrf_token()}}}">
+	    				<a href="" style="color: #ff0000;" onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
+	    					<span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
+	    				</a>
+	    				</form>
+    				</td>
+	        	</tr>
+	        	@endforeach
+	        	@if(!$leases->count())
+		       	<tr><td colspan="8" style="text-align:center">No Active Leases</td></tr>
+		       	@endif
+	        </tbody>
+	        </table>
+
 
 			<h2>Security Group Rules</h2>
             Inbound Rules:
