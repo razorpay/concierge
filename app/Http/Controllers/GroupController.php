@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Lease;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App;
 use View;
 use Carbon\Carbon;
@@ -45,6 +45,10 @@ class GroupController extends Controller
         );
 
         $security_groups = $security_groups['SecurityGroups'];
+        // Sorting based on SGname in Ascending order
+        usort($security_groups, function ($item1, $item2) {
+            return $item1['GroupName'] <=> $item2['GroupName'];
+        });
 
         //Get all active leases
         $leases = Lease::where('lease_type', 'aws')->get();

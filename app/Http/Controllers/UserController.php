@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use SocialOAuth;
 use App\Models\User;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App;
 use View;
 use Validator;
@@ -37,12 +37,12 @@ class UserController extends Controller
             $response = $google_service->request(config('oauth-5-laravel.userinfo_url'));
             $result = json_decode($response);
 
+
             // Email must be:
             // - Verified
             // - Belong to razorpay.com domain
             //
             // Then only we'll create a user entry in the system or check for one
-
             if ($result->verified_email !== true or
                 (isset($result->hd) and $result->hd !== config('concierge.google_domain'))) {
                 return App::abort(404);
@@ -50,7 +50,6 @@ class UserController extends Controller
 
             // Find the user by email
             $user = User::where('email', $result->email)->first();
-
             if ($user) {
                 // Update some fields
                 $user->access_token = $token->getAccessToken();
@@ -59,7 +58,6 @@ class UserController extends Controller
 
                 // Login the user into the app
                 Auth::loginUsingId($user->id);
-
                 return redirect('/groups');
             } else {
                 App::abort(401);
@@ -84,6 +82,11 @@ class UserController extends Controller
      */
     public function getUsers()
     {
+        if (!Auth::User()->admin) {
+            return redirect()->back()
+            ->with('message', 'You don\'t have permission to manage users')
+            ->with('class', 'Warning');
+        }
         $users = User::get();
 
         return view('getUsers', [
@@ -96,6 +99,11 @@ class UserController extends Controller
      */
     public function getAddUser()
     {
+        if (!Auth::User()->admin) {
+            return redirect()->back()
+            ->with('message', 'You don\'t have permission to add new users')
+            ->with('class', 'Warning');
+        }
         $user = new User();
 
         return View::make('getAddUser', compact('user'));
@@ -106,6 +114,11 @@ class UserController extends Controller
      */
     public function postAddUser(Request $request)
     {
+        if (!Auth::User()->admin) {
+            return redirect()->back()
+            ->with('message', 'You don\'t have permission to add new users')
+            ->with('class', 'Warning');
+        }
         $input = $request->all();
         $input['username'] = explode('@', $input['email'])[0];
 
@@ -138,12 +151,22 @@ class UserController extends Controller
 
     public function getEditUser($id)
     {
+        if (!Auth::User()->admin) {
+            return redirect()->back()
+            ->with('message', 'You don\'t have permission to edit/update users')
+            ->with('class', 'Warning');
+        }
         $user = User::find($id);
         return View::make('getAddUser', compact('user'));
     }
 
     public function postEditUser(Request $request, $id)
     {
+        if (!Auth::User()->admin) {
+            return redirect()->back()
+            ->with('message', 'You don\'t have permission to edit/update users')
+            ->with('class', 'Warning');
+        }
         $input = $request->all();
         $input['username'] = explode('@', $input['email'])[0];
 
@@ -178,6 +201,11 @@ class UserController extends Controller
      */
     public function postUsers(Request $request)
     {
+        if (!Auth::User()->admin) {
+            return redirect()->back()
+            ->with('message', 'You don\'t have permission to delete users')
+            ->with('class', 'Warning');
+        }
         $input = $request->all();
         $message = null;
 
