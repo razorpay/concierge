@@ -14,15 +14,16 @@ class CreateLeasesTable extends Migration
     public function up()
     {
         Schema::create('leases', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('user_id');
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
             $table->string('group_id');
             $table->string('lease_ip');
-            $table->string('protocol');
-            $table->string('port_from');
-            $table->string('port_to');
+            $table->string('protocol')->nullable();
+            $table->string('port_from')->nullable();
+            $table->string('port_to')->nullable();
             $table->integer('expiry')->unsigned();
             $table->string('invite_email')->nullable();
+            $table->string('lease_type')->default("AWS");
             $table->softDeletes();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')

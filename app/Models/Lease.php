@@ -27,7 +27,7 @@ class Lease extends Model
      */
     protected $fillable = [
         'user_id', 'group_id', 'lease_ip', 'protocol', 'port_from', 'port_to',
-        'expiry', 'invite_email',
+        'expiry', 'invite_email', 'lease_type',
     ];
 
     /**
@@ -48,7 +48,8 @@ class Lease extends Model
      */
     public static function getByGroupId($group_id)
     {
-        $leases = self::where('group_id', $group_id)->get();
+        $leases = self::where('group_id', $group_id)
+            ->where('lease_type', 'aws')->get();
 
         return $leases;
     }
@@ -129,7 +130,7 @@ class Lease extends Model
     public static function cleanLeases()
     {
         $messages = [];
-        $leases = self::get();
+        $leases = self::where('lease_type', 'aws')->get();
         foreach ($leases as $lease) {
             $time_left = strtotime($lease->created_at) + $lease->expiry - time();
             if ($time_left <= 0) {

@@ -34,7 +34,7 @@ class GroupController extends Controller
             [
                 "Name"   => "tag-key",
                 "Values" => [self::CONCIERGE_TAG]
-            ],[
+            ], [
                 "Name"   => "tag-value",
                 "Values" => ["true"]
             ],
@@ -47,7 +47,7 @@ class GroupController extends Controller
         $security_groups = $security_groups['SecurityGroups'];
 
         //Get all active leases
-        $leases = Lease::get();
+        $leases = Lease::where('lease_type', 'aws')->get();
 
         return view('getGroups', [
             'security_groups'   => $security_groups,
@@ -55,7 +55,7 @@ class GroupController extends Controller
         ]);
     }
 
-     /*
+    /*
      * Displays a security groups details with active leases & security rules.
      * @return getManage View
      */
@@ -104,10 +104,10 @@ class GroupController extends Controller
             if ($protocol != 'tcp' && $protocol != 'udp') {
                 array_push($messages, 'Invalid Protocol');
             }
-            if (! is_numeric($port_from) || $port_from > 65535 || $port_from <= 0) {
+            if (!is_numeric($port_from) || $port_from > 65535 || $port_from <= 0) {
                 array_push($messages, 'Invalid From port');
             }
-            if (! is_numeric($port_to) || $port_to > 65535 || $port_to <= 0) {
+            if (!is_numeric($port_to) || $port_to > 65535 || $port_to <= 0) {
                 array_push($messages, 'Invalid To port');
             }
             if ($port_from > $port_to) {
@@ -119,12 +119,12 @@ class GroupController extends Controller
 
         //Other validations
         $expiry = $input['expiry'];
-        if (! is_numeric($expiry) or $expiry <= 0 or $expiry > self::MAX_EXPIRY) {
+        if (!is_numeric($expiry) or $expiry <= 0 or $expiry > self::MAX_EXPIRY) {
             array_push($messages, 'Invalid Expiry Time');
         }
 
         //Validation fails
-        if (! empty($messages)) {
+        if (!empty($messages)) {
             return redirect("/manage/$group_id")
                 ->with('message', implode('<br/>', $messages))
                 ->with('class', 'Danger');
@@ -132,19 +132,21 @@ class GroupController extends Controller
 
         //Creating the lease
         $lease = [
-            'user_id'  => Auth::User()->id,
-            'group_id' => $group_id,
-            'lease_ip' => $this->getClientIp().'/32',
-            'protocol' => $protocol,
-            'port_from'=> $port_from,
-            'port_to'  => $port_to,
-            'expiry'   => $expiry,
+            'user_id'       => Auth::User()->id,
+            'group_id'      => $group_id,
+            'lease_ip'      => $this->getClientIp() . '/32',
+            'lease_type'    => 'aws',
+            'protocol'      => $protocol,
+            'port_from'     => $port_from,
+            'port_to'       => $port_to,
+            'expiry'        => $expiry,
         ];
 
         $existingLease = Lease::where('lease_ip', '=', $lease['lease_ip'])
             ->where('group_id', '=', $lease['group_id'])
             ->where('protocol', '=', $lease['protocol'])
             ->where('port_from', '=', $lease['port_from'])
+            ->where('lease_type', '=', $lease['lease_type'])
             ->where('port_to', '=', $lease['port_to']);
 
         if ($existingLease->count() > 0) {
@@ -154,7 +156,7 @@ class GroupController extends Controller
             $newLease->save();
         } else {
             $result = Lease::createLease($lease, Auth::User()->email);
-            if (! $result) {
+            if (!$result) {
                 // Lease Creation Failed.
                 // AWS Reported an error. Generally in case if a lease with same ip,
                 // protocol, port already exists on AWS.
@@ -237,7 +239,7 @@ class GroupController extends Controller
             //Delete from DB
             $lease->delete();
 
-            if (! $result) {
+            if (!$result) {
                 //Should not occur even if lease doesn't exist with AWS. Check AWS API Conf.
                 return redirect("/manage/$group_id")
                     ->with('message', 'Lease Termination returned error. Assumed the lease was already deleted')
