@@ -33,8 +33,8 @@ CREATE TABLE `invites` (
   `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `token` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `invites_token_unique` (`token`),
   KEY `invites_user_id_foreign` (`user_id`),
@@ -123,3 +123,19 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2017-07-14 12:17:39
+
+--
+-- Table structure for table `concierge_sessions`
+--
+DROP TABLE IF EXISTS `concierge_sessions`;
+
+create table `concierge_sessions` (
+  `id` varchar(255) not null,
+  `user_id` int null,
+  `ip_address` varchar(45) null,
+  `user_agent` text null,
+  `payload` text not null,
+  `last_activity` int not null
+) default character set utf8 collate utf8_unicode_ci;
+
+alter table `concierge_sessions` add unique `concierge_sessions_id_unique`(`id`);
