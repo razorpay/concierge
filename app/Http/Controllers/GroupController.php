@@ -15,8 +15,8 @@ use AWS;
 class GroupController extends Controller
 {
 
-    // 6 hours
-    const MAX_EXPIRY = 21600;
+    // 9 hours
+    const MAX_EXPIRY = 32400;
 
     const CONCIERGE_TAG = 'concierge';
 
