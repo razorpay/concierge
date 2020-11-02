@@ -17,7 +17,7 @@ class UsersTableSeeder extends Seeder
                 'name' => 'Admin',
                 'username' => 'admin',
                 'admin'    => 1,
-                'email'    => 'ankit.infra@razorpay.com',
+                'email'    => 'chulbul.pandey@razorpay.com',
                 'access_token' => '',
                 'google_id' => '',
             ],
