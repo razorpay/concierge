@@ -21,6 +21,7 @@ then
     php artisan concierge:cronjob
 fi
 
+cp ./dockerconf/concierge.nginx.conf /etc/nginx/conf.d/default.conf
 chown -R nginx:nginx /app/storage/logs
 
 /usr/sbin/php-fpm7

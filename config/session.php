@@ -46,7 +46,7 @@ return [
     |
     */
 
-    'encrypt' => false,
+    'encrypt' => env('ENCRYPT_COOKIE', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -195,7 +195,5 @@ return [
     */
 
     'same_site' => null,
-
-    'encrypt' => env('ENCRYPT_COOKIE', true),
 
 ];
