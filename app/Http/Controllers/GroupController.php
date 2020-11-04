@@ -291,17 +291,13 @@ class GroupController extends Controller
     */
     public function getStatus()
     {
-        try
-        {
-            if (DB::connection()->getPdo())
-            {
+        try {
+            if (DB::connection()->getPdo()) {
                 return response()->json([
                     'msg' => 'Connected to DB',
                 ]);
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             return response()->json(['error' => 'DB Connection error'], 500);
         }
     }

@@ -9,7 +9,6 @@ env:
   COMPOSE_VERSION: 1.24.1
 
 php:
-  - 7.1
   - 7.2
 
 before_install:
@@ -28,6 +27,7 @@ script:
   - mkdir -p build/logs
   - php vendor/bin/phpcbf --standard=ruleset.xml app/
   - php vendor/bin/phpcs --standard=ruleset.xml app/
+  - php vendor/bin/phpunit -c phpunit.xml
   - echo "Testing Docker"
   - sed -i "s/DB_HOST=127.0.0.1/DB_HOST=concierge-db/" .env
   - sed -i "s/3306:3306/33066:3306/" docker-compose.yml
@@ -35,6 +35,7 @@ script:
   - docker-compose up -d
   - docker images
   - docker ps
+  - sleep 10
   - docker logs concierge
 
 
