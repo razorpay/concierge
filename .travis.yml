@@ -17,6 +17,7 @@ before_install:
   - cp .env.travis .env.example
   - cp .env.travis .env
   - composer install --dev --ignore-platform-reqs
+  - php artisan key:generate
 
 script:
   - mkdir -p build/logs
