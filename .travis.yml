@@ -16,6 +16,7 @@ before_install:
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
 
+  - cp .env.travis .env.example
   - cp .env.travis .env
   - composer install --dev --ignore-platform-reqs
   - php artisan key:generate
@@ -28,7 +29,9 @@ script:
   - php vendor/bin/phpcbf --standard=ruleset.xml app/
   - php vendor/bin/phpcs --standard=ruleset.xml app/
   - php vendor/bin/phpunit -c phpunit.xml
+  - echo "###################################################################"
   - echo "Testing Docker"
+  - echo "###################################################################"
   - sed -i "s/DB_HOST=127.0.0.1/DB_HOST=concierge-db/" .env
   - sed -i "s/3306:3306/33066:3306/" docker-compose.yml
   - docker-compose build
@@ -37,6 +40,7 @@ script:
   - docker ps
   - sleep 10
   - docker logs concierge
+  - curl -X GET localhost:8000/status
 
 
 after_script:
