@@ -2,7 +2,6 @@ language: php
 
 sudo: required
 services:
-  - mysql
   - docker
 
 env:
@@ -15,14 +14,9 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
-
   - cp .env.travis .env.example
   - cp .env.travis .env
   - composer install --dev --ignore-platform-reqs
-  - php artisan key:generate
-  - mysql -e 'CREATE DATABASE concierge;'
-  - php artisan migrate
-  - php artisan db:seed
 
 script:
   - mkdir -p build/logs
@@ -33,7 +27,6 @@ script:
   - echo "Testing Docker"
   - echo "###################################################################"
   - sed -i "s/DB_HOST=127.0.0.1/DB_HOST=concierge-db/" .env
-  - sed -i "s/3306:3306/33066:3306/" docker-compose.yml
   - docker-compose build
   - docker-compose up -d
   - docker images
