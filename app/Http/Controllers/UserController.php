@@ -27,7 +27,7 @@ class UserController extends Controller
 
         if (! $code) {
             $url = $google_service->getAuthorizationUri([
-                'hosted_domain' =>  config('concierge.google_domain')
+                'hd' =>  config('concierge.google_domain')
             ]);
 
             return redirect((string) $url);
