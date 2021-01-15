@@ -19,6 +19,8 @@ type LookerClient struct {
 	baseUrl             string
 	clientId            string
 	clientSecret        string
+	datumUrl            string
+	datumSecret         string
 }
 
 type LookerPatchUserRequest struct {
@@ -46,6 +48,8 @@ func GetLookerClient() *LookerClient {
 			baseUrl:             config.LookerConfig.BaseUrl,
 			clientId:            config.LookerConfig.ClientId,
 			clientSecret:        config.LookerConfig.ClientSecret,
+			datumUrl:            config.LookerConfig.DatumHostname,
+			datumSecret:         config.LookerConfig.DatumAuthSecret,
 		}
 	}
 	return client
@@ -89,6 +93,34 @@ func (c *LookerClient) SearchUser(req LookerSearchUserRequest) ([]LookerSearchUs
 
 	return resp, nil
 }
+
+
+func (c *LookerClient) UpdateLookerUserAttribute(email string) (error) {
+
+	url := c.datumUrl + "/looker/qubole_api_token_update"
+	body := struct {
+		Email string `json:"email"`
+	}{email}
+
+	req := gorequest.New()
+	req = req.Post(url).Send(body)
+
+	req.Header.Set("X-Auth-Token", c.datumSecret)
+
+	resp, _, errs := req.End()
+
+	if resp.StatusCode != 200 {
+		return errors.New("There was an error updating Looker user attribute. Please try Opening Looker once. " +
+			"If dashboards are inaccessible, please contact `data platform` team.")
+	}
+
+	if len(errs) > 0 {
+		return errs[0]
+	}
+
+	return nil
+}
+
 
 func (c *LookerClient) isAccessTokenExpired() bool {
 	return time.Now().Unix() >= c.accessTokenExpireAt
