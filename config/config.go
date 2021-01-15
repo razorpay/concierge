@@ -185,6 +185,9 @@ func initializeLookerConfig() {
 	baseUrl := getEnv(os.Getenv("LOOKER_BASE_URL"), "").(string)
 	clientId := getEnv(os.Getenv("LOOKER_CLIENT_ID"), "").(string)
 	clientSecret := getEnv(os.Getenv("LOOKER_CLIENT_SECRET"), "").(string)
+	datumHostname := getEnv(os.Getenv("DATUM_HOSTNAME"), "").(string)
+	datumAuthSecret := getEnv(os.Getenv("DATUM_AUTH_SECRET"), "").(string)
+
 
 	isEnabled := false
 
@@ -197,6 +200,8 @@ func initializeLookerConfig() {
 		ClientId:     clientId,
 		ClientSecret: clientSecret,
 		IsEnabled:    isEnabled,
+		DatumHostname: datumHostname,
+		DatumAuthSecret: datumAuthSecret,
 	}
 }
 
