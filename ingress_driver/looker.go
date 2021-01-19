@@ -65,6 +65,10 @@ func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseRe
 	user := users[0]
 
 	if user.IsDisabled == false {
+		userAttributeErr := client.UpdateLookerUserAttribute(req.User.Email)
+		if userAttributeErr != nil {
+			return resp, userAttributeErr
+		}
 		return resp, errors.New("Looker user already enabled for user. Please visit looker.")
 	}
 
@@ -79,6 +83,11 @@ func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseRe
 	}
 
 	resp.UpdateStatusFlag = true
+
+	userAttributeErr := client.UpdateLookerUserAttribute(req.User.Email)
+	if userAttributeErr != nil {
+		return resp, userAttributeErr
+	}
 
 	return resp, nil
 }
