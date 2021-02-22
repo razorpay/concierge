@@ -1,7 +1,4 @@
-ARG BASE_IMAGE=razorpay/pithos:rzp-php7.1-nginx
-
-# hadolint ignore=DL3006
-FROM ${BASE_IMAGE}
+FROM razorpay/pithos:rzp-php7.1-nginx
 
 LABEL maintainer="Nemo <n@rzp.io>"
 
