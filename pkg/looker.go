@@ -121,6 +121,30 @@ func (c *LookerClient) UpdateLookerUserAttribute(email string) (error) {
 	return nil
 }
 
+func (c *LookerClient) CreateLookerUser(email string) (error) {
+
+	url := c.datumUrl + "/looker/onboard-user"
+	body := struct {
+		Email string `json:"email"`
+	}{email}
+
+	req := gorequest.New()
+	req = req.Post(url).Send(body)
+
+	req.Header.Set("X-Auth-Token", c.datumSecret)
+
+	resp, _, errs := req.End()
+
+	if resp.StatusCode != 200 {
+		return errors.New(" There was an error while creating Looker user. Please contact `data platform` team.")
+	}
+
+	if len(errs) > 0 {
+		return errs[0]
+	}
+
+	return nil
+}
 
 func (c *LookerClient) isAccessTokenExpired() bool {
 	return time.Now().Unix() >= c.accessTokenExpireAt
