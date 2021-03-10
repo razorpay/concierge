@@ -191,7 +191,7 @@ func initializeLookerConfig() {
 
 	isEnabled := false
 
-	if baseUrl != "" && clientId != "" && clientSecret != "" {
+	if baseUrl != "" && clientId != "" && clientSecret != "" && datumHostname != "" && datumAuthSecret != "" {
 		isEnabled = true
 	}
 
