@@ -55,7 +55,16 @@ func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseRe
 	}
 
 	if len(users) == 0 {
-		return resp, errors.New("You dont have a looker account. Please contact Looker admins")
+		userCreationErr := client.CreateLookerUser(req.User.Email)
+
+		userAttributeErr := client.UpdateLookerUserAttribute(req.User.Email)
+		if userAttributeErr != nil {
+			return resp, userAttributeErr
+		}
+
+		resp.UpdateStatusFlag = true
+
+		return resp, userCreationErr
 	}
 
 	if len(users) > 1 {
