@@ -14,6 +14,7 @@ RUN /app/dockerconf/build.sh
 
 WORKDIR /app
 
+# hadolint ignore=DL3018
 RUN apk update && \
     apk add --no-cache \
     php7-tokenizer \
