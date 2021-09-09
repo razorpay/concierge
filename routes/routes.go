@@ -3,6 +3,7 @@ package routes
 import (
 	"concierge/controllers"
 	"concierge/routes/middleware"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,16 +13,16 @@ func InitializeRoutes(router *gin.Engine) {
 
 	// Handle the index route
 	router.GET("/", func(c *gin.Context) {
-		c.Redirect(302, "http://"+c.Request.Host+"/ingress")
+		c.Redirect(302, "http://"+c.Request.Host+"/resources")
 	})
 
 	authorized := router.Group("/")
 	authorized.Use(middleware.Authorize)
 	{
-		authorized.GET("/ingress", controllers.ShowAllowedIngress)
-		authorized.GET("/ingress/:ns/:name", controllers.IngressDetails)
-		authorized.POST("/ingress/:ns/:name", controllers.WhiteListIP)
-		authorized.POST("/ingress/:ns/:name/:id", controllers.DeleteIPFromIngress)
+		authorized.GET("/resources", controllers.ShowAllowedIngress)
+		authorized.GET("/resources/:driver/:ns/:name", controllers.IngressDetails)
+		authorized.POST("/resources/:driver/:ns/:name", controllers.WhiteListIP)
+		authorized.POST("/resources/:driver/:ns/:name/:id", controllers.DeleteIPFromIngress)
 		authorized.GET("/users", controllers.GetUsers)
 		authorized.GET("/users/add", controllers.AddUsersForm)
 		authorized.POST("/users/add", controllers.AddUsers)
@@ -33,10 +34,12 @@ func InitializeRoutes(router *gin.Engine) {
 		})
 	}
 
-	router.GET("/cron", controllers.ClearExpiredLeases)
-	cron := router.Group("/cron")
+	cron := router.Group("/cron", gin.BasicAuth(gin.Accounts{
+		os.Getenv("CRON_USERNAME"): os.Getenv("CRON_PASSWORD"),
+	}))
 	cron.Use(middleware.Cron)
 	{
+		cron.GET("/", controllers.ClearExpiredLeases)
 		cron.POST("/", controllers.ClearExpiredLeases)
 	}
 }

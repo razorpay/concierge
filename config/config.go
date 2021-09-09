@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"concierge/constants"
+
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -37,6 +39,9 @@ var AppCfg Application
 //LookerConfig
 var LookerConfig Looker
 
+//RedisDBConfig ...
+var RedisDBConfig RedisConfig
+
 //LoadConfig ...
 func LoadConfig() {
 	err := godotenv.Load()
@@ -52,6 +57,7 @@ func LoadConfig() {
 	initilizeCSRFConfig()
 	initilizeAppConfig()
 	initializeLookerConfig()
+	initilizeMutexConfig()
 }
 
 func initilizeDBConfig() {
@@ -71,11 +77,24 @@ func initilizeDBConfig() {
 	}
 }
 
+func initilizeMutexConfig() {
+	database := getEnv(constants.MutexDatabase, 0).(int)
+	maxIdle := getEnv(constants.MutexMaxIdle, 10).(int)
+	maxActive := getEnv(constants.MutexMaxActive, 100).(int)
+
+	RedisDBConfig = RedisConfig{
+		Host:      os.Getenv(constants.MutexHost),
+		Database:  database,
+		Password:  os.Getenv(constants.MutexPassword),
+		Port:      os.Getenv(constants.MutexPort),
+		MaxIdle:   maxIdle,
+		MaxActive: maxActive,
+	}
+}
+
 func initilizeKubeContext() {
 	k8sContexts := strings.Split(os.Getenv("KUBE_CONTEXTS"), ",")
-	for _, context := range k8sContexts {
-		Contexts = append(Contexts, context)
-	}
+	Contexts = append(Contexts, k8sContexts...)
 }
 
 func initilizeKubeConfig() {
@@ -188,7 +207,6 @@ func initializeLookerConfig() {
 	datumHostname := getEnv(os.Getenv("DATUM_HOSTNAME"), "").(string)
 	datumAuthSecret := getEnv(os.Getenv("DATUM_AUTH_SECRET"), "").(string)
 
-
 	isEnabled := false
 
 	if baseUrl != "" && clientId != "" && clientSecret != "" && datumHostname != "" && datumAuthSecret != "" {
@@ -196,11 +214,11 @@ func initializeLookerConfig() {
 	}
 
 	LookerConfig = Looker{
-		BaseUrl:      baseUrl,
-		ClientId:     clientId,
-		ClientSecret: clientSecret,
-		IsEnabled:    isEnabled,
-		DatumHostname: datumHostname,
+		BaseUrl:         baseUrl,
+		ClientId:        clientId,
+		ClientSecret:    clientSecret,
+		IsEnabled:       isEnabled,
+		DatumHostname:   datumHostname,
 		DatumAuthSecret: datumAuthSecret,
 	}
 }
