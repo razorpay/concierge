@@ -4,6 +4,7 @@ import (
 	"concierge/config"
 	"concierge/pkg"
 	"errors"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -32,7 +33,7 @@ func getLookerIngressDriver() IngressDriver {
 
 func (k *LookerIngressDriver) ShowAllowedIngress() (ShowAllowedIngressResponse, error) {
 	resp := ShowAllowedIngressResponse{
-		Ingresses: []pkg.IngressList{k.ingress},
+		Looker: []pkg.IngressList{k.ingress},
 	}
 
 	return resp, nil
@@ -41,7 +42,7 @@ func (k *LookerIngressDriver) ShowAllowedIngress() (ShowAllowedIngressResponse, 
 func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResponse, error) {
 	log.Infof("Received Looker EnableLeaseRequest %v", req.User.Name)
 	resp := EnableLeaseResponse{
-		Ingress:         k.ingress,
+		Looker:          k.ingress,
 		LeaseIdentifier: req.User.Email,
 		LeaseType:       k.GetLeaseType(),
 	}
@@ -68,17 +69,17 @@ func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseRe
 	}
 
 	if len(users) > 1 {
-		return resp, errors.New("You have multiple looker accounts. Please contact looker admins")
+		return resp, errors.New("you have multiple looker accounts. Please contact looker admins")
 	}
 
 	user := users[0]
 
-	if user.IsDisabled == false {
+	if !user.IsDisabled {
 		userAttributeErr := client.UpdateLookerUserAttribute(req.User.Email)
 		if userAttributeErr != nil {
 			return resp, userAttributeErr
 		}
-		return resp, errors.New("Looker user already enabled for user. Please visit looker.")
+		return resp, errors.New("looker user already enabled for user. Please visit looker")
 	}
 
 	patchedUser, patchErr := client.PatchUser(user.Id, pkg.LookerPatchUserRequest{IsDisabled: false})
@@ -87,8 +88,8 @@ func (k *LookerIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseRe
 		return resp, patchErr
 	}
 
-	if patchedUser.IsDisabled == true {
-		return resp, errors.New("Failed to enable user. please contact admin")
+	if patchedUser.IsDisabled {
+		return resp, errors.New("failed to enable user. please contact admin")
 	}
 
 	resp.UpdateStatusFlag = true
@@ -120,7 +121,7 @@ func (k *LookerIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeas
 
 		patchedUser, patchErr := client.PatchUser(user.Id, pkg.LookerPatchUserRequest{IsDisabled: true})
 
-		if patchErr != nil || patchedUser.IsDisabled == false {
+		if patchErr != nil || !patchedUser.IsDisabled {
 			return response, errors.New("failed to delete lease. contact looker admin")
 		}
 	}
@@ -131,7 +132,7 @@ func (k *LookerIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeas
 }
 
 func (k *LookerIngressDriver) ShowIngressDetails(ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error) {
-	return ShowIngressDetailsResponse{Ingress: k.ingress}, nil
+	return ShowIngressDetailsResponse{Looker: k.ingress}, nil
 }
 
 func (k *LookerIngressDriver) GetName() string {

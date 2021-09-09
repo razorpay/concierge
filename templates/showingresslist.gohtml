@@ -9,35 +9,104 @@
     {{ template "flashmessage" .message}}
 
     {{ template "navbar" .user}}
-
+    
     <div class="container">
         <div class="row">
-            <div class="col-md-6 col-md-offset-3 modal-outer noPad">
-                <h2>All Ingress List</h2>
-                <table class="table table-hover table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Namespace</th>
-                            <th>Ingress Name</th>
-                            <th>Host</th>
-                            <th>Ingress Class</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{range .data}}
-                        <tr>
-                            <td>{{.Namespace}}</td>
-                            <td><a href="/ingress/{{.Namespace}}/{{.Name}}">{{.Name}}</a></td>
-                            <td>{{.Host}}</td>
-                            <td>{{.Class}}</td>
-                        </tr>
-                        {{end}}
-                    </tbody>
-                </table>
+            <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                <ul class="nav nav-tabs" id="myTabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#aws" id="aws-tab" data-toggle="tab">AWS</a></li>
+                    <li role="presentation"><a href="#looker" id="looker-tab" data-toggle="tab">Looker</a></li>
+                    <li role="presentation"><a href="#ingress" id="ingress-tab" data-toggle="tab">Ingress</a></li>
+                </ul>
             </div>
         </div>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade active in" role="tabpanel" aria-labelledby="aws-tab" id="aws">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                        <h2>All Security Groups</h2>
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>ID</th>
+                                    <th>Description</th>
+                                    <th>VPC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .data.SecurityGroups}}
+                                <tr>
+                                    <td><a href="/resources/aws/{{.GroupId}}/{{.Name}}">{{.Name}}</a></td>
+                                    <td>{{.GroupId}}</td>
+                                    <td>{{.Description}}</td>
+                                    <td>{{.VpcId}}</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
+            <div class="tab-pane fade" role="tabpanel" aria-labelledby="looker-tab" id="looker">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                        <h2>Looker</h2>
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Namespace</th>
+                                    <th>Ingress Name</th>
+                                    <th>Host</th>
+                                    <th>Ingress Class</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .data.Looker}}
+                                <tr>
+                                    <td>{{.Namespace}}</td>
+                                    <td><a href="/resources/looker/{{.Namespace}}/{{.Name}}">{{.Name}}</a></td>
+                                    <td>{{.Host}}</td>
+                                    <td>{{.Class}}</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" aria-labelledby="ingress-tab" id="ingress">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                        <h2>All Ingress List</h2>
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Namespace</th>
+                                    <th>Ingress Name</th>
+                                    <th>Host</th>
+                                    <th>Ingress Class</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .data.Ingresses}}
+                                <tr>
+                                    <td>{{.Namespace}}</td>
+                                    <td><a href="/resources/ingress/{{.Namespace}}/{{.Name}}">{{.Name}}</a></td>
+                                    <td>{{.Host}}</td>
+                                    <td>{{.Class}}</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
     {{ template "footer" }}
 </body>
 </html>
