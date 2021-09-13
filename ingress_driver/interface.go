@@ -1,15 +1,16 @@
 package ingress_driver
 
 import (
-	"concierge/models"
 	"concierge/config"
+	"concierge/models"
 	"concierge/pkg"
+
 	"github.com/gin-gonic/gin"
 )
 
 const (
 	Looker = "looker"
-	AWS = "aws"
+	AWS    = "aws"
 
 	DefaultContext = "default"
 	DefaultClass   = "default"
@@ -26,22 +27,22 @@ type IngressDriver interface {
 }
 
 type ShowAllowedIngressResponse struct {
-	Ingresses []pkg.IngressList
+	Ingresses      []pkg.IngressList
 	SecurityGroups []pkg.SecurityGroupList
-	Looker []pkg.IngressList
+	Looker         []pkg.IngressList
 }
 
 type EnableLeaseRequest struct {
-	Name       string
+	Name          string
 	SecurityGroup config.SecurityGroupIngress
-	GinContext *gin.Context
-	User       *models.Users
+	GinContext    *gin.Context
+	User          *models.Users
 }
 
 type EnableLeaseResponse struct {
 	UpdateStatusFlag bool
 	Ingress          pkg.IngressList
-	Looker          pkg.IngressList
+	Looker           pkg.IngressList
 	SecurityGroup    pkg.SecurityGroupList
 	LeaseIdentifier  string
 	LeaseType        string
@@ -49,14 +50,14 @@ type EnableLeaseResponse struct {
 
 type DisableLeaseRequest struct {
 	Name            string
-	SecurityGroup config.SecurityGroupIngress
+	SecurityGroup   config.SecurityGroupIngress
 	LeaseIdentifier string
 }
 
 type DisableLeaseResponse struct {
 	UpdateStatusFlag bool
 	Ingress          pkg.IngressList
-	Looker          pkg.IngressList
+	Looker           pkg.IngressList
 	SecurityGroup    pkg.SecurityGroupList
 }
 
@@ -65,12 +66,11 @@ type ShowIngressDetailsRequest struct {
 }
 
 type ShowIngressDetailsResponse struct {
-	Ingress pkg.IngressList
-	Looker          pkg.IngressList
-	SecurityGroup    pkg.SecurityGroupList
+	Ingress       pkg.IngressList
+	Looker        pkg.IngressList
+	SecurityGroup pkg.SecurityGroupList
 }
 
-//TODO change this parameter from `ns` to `driver`
 func GetIngressDriverForNamespace(driver string, ns string) IngressDriver {
 	switch driver {
 	case Looker:

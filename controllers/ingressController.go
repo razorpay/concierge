@@ -23,12 +23,12 @@ func ShowAllowedIngress(c *gin.Context) {
 	User, _ := c.Get("User")
 	var data ingress_driver.ShowAllowedIngressResponse
 
-	log.Infof("Listing ingress in all namespaces for user %s\n", User.(*models.Users).Email)
+	log.Infof("Listing securityGroups, ingresses, looker for user %s\n", User.(*models.Users).Email)
 
 	for _, driver := range ingress_driver.GetEnabledIngressDrivers() {
 		response, err := driver.ShowAllowedIngress()
 		if err != nil {
-			log.Errorf("Error listing ingresses for driver %s for user %s ", driver.GetName(), User)
+			log.Errorf("Error listing resources for driver %s for user %s ", driver.GetName(), User)
 		} else {
 			switch driver.GetLeaseType() {
 			case "looker":
@@ -52,10 +52,7 @@ func WhiteListIP(c *gin.Context) {
 	var leases []models.Leases
 	var securityGroup config.SecurityGroupIngress
 	User, _ := c.Get("User")
-	log.Debug(User)
-	// TODO change this parameter from `ns` to `driver`. Need to refactor in
-	// 1. code(variables/method names)
-	// 2. html templates
+
 	driver := c.Param("driver")
 	ns := c.Param("ns")
 	name := c.Param("name")
@@ -131,7 +128,7 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	if enableUserResponse.UpdateStatusFlag {
-		msgInfo := "Whitelisted " + enableUserResponse.LeaseIdentifier + " to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+		msgInfo := "Whitelisted " + enableUserResponse.LeaseIdentifier + " to " + driver + " " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
 		if database.DB == nil {
@@ -253,7 +250,7 @@ func DeleteIPFromIngress(c *gin.Context) {
 		return
 	}
 	if resp.UpdateStatusFlag {
-		msgInfo := "Removed IP " + leaseIdentifier + " from ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+		msgInfo := "Removed IP " + leaseIdentifier + " from " + driver + " " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
 		leases = GetActiveLeases(driver, ns, name)
@@ -363,7 +360,7 @@ func GetActiveLeases(driver string, ns string, name string) []models.Leases {
 			resp, err := DeleteLeases(driver, ns, name, lease, lease.ID)
 
 			if resp.UpdateStatusFlag {
-				log.Infof("Removed expired IP %s from ingress %s in namespace %s for User %s\n", lease.LeaseIdentifier, name, ns, lease.User.Email)
+				log.Infof("Removed expired IP %s from %s %s in namespace %s for User %s\n", lease.LeaseIdentifier, driver, name, ns, lease.User.Email)
 			} else {
 				log.Error("Error: ", err)
 			}
