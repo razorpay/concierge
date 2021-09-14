@@ -1,9 +1,9 @@
 package routes
 
 import (
+	"concierge/config"
 	"concierge/controllers"
 	"concierge/routes/middleware"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,7 +35,7 @@ func InitializeRoutes(router *gin.Engine) {
 	}
 
 	cron := router.Group("/cron", gin.BasicAuth(gin.Accounts{
-		os.Getenv("CRON_USERNAME"): os.Getenv("CRON_PASSWORD"),
+		config.CronConfig.CronUsername: config.CronConfig.CronPassword,
 	}))
 	cron.Use(middleware.Cron)
 	{

@@ -13,5 +13,5 @@ const (
 
 	MutexPort = "REDIS_PORT"
 
-	MutexPrefix = "ingress_concierge_"
+	MutexPrefix = "ingress_concierge"
 )
