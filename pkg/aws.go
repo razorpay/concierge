@@ -61,10 +61,8 @@ func (c *AWSClientSession) GetSecurityGroups() (*ec2.DescribeSecurityGroupsOutpu
 				return nil, errors.New(aerr.Error())
 			}
 		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
 			log.Error("Error: ", err.Error())
-			return nil, errors.New(aerr.Error())
+			return nil, err
 		}
 	}
 	return result, nil
@@ -86,10 +84,8 @@ func (c *AWSClientSession) GetSecurityGroupDetails(groupId string) (*ec2.Describ
 				return nil, errors.New(aerr.Error())
 			}
 		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
 			log.Error("Error: ", err.Error())
-			return nil, errors.New(aerr.Error())
+			return nil, err
 		}
 	}
 	return result, nil
@@ -118,15 +114,17 @@ func (c *AWSClientSession) WhitelistIP(groupId string, ip string, securityGroup 
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
 			switch aerr.Code() {
+			case "InvalidPermission.Duplicate":
+				mesg := "lease creation failed! Does a similar lease already exist? Terminate that first"
+				log.Error("Error: " + mesg)
+				return errors.New(mesg)
 			default:
 				log.Error("Error: ", aerr.Error())
 				return errors.New(aerr.Error())
 			}
 		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
-			log.Error("Error: ", err.Error())
-			return errors.New(aerr.Error())
+			log.Error("Error: ", aerr.Error())
+			return err
 		}
 	}
 	return nil
@@ -158,10 +156,8 @@ func (c *AWSClientSession) RevokeIP(groupId string, ip string, securityGroup con
 				return errors.New(aerr.Error())
 			}
 		} else {
-			// Print the error, cast err to awserr.Error to get the Code and
-			// Message from an error.
 			log.Error("Error: ", err.Error())
-			return errors.New(aerr.Error())
+			return err
 		}
 	}
 	return nil
