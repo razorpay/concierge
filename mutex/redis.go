@@ -51,7 +51,7 @@ func Pool() *redsync.Redsync {
 }
 
 func (m *RedisMutexDriver) NewMutex(name string) {
-	m.mutex = m.New.NewMutex(name)
+	m.mutex = m.New.NewMutex(config.MutexPrefix + "_" + name)
 }
 
 func (m *RedisMutexDriver) Lock() error {

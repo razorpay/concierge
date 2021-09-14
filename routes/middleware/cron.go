@@ -1,8 +1,8 @@
 package middleware
 
 import (
+	"concierge/config"
 	"encoding/base64"
-	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -20,11 +20,11 @@ func Cron(c *gin.Context) {
 	pair := strings.SplitN(string(payload), ":", 2)
 	username := pair[0]
 	password := pair[1]
-	if username != os.Getenv("CRON_USERNAME") {
+	if username != config.CronConfig.CronUsername {
 		c.AbortWithStatusJSON(401, "Invalid username.")
 		return
 	}
-	if password != os.Getenv("CRON_PASSWORD") {
+	if password != config.CronConfig.CronPassword {
 		c.AbortWithStatusJSON(401, "Invalid password.")
 		return
 	}

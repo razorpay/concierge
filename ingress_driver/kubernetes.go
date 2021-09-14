@@ -2,7 +2,6 @@ package ingress_driver
 
 import (
 	"concierge/config"
-	"concierge/constants"
 	"concierge/mutex"
 	"concierge/pkg"
 	"errors"
@@ -57,7 +56,7 @@ func (k *KubeIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResp
 		}
 	}
 	// Locks
-	mutex.M.NewMutex(constants.MutexPrefix + k.Namespace + ":" + req.Name)
+	mutex.M.NewMutex(k.Namespace + ":" + req.Name)
 	mutex.M.Lock()
 
 	ips := req.GinContext.Request.Header["X-Forwarded-For"][0]
@@ -102,7 +101,7 @@ func (k *KubeIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseR
 		}
 	}
 	// Locks
-	mutex.M.NewMutex(constants.MutexPrefix + k.Namespace + ":" + req.Name)
+	mutex.M.NewMutex(k.Namespace + ":" + req.Name)
 	mutex.M.Lock()
 
 	for _, kubeClient := range config.KubeClients {

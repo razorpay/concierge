@@ -33,6 +33,9 @@ var Contexts = []string{}
 //CSRFConfig ...
 var CSRFConfig CSRF
 
+//CronConfig ...
+var CronConfig Cron
+
 //AppCfg ...
 var AppCfg Application
 
@@ -41,6 +44,8 @@ var LookerConfig Looker
 
 //RedisDBConfig ...
 var RedisDBConfig RedisConfig
+
+var MutexPrefix string
 
 //LoadConfig ...
 func LoadConfig() {
@@ -58,6 +63,7 @@ func LoadConfig() {
 	initilizeAppConfig()
 	initializeLookerConfig()
 	initilizeMutexConfig()
+	initializeCronConfig()
 }
 
 func initilizeDBConfig() {
@@ -90,6 +96,8 @@ func initilizeMutexConfig() {
 		MaxIdle:   maxIdle,
 		MaxActive: maxActive,
 	}
+
+	MutexPrefix = getEnv(os.Getenv("Name"), constants.MutexPrefix).(string)
 }
 
 func initilizeKubeContext() {
@@ -180,6 +188,13 @@ func initilizeCSRFConfig() {
 	CSRFConfig = CSRF{
 		AuthKey: os.Getenv("CSRF_AUTH_KEY"),
 		Secure:  secure,
+	}
+}
+
+func initializeCronConfig() {
+	CronConfig = Cron{
+		CronUsername: getEnv(os.Getenv("CRON_USERNAME"), "cron").(string),
+		CronPassword: os.Getenv("CRON_PASSWORD"),
 	}
 }
 
