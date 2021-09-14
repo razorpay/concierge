@@ -14,12 +14,19 @@
         <div class="row">
             <div class="col-md-8 col-md-offset-2 modal-outer noPad">
                 <ul class="nav nav-tabs" id="myTabs" role="tablist">
+                    {{ if .data.SecurityGroups }}
                     <li role="presentation" class="active"><a href="#aws" id="aws-tab" data-toggle="tab">AWS</a></li>
+                    {{ end }}
+                    {{ if .data.Looker }}
                     <li role="presentation"><a href="#looker" id="looker-tab" data-toggle="tab">Looker</a></li>
+                    {{ end }}
+                    {{ if .data.Ingresses }}
                     <li role="presentation"><a href="#ingress" id="ingress-tab" data-toggle="tab">Ingress</a></li>
+                    {{ end }}
                 </ul>
             </div>
         </div>
+
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade active in" role="tabpanel" aria-labelledby="aws-tab" id="aws">
                 <div class="row">
