@@ -361,10 +361,10 @@ func GetActiveLeases(driver string, ns string, name string) []models.Leases {
 		t := uint(lease.CreatedAt.Unix()) + lease.Expiry
 		if t < uint(time.Now().Unix()) {
 			leases[i].Expiry = uint(0)
-			resp, err := DeleteLeases(driver, ns, name, lease, lease.ID)
+			resp, err := DeleteLeases(lease.LeaseType, ns, name, lease, lease.ID)
 
 			if resp.UpdateStatusFlag {
-				log.Infof("Removed expired IP %s from %s %s in namespace %s for User %s\n", lease.LeaseIdentifier, driver, name, ns, lease.User.Email)
+				log.Infof("Removed expired IP %s from %s %s in namespace %s for User %s\n", lease.LeaseIdentifier, lease.LeaseType, name, ns, lease.User.Email)
 			} else {
 				log.Error("Error: ", err)
 			}
