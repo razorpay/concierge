@@ -14,6 +14,8 @@
 Route::group(['middleware' => ['web']], function() {
     //Routes for logged in user
     Route::group(['middleware' => ['auth']], function () {
+
+        Route::get('/kubernetes', 'HomeController@getIngresses');
         Route::get('/groups', 'HomeController@getGroups');
 
         Route::get('/manage/{group_id}', 'HomeController@getManage');

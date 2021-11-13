@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App;
-use Illuminate\Support\Facades\Log;
 use Auth;
 use Mail;
 use View;
@@ -15,6 +14,8 @@ use App\Models;
 use Validator;
 use Exception;
 use Carbon\Carbon;
+use Maclof\Kubernetes\Client;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends BaseController
 {
@@ -118,6 +119,8 @@ class HomeController extends BaseController
 
         $security_groups = $security_groups['SecurityGroups'];
 
+        error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
+
         //Get all active leases
         $leases = Models\Lease::where('lease_type', 'aws')->get();
 
@@ -128,6 +131,37 @@ class HomeController extends BaseController
             'security_groups'   => $security_groups,
             'leases'            => $leases,
             'invites'           => $invites,
+        ]);
+    }
+
+    public function getIngresses()
+    {
+        $client = new Client([
+            'master'        => 'http://127.0.0.1:8001',
+        ]);
+
+        $ingresses = $client->sendRequest('GET', '/ingresses', [
+            'labelSelector' => 'concierge=true'
+        ], null, false,  'extensions/v1beta1')['items'];
+
+
+        array_walk($ingresses, function(&$ingress) {
+            if (!isset($ingress['spec']['rules'])) {
+                $ingress['hosts'] = [];
+            }
+            else {
+                $hosts = [];
+                foreach ($ingress['spec']['rules'] as $rule) {
+                    if (isset($rule['host'])) {
+                        $hosts[] = $rule['host'];
+                    }
+                }
+                $ingress['hosts'] = $hosts;
+            }
+        });
+
+        return view('kubernetes', [
+            'ingresses'   => $ingresses,
         ]);
     }
 
