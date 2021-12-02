@@ -2,6 +2,7 @@ package ingress_driver
 
 import (
 	"concierge/config"
+	"concierge/mutex"
 	"concierge/pkg"
 	"errors"
 	"strings"
@@ -49,6 +50,15 @@ func (k *KubeIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResp
 
 	errs := 0
 
+	if mutex.M == nil {
+		mutex.M = &mutex.RedisMutexDriver{
+			New: mutex.Pool(),
+		}
+	}
+	// Locks
+	mutex.M.NewMutex(k.Namespace + ":" + req.Name)
+	mutex.M.Lock()
+
 	ips := req.GinContext.Request.Header["X-Forwarded-For"][0]
 	ip := strings.Split(ips, ",")[0]
 	ip = ip + "/32"
@@ -66,12 +76,14 @@ func (k *KubeIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResp
 
 		}
 	}
+	// Unlocks
+	mutex.M.Unlock()
 
 	resp.LeaseIdentifier = ip
 	resp.LeaseType = k.GetLeaseType()
 
 	if errs >= len(config.KubeClients) {
-		return EnableLeaseResponse{}, errors.New("Your IP is already there")
+		return EnableLeaseResponse{}, errors.New("your IP is already there")
 	}
 
 	return resp, nil
@@ -82,6 +94,15 @@ func (k *KubeIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseR
 	resp := DisableLeaseResponse{UpdateStatusFlag: true}
 	var err error
 	errs := 0
+
+	if mutex.M == nil {
+		mutex.M = &mutex.RedisMutexDriver{
+			New: mutex.Pool(),
+		}
+	}
+	// Locks
+	mutex.M.NewMutex(k.Namespace + ":" + req.Name)
+	mutex.M.Lock()
 
 	for _, kubeClient := range config.KubeClients {
 		clientset := kubeClient.ClientSet
@@ -94,6 +115,8 @@ func (k *KubeIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseR
 			resp.UpdateStatusFlag = false
 		}
 	}
+	// Unlocks
+	mutex.M.Unlock()
 
 	if errs >= len(config.KubeClients) {
 		return resp, err
@@ -108,7 +131,6 @@ func (k *KubeIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (S
 	errs := 0
 
 	resp := ShowIngressDetailsResponse{}
-
 	for kubeContext, kubeClient := range config.KubeClients {
 		clientset := kubeClient.ClientSet
 		myclientset := pkg.MyClientSet{Clientset: clientset}

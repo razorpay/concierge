@@ -1,13 +1,16 @@
 package ingress_driver
 
 import (
+	"concierge/config"
 	"concierge/models"
 	"concierge/pkg"
+
 	"github.com/gin-gonic/gin"
 )
 
 const (
 	Looker = "looker"
+	AWS    = "aws"
 
 	DefaultContext = "default"
 	DefaultClass   = "default"
@@ -24,30 +27,38 @@ type IngressDriver interface {
 }
 
 type ShowAllowedIngressResponse struct {
-	Ingresses []pkg.IngressList
+	Ingresses      []pkg.IngressList
+	SecurityGroups []pkg.SecurityGroupList
+	Looker         []pkg.IngressList
 }
 
 type EnableLeaseRequest struct {
-	Name       string
-	GinContext *gin.Context
-	User       *models.Users
+	Name          string
+	SecurityGroup config.SecurityGroupIngress
+	GinContext    *gin.Context
+	User          *models.Users
 }
 
 type EnableLeaseResponse struct {
 	UpdateStatusFlag bool
 	Ingress          pkg.IngressList
+	Looker           pkg.IngressList
+	SecurityGroup    pkg.SecurityGroupList
 	LeaseIdentifier  string
 	LeaseType        string
 }
 
 type DisableLeaseRequest struct {
 	Name            string
+	SecurityGroup   config.SecurityGroupIngress
 	LeaseIdentifier string
 }
 
 type DisableLeaseResponse struct {
 	UpdateStatusFlag bool
 	Ingress          pkg.IngressList
+	Looker           pkg.IngressList
+	SecurityGroup    pkg.SecurityGroupList
 }
 
 type ShowIngressDetailsRequest struct {
@@ -55,14 +66,17 @@ type ShowIngressDetailsRequest struct {
 }
 
 type ShowIngressDetailsResponse struct {
-	Ingress pkg.IngressList
+	Ingress       pkg.IngressList
+	Looker        pkg.IngressList
+	SecurityGroup pkg.SecurityGroupList
 }
 
-//TODO change this parameter from `ns` to `driver`
-func GetIngressDriverForNamespace(ns string) IngressDriver {
-	switch ns {
+func GetIngressDriverForNamespace(driver string, ns string) IngressDriver {
+	switch driver {
 	case Looker:
 		return getLookerIngressDriver()
+	case AWS:
+		return getAWSIngressDriver(ns)
 	default:
 		return getKubernetesIngressDriver(ns)
 	}
@@ -88,6 +102,6 @@ func GetLeaseTypes() []string {
 }
 
 func getAllDrivers() []IngressDriver {
-	drivers := []IngressDriver{getLookerIngressDriver(), getKubernetesIngressDriver("")}
+	drivers := []IngressDriver{getLookerIngressDriver(), getKubernetesIngressDriver(""), getAWSIngressDriver("")}
 	return drivers
 }

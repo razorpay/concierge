@@ -27,7 +27,7 @@ type MyClientSet struct {
 }
 
 //GetIngresses ...
-func (c MyClientSet) GetIngresses(context string, ns string) ([]IngressList, error) {
+func (c *MyClientSet) GetIngresses(context string, ns string) ([]IngressList, error) {
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 
 	ingressLists, err := ingressClient.List(metav1.ListOptions{})
@@ -67,7 +67,7 @@ func (c MyClientSet) GetIngresses(context string, ns string) ([]IngressList, err
 }
 
 //RemoveIngressIP ...
-func (c MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (bool, bool, error) {
+func (c *MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (bool, bool, error) {
 	c.Lock()
 	defer c.Unlock()
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
@@ -102,13 +102,13 @@ func (c MyClientSet) RemoveIngressIP(ns string, ingressName string, ip string) (
 			return true, false, nil
 		}
 	}
-	err = errors.New("Ingress Annotation not found")
+	err = errors.New("ingress Annotation not found")
 	log.Error("Error: ", err)
 	return false, false, err
 }
 
 //WhiteListIP ...
-func (c MyClientSet) WhiteListIP(ns string, ingressName string, ip string) (bool, error) {
+func (c *MyClientSet) WhiteListIP(ns string, ingressName string, ip string) (bool, error) {
 	c.Lock()
 	defer c.Unlock()
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
@@ -149,13 +149,13 @@ func (c MyClientSet) WhiteListIP(ns string, ingressName string, ip string) (bool
 			return false, nil
 		}
 	}
-	err = errors.New("Ingress Annotation not found")
+	err = errors.New("ingress Annotation not found")
 	log.Error("Error: ", err)
 	return false, err
 }
 
 //GetIngress ...
-func (c MyClientSet) GetIngress(context string, ns string, ingressName string) (IngressList, error) {
+func (c *MyClientSet) GetIngress(context string, ns string, ingressName string) (IngressList, error) {
 	ingressClient := c.Clientset.ExtensionsV1beta1().Ingresses(ns)
 	ingress, err := ingressClient.Get(ingressName, metav1.GetOptions{})
 	if err != nil {
@@ -185,7 +185,7 @@ func (c MyClientSet) GetIngress(context string, ns string, ingressName string) (
 		}
 		return myIngress, nil
 	}
-	err = errors.New("Ingress Annotation not found")
+	err = errors.New("ingress Annotation not found")
 	log.Error("Error: ", err)
 	return IngressList{}, err
 }

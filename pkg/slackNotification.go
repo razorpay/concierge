@@ -10,7 +10,7 @@ import (
 
 //Payloads ...
 type Payloads struct {
-	Attachments map[string][]Payload `json: "attachments"`
+	Attachments map[string][]Payload `json:"attachments"`
 }
 
 //Payload ...
@@ -31,7 +31,7 @@ func (p Payloads) SlackNotification(url string) {
 	if err != nil {
 		log.Info(err)
 	}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
 
 	req.Header.Set("Content-Type", "application/json")
 

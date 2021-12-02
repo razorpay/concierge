@@ -23,23 +23,22 @@ It uses **Kubernetes client go** package (Go) to access and make changes in the 
 
 6. You can also terminate the lease or it will automatically get terminated after its expiry time.
 
- 
 ## Installation
 
-1. Obtain Google client secret and client id for OAuth. 
+1. Obtain Google client secret and client id for OAuth.
 
 2. Add `http://127.0.0.1:4180` in **Authorized JavaScript origins** and `http://127.0.0.1:4180/oauth2/callback` in **Authorized redirect URIs**.
 
 3. Get the source code on your machine via git.
 
     ```shell
-    $ git clone --branch ingress-concierge https://github.com/razorpay/concierge.git
+    git clone --branch ingress-concierge https://github.com/razorpay/concierge.git
     ```
 
 4. Rename file `.env.example` to `.env` and change credentials.
 
     ```shell
-    $ mv .env.example .env
+    mv .env.example .env
     ```
 
 5. Rename file `oauth2_proxy.example.cfg` to `oauth2_proxy.cfg` in `oauth2_proxy` dir and add the following values obtained from Google OAuth
@@ -57,13 +56,13 @@ It uses **Kubernetes client go** package (Go) to access and make changes in the 
 7. Run docker-compose command to run the application.
 
     ```shell
-    $ docker-compose up -d
+    docker-compose up -d
     ```
 
 8. Check for the running application.
 
     ```shell
-    $ docker ps
+    docker ps
     ```
 
 9. Access the application on [http://127.0.0.1:4180](http://127.0.0.1:4180)

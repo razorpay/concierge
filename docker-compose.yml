@@ -10,14 +10,14 @@ volumes:
 services:
   redis:
     image: redis
-    container_name: concierge-redis
+    container_name: ing-concierge-redis
     networks:
       - internal
     restart: always
 
   mysql:
     image: mysql:8.0
-    container_name: concierge-db
+    container_name: ing-concierge-db
     volumes:
       - db-data:/var/lib/mysql
     networks:
@@ -32,8 +32,8 @@ services:
   concierge:
     build:
       context: .
-    image: razorpay/concierge:v2
-    container_name: concierge-ingress
+    image: razorpay/ingress-concierge:v2
+    container_name: ing-concierge
     networks:
       - internal
     volumes:
