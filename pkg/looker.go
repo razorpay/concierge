@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/parnurzeal/gorequest"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/parnurzeal/gorequest"
 )
 
 var client *LookerClient
@@ -94,8 +95,7 @@ func (c *LookerClient) SearchUser(req LookerSearchUserRequest) ([]LookerSearchUs
 	return resp, nil
 }
 
-
-func (c *LookerClient) UpdateLookerUserAttribute(email string) (error) {
+func (c *LookerClient) UpdateLookerUserAttribute(email string) error {
 
 	url := c.datumUrl + "/looker/qubole_api_token_update"
 	body := struct {
@@ -110,8 +110,8 @@ func (c *LookerClient) UpdateLookerUserAttribute(email string) (error) {
 	resp, _, errs := req.End()
 
 	if resp.StatusCode != 200 {
-		return errors.New("There was an error updating Looker user attribute. Please try Opening Looker once. " +
-			"If dashboards are inaccessible, please contact `data platform` team.")
+		return errors.New("there was an error updating Looker user attribute. Please try Opening Looker once. " +
+			"If dashboards are inaccessible, please contact `data platform` team")
 	}
 
 	if len(errs) > 0 {
@@ -121,7 +121,7 @@ func (c *LookerClient) UpdateLookerUserAttribute(email string) (error) {
 	return nil
 }
 
-func (c *LookerClient) CreateLookerUser(email string) (error) {
+func (c *LookerClient) CreateLookerUser(email string) error {
 
 	url := c.datumUrl + "/looker/onboard-user"
 	body := struct {
@@ -136,7 +136,7 @@ func (c *LookerClient) CreateLookerUser(email string) (error) {
 	resp, _, errs := req.End()
 
 	if resp.StatusCode != 200 {
-		return errors.New(" There was an error while creating Looker user. Please contact `data platform` team.")
+		return errors.New("there was an error while creating Looker user. Please contact `data platform` team")
 	}
 
 	if len(errs) > 0 {

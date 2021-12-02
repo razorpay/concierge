@@ -3,3 +3,4 @@ concierge
 */oauth2_proxy.cfg
 .env
 vendor
+__pycache__/

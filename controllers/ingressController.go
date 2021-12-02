@@ -18,27 +18,28 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type info struct {
-	Userinfo  models.Users
-	Leaseinfo models.Leases
-}
-
 //ShowAllowedIngress ...
 func ShowAllowedIngress(c *gin.Context) {
 	User, _ := c.Get("User")
-	var data []pkg.IngressList
+	var data ingress_driver.ShowAllowedIngressResponse
 
-	log.Infof("Listing ingress in all namespaces for user %s\n", User.(*models.Users).Email)
+	log.Infof("Listing securityGroups, ingresses, looker for user %s\n", User.(*models.Users).Email)
 
 	for _, driver := range ingress_driver.GetEnabledIngressDrivers() {
 		response, err := driver.ShowAllowedIngress()
 		if err != nil {
-			log.Errorf("Error listing ingresses for driver %s for user %s ", driver.GetName(), User)
+			log.Errorf("Error listing resources for driver %s for user %s ", driver.GetName(), User)
 		} else {
-			data = append(data, response.Ingresses...)
+			switch driver.GetLeaseType() {
+			case "looker":
+				data.Looker = response.Looker
+			case "aws":
+				data.SecurityGroups = response.SecurityGroups
+			default:
+				data.Ingresses = response.Ingresses
+			}
 		}
 	}
-
 	c.HTML(http.StatusOK, "showingresslist.gohtml", gin.H{
 		"data":  data,
 		"user":  User,
@@ -49,30 +50,49 @@ func ShowAllowedIngress(c *gin.Context) {
 //WhiteListIP ...
 func WhiteListIP(c *gin.Context) {
 	var leases []models.Leases
-
+	var securityGroup config.SecurityGroupIngress
 	User, _ := c.Get("User")
 
-	// TODO change this parameter from `ns` to `driver`. Need to refactor in
-	// 1. code(variables/method names)
-	// 2. html templates
+	driver := c.Param("driver")
 	ns := c.Param("ns")
 	name := c.Param("name")
+
+	if driver == "aws" {
+		securityGroup = config.SecurityGroupIngress{
+			RuleType: c.PostForm("rule_type"),
+		}
+		switch securityGroup.RuleType {
+		case "ssh":
+			securityGroup.Protocol = "tcp"
+			securityGroup.PortFrom = 22
+			securityGroup.PortTo = 22
+		case "https":
+			securityGroup.Protocol = "tcp"
+			securityGroup.PortFrom = 443
+			securityGroup.PortTo = 443
+		case "custom":
+			securityGroup.Protocol = c.PostForm("protocol")
+			securityGroup.PortFrom, _ = strconv.ParseInt(c.PostForm("port_from"), 10, 64)
+			securityGroup.PortTo, _ = strconv.ParseInt(c.PostForm("port_to"), 10, 64)
+		}
+	}
 
 	expiry, _ := strconv.Atoi(c.PostForm("expiry"))
 	if expiry > config.AppCfg.MaxExpiry {
 		c.SetCookie("message", "Expiry time is incorrect", 10, "/", "", config.AppCfg.CookieSecure, config.AppCfg.CookieHTTPOnly)
-		c.Redirect(http.StatusFound, "/ingress/"+ns+"/"+name)
+		c.Redirect(http.StatusFound, "/resources/"+driver+"/"+ns+"/"+name)
 		return
 	}
-	leases = GetActiveLeases(ns, name)
+	leases = GetActiveLeases(driver, ns, name)
 
-	showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).
+	showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(driver, ns).
 		ShowIngressDetails(ingress_driver.ShowIngressDetailsRequest{Name: name})
 
 	if err != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": showIngressDetailsResponse.Ingress,
-			"user": User,
+			"data":   showIngressDetailsResponse,
+			"user":   User,
+			"driver": driver,
 			"message": map[string]string{
 				"class":   "Danger",
 				"message": err.Error(),
@@ -84,17 +104,19 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	enableUserRequest := ingress_driver.EnableLeaseRequest{
-		Name:       name,
-		GinContext: c,
-		User:       User.(*models.Users),
+		Name:          name,
+		GinContext:    c,
+		User:          User.(*models.Users),
+		SecurityGroup: securityGroup,
 	}
 
-	enableUserResponse, enableUserErr := ingress_driver.GetIngressDriverForNamespace(ns).EnableLease(enableUserRequest)
+	enableUserResponse, enableUserErr := ingress_driver.GetIngressDriverForNamespace(driver, ns).EnableLease(enableUserRequest)
 
 	if enableUserErr != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": showIngressDetailsResponse.Ingress,
-			"user": User,
+			"data":   showIngressDetailsResponse,
+			"user":   User,
+			"driver": driver,
 			"message": map[string]string{
 				"class":   "Danger",
 				"message": enableUserErr.Error(),
@@ -106,7 +128,7 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	if enableUserResponse.UpdateStatusFlag {
-		msgInfo := "Whitelisted" + enableUserResponse.LeaseIdentifier + "to ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+		msgInfo := "Whitelisted " + enableUserResponse.LeaseIdentifier + " to " + driver + " " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
 		if database.DB == nil {
@@ -121,13 +143,20 @@ func WhiteListIP(c *gin.Context) {
 			Expiry:          uint(expiry),
 		}
 
+		if driver == "aws" {
+			lease.Protocol = securityGroup.Protocol
+			lease.PortFrom = strconv.FormatInt(securityGroup.PortFrom, 10)
+			lease.PortTo = strconv.FormatInt(securityGroup.PortTo, 10)
+		}
+
 		database.DB.Create(&lease)
 
-		leases = GetActiveLeases(ns, name)
+		leases = GetActiveLeases(driver, ns, name)
 
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": showIngressDetailsResponse.Ingress,
-			"user": User,
+			"data":   showIngressDetailsResponse,
+			"user":   User,
+			"driver": driver,
 			"message": map[string]string{
 				"class":   "Success",
 				"message": "Lease is successfully taken",
@@ -139,8 +168,9 @@ func WhiteListIP(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-		"data": showIngressDetailsResponse.Ingress,
-		"user": User,
+		"data":   showIngressDetailsResponse,
+		"user":   User,
+		"driver": driver,
 		"message": map[string]string{
 			"class":   "Danger",
 			"message": "Your IP/User is already present",
@@ -154,19 +184,21 @@ func WhiteListIP(c *gin.Context) {
 func DeleteIPFromIngress(c *gin.Context) {
 	var err error
 	User, _ := c.Get("User")
+	driver := c.Param("driver")
 	ns := c.Param("ns")
 	name := c.Param("name")
-	leaseID, err := strconv.Atoi(c.Param("id"))
+	leaseID, _ := strconv.Atoi(c.Param("id"))
 	ID := uint(leaseID)
-	leases := GetActiveLeases(ns, name)
+	leases := GetActiveLeases(driver, ns, name)
 
-	showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(ns).
+	showIngressDetailsResponse, err := ingress_driver.GetIngressDriverForNamespace(driver, ns).
 		ShowIngressDetails(ingress_driver.ShowIngressDetailsRequest{Name: name})
 
 	if err != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": showIngressDetailsResponse.Ingress,
-			"user": User,
+			"data":   showIngressDetailsResponse,
+			"user":   User,
+			"driver": driver,
 			"message": map[string]string{
 				"class":   "Danger",
 				"message": err.Error(),
@@ -185,11 +217,12 @@ func DeleteIPFromIngress(c *gin.Context) {
 		ID: ID,
 	}).Find(&myCurrentLease)
 	if myCurrentLease.UserID != User.(*models.Users).ID {
-		err := errors.New("Unauthorized, Trying to delete a lease of other user")
+		err := errors.New("unauthorized, Trying to delete a lease of other user")
 		log.Error("Error: ", err)
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": showIngressDetailsResponse.Ingress,
-			"user": User,
+			"data":   showIngressDetailsResponse,
+			"user":   User,
+			"driver": driver,
 			"message": map[string]string{
 				"class":   "Danger",
 				"message": err.Error(),
@@ -201,11 +234,12 @@ func DeleteIPFromIngress(c *gin.Context) {
 	}
 	leaseIdentifier := myCurrentLease.LeaseIdentifier
 
-	resp, respErr := DeleteLeases(ns, name, leaseIdentifier, ID)
+	resp, respErr := DeleteLeases(driver, ns, name, myCurrentLease, ID)
 	if respErr != nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data": showIngressDetailsResponse.Ingress,
-			"user": User,
+			"data":   showIngressDetailsResponse,
+			"user":   User,
+			"driver": driver,
 			"message": map[string]string{
 				"class":   "Danger",
 				"message": respErr.Error(),
@@ -216,13 +250,14 @@ func DeleteIPFromIngress(c *gin.Context) {
 		return
 	}
 	if resp.UpdateStatusFlag {
-		msgInfo := "Removed IP " + leaseIdentifier + " from ingress " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
+		msgInfo := "Removed IP " + leaseIdentifier + " from " + driver + " " + name + " in namespace " + ns + " for user " + User.(*models.Users).Email
 		slackNotification(msgInfo, User.(*models.Users).Email)
 		log.Info(msgInfo)
-		leases = GetActiveLeases(ns, name)
+		leases = GetActiveLeases(driver, ns, name)
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data":         showIngressDetailsResponse.Ingress,
+			"data":         showIngressDetailsResponse,
 			"user":         User,
+			"driver":       driver,
 			"activeLeases": leases,
 			"message": map[string]string{
 				"class":   "Success",
@@ -233,8 +268,9 @@ func DeleteIPFromIngress(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-		"data": showIngressDetailsResponse.Ingress,
-		"user": User,
+		"data":   showIngressDetailsResponse,
+		"user":   User,
+		"driver": driver,
 		"message": map[string]string{
 			"class":   "Danger",
 			"message": "There is some error in deleting your IP, Try again or contact admin",
@@ -248,11 +284,12 @@ func DeleteIPFromIngress(c *gin.Context) {
 func IngressDetails(c *gin.Context) {
 
 	User, _ := c.Get("User")
+	driver := c.Param("driver")
 	ns := c.Param("ns")
 	name := c.Param("name")
-	leases := GetActiveLeases(ns, name)
+	leases := GetActiveLeases(driver, ns, name)
 
-	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).
+	resp, err := ingress_driver.GetIngressDriverForNamespace(driver, ns).
 		ShowIngressDetails(ingress_driver.ShowIngressDetailsRequest{Name: name})
 
 	if err != nil {
@@ -262,6 +299,7 @@ func IngressDetails(c *gin.Context) {
 				"message": err.Error(),
 			},
 			"user":         User,
+			"driver":       driver,
 			"activeLeases": leases,
 			"token":        csrf.Token(c.Request),
 		})
@@ -270,8 +308,9 @@ func IngressDetails(c *gin.Context) {
 	message, cookieErr := c.Cookie("message")
 	if cookieErr == nil {
 		c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-			"data":         resp.Ingress,
+			"data":         resp,
 			"user":         User,
+			"driver":       driver,
 			"activeLeases": leases,
 			"token":        csrf.Token(c.Request),
 			"message": map[string]string{
@@ -282,15 +321,16 @@ func IngressDetails(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "manageingress.gohtml", gin.H{
-		"data":         resp.Ingress,
+		"data":         resp,
 		"user":         User,
+		"driver":       driver,
 		"activeLeases": leases,
 		"token":        csrf.Token(c.Request),
 	})
 }
 
 //GetActiveLeases ...
-func GetActiveLeases(ns string, name string) []models.Leases {
+func GetActiveLeases(driver string, ns string, name string) []models.Leases {
 	if database.DB == nil {
 		database.Conn()
 	}
@@ -313,14 +353,18 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 	for i, lease := range leases {
 		splitGroupID := strings.Split(lease.GroupID, ":")
 		ns = splitGroupID[0]
-		name = splitGroupID[1]
+		// Since old data has groupID without colon format.
+		name = splitGroupID[0]
+		if len(splitGroupID) > 1 {
+			name = splitGroupID[1]
+		}
 		t := uint(lease.CreatedAt.Unix()) + lease.Expiry
 		if t < uint(time.Now().Unix()) {
 			leases[i].Expiry = uint(0)
-			resp, err := DeleteLeases(ns, name, lease.LeaseIdentifier, lease.ID)
+			resp, err := DeleteLeases(lease.LeaseType, ns, name, lease, lease.ID)
 
 			if resp.UpdateStatusFlag {
-				log.Infof("Removed expired IP %s from ingress %s in namespace %s for User %s\n", lease.LeaseIdentifier, name, ns, lease.User.Email)
+				log.Infof("Removed expired IP %s from %s %s in namespace %s for User %s\n", lease.LeaseIdentifier, lease.LeaseType, name, ns, lease.User.Email)
 			} else {
 				log.Error("Error: ", err)
 			}
@@ -332,31 +376,37 @@ func GetActiveLeases(ns string, name string) []models.Leases {
 	return myleases
 }
 
-//DeleteLeases ...
-func DeleteLeases(ns string, name string, leaseIdentifier string, ID uint) (ingress_driver.DisableLeaseResponse, error) {
+//DeleteLeases driver, ...
+func DeleteLeases(driver string, ns string, name string, myCurrentLease models.Leases, ID uint) (ingress_driver.DisableLeaseResponse, error) {
 	if database.DB == nil {
 		database.Conn()
 	}
-
+	portFrom, _ := strconv.ParseInt(myCurrentLease.PortFrom, 10, 64)
+	portTo, _ := strconv.ParseInt(myCurrentLease.PortTo, 10, 64)
 	req := ingress_driver.DisableLeaseRequest{
 		Name:            name,
-		LeaseIdentifier: leaseIdentifier,
+		LeaseIdentifier: myCurrentLease.LeaseIdentifier,
+		SecurityGroup: config.SecurityGroupIngress{
+			Protocol: myCurrentLease.Protocol,
+			PortFrom: portFrom,
+			PortTo:   portTo,
+		},
 	}
 
-	resp, err := ingress_driver.GetIngressDriverForNamespace(ns).DisableLease(req)
+	resp, err := ingress_driver.GetIngressDriverForNamespace(driver, ns).DisableLease(req)
 
 	if resp.UpdateStatusFlag {
 		database.DB.Delete(models.Leases{
 			ID: ID,
 		})
-		log.Infof("Removing IP %s from database\n", leaseIdentifier)
+		log.Infof("Removing IP %s from database\n", myCurrentLease.LeaseIdentifier)
 	}
 	return resp, err
 }
 
 //ClearExpiredLeases ...
 func ClearExpiredLeases(c *gin.Context) {
-	GetActiveLeases("", "")
+	GetActiveLeases("", "", "")
 	c.String(200, "Done")
 }
 
@@ -377,7 +427,7 @@ func slackNotification(msg string, user string) {
 	}
 	payloads := pkg.Payloads{
 		Attachments: map[string][]pkg.Payload{
-			"attachments": []pkg.Payload{
+			"attachments": {
 				payload,
 			},
 		},

@@ -35,5 +35,10 @@
 	    	div.text("Expired");
 	    }
 	});
+
+	$('#myTabs a').click(function (e) {
+		e.preventDefault()
+		$(this).tab('show')
+	})
 </script>
 {{end}}
