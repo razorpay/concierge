@@ -259,7 +259,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{$data:=.data.Ingress}}
+                        {{ $data := "" }}
+                        {{if eq $driver "ingress"}}
+                        {{ $data = .data.Ingress }}
+                        {{ else }}
+                        {{ $data = .data.Looker }}
+                        {{ end }}
                         {{$user_id:=.user.ID}}
                         {{$admin:=.user.Admin}}
                         {{range .activeLeases}}
