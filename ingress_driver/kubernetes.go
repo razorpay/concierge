@@ -157,7 +157,7 @@ func (k *KubeIngressDriver) GetName() string {
 }
 
 func (k *KubeIngressDriver) GetLeaseType() string {
-	return "Ingress"
+	return "ingress"
 }
 
 func (k *KubeIngressDriver) isEnabled() bool {

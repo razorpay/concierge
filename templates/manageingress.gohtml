@@ -14,7 +14,7 @@
     <div class="container">
         <div class="row">
 
-        {{if eq $driver "aws"}}
+        {{if eq $driver "awssg"}}
             <!-- AWS Start -->
             <div class="col-md-6 col-md-offset-3 modal-outer noPad">
                 <h2>Security Group Details</h2>
@@ -199,7 +199,88 @@
                 {{end}}
                 <br/>
             </div>
-            <!-- AWS End -->
+            <!-- AWS SG End -->
+            <!-- AWS S3 Start -->
+
+            {{else if eq $driver "awss3"}}
+            <div class="col-md-6 col-md-offset-3 modal-outer noPad">
+                <h2>S3 Buckets Details</h2>
+                <div class="row">
+                    <div class="col-md-3">Name:</div>
+                    <div class="col-md-6">{{.data.S3Bucket.Name}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">ARN:</div>
+                    <div class="col-md-6">arn:aws:s3:::{{.data.S3Bucket.Name}}</div>
+                </div>
+
+                <h2>Create Access On this S3 Bucket</h2>
+                <form action="/resources/{{$driver}}/{{.data.S3Bucket.Name}}/{{.data.S3Bucket.Name}}" method="post">
+                    <div class="row">
+                        <label for="expiry" class="col-sm-2 control-label">Expiry:</label>
+                        <div class="col-sm-4">
+                            <select name="expiry" class="form-control" required>
+                                <option value="3600" selected>1 hour</option>
+                                <option value="14400">4 hours</option>
+                                <option value="21600">6 hours</option>
+                                <option value="32400">9 hours</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="_token" value="{{ $token }}">
+                        <input class="col-sm-2" type="submit" name="Access" value="Access" />
+                    </div>
+                </form>
+
+                {{ if .activeLeases }}
+                <h2>Active Leases</h2>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Creator</th>
+                            <th>Leased IP</th>
+                            <th>Time Left</th>
+                            <th>Lease Type</th>
+                            <th>Terminate?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{$data:=.data.S3Bucket}}
+                        {{$user_id:=.user.ID}}
+                        {{$admin:=.user.Admin}}
+                        {{range .activeLeases}}
+                        <tr>
+                            <td>{{.User.Username}}</td>
+                            {{ if eq .User.ID $user_id}}
+                            <td>{{.LeaseIdentifier}}</td>
+                            {{ else if $admin }}
+                            <td>{{.LeaseIdentifier}}</td>
+                            {{ else }}
+                            <td></td>
+                            {{ end }}
+                            <td class="time" >{{.Expiry}}</td>
+                            <td>{{.LeaseType}}</td>
+                            <td>
+                            {{ if eq .User.ID $user_id}}
+                                <form method="post" action="/resources/{{$driver}}/{{$data.Name}}/{{$data.Name}}/{{.ID}}">
+                                    <input type="hidden" name="lease_id" value="{{.ID}}" />
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_token" value="{{ $token }}">
+                                    <a href="" style="color: #ff0000;"
+                                        onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
+                                        <span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
+                                    </a>
+                                </form>
+                            {{end}}
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+                {{end}}
+                <br/>
+            </div>
+            <!-- AWS S3 End -->
         {{else}}
             <!-- Ingress & Looker Start -->
             {{ $data := "" }}
