@@ -33,9 +33,11 @@ func ShowAllowedIngress(c *gin.Context) {
 			switch driver.GetLeaseType() {
 			case "looker":
 				data.Looker = response.Looker
-			case "aws":
+			case "awssg":
 				data.SecurityGroups = response.SecurityGroups
-			default:
+			case "awss3":
+				data.Buckets = response.Buckets
+			case "ingress":
 				data.Ingresses = response.Ingresses
 			}
 		}
@@ -57,7 +59,7 @@ func WhiteListIP(c *gin.Context) {
 	ns := c.Param("ns")
 	name := c.Param("name")
 
-	if driver == "aws" {
+	if driver == "awssg" {
 		securityGroup = config.SecurityGroupIngress{
 			RuleType: c.PostForm("rule_type"),
 		}
@@ -143,7 +145,7 @@ func WhiteListIP(c *gin.Context) {
 			Expiry:          uint(expiry),
 		}
 
-		if driver == "aws" {
+		if driver == "awssg" {
 			lease.Protocol = securityGroup.Protocol
 			lease.PortFrom = strconv.FormatInt(securityGroup.PortFrom, 10)
 			lease.PortTo = strconv.FormatInt(securityGroup.PortTo, 10)
@@ -288,7 +290,6 @@ func IngressDetails(c *gin.Context) {
 	ns := c.Param("ns")
 	name := c.Param("name")
 	leases := GetActiveLeases(driver, ns, name)
-
 	resp, err := ingress_driver.GetIngressDriverForNamespace(driver, ns).
 		ShowIngressDetails(ingress_driver.ShowIngressDetailsRequest{Name: name})
 

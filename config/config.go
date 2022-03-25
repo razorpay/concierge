@@ -47,6 +47,8 @@ var RedisDBConfig RedisConfig
 
 var MutexPrefix string
 
+var AWSS3Buckets string
+
 //LoadConfig ...
 func LoadConfig() {
 	err := godotenv.Load()
@@ -64,6 +66,7 @@ func LoadConfig() {
 	initializeLookerConfig()
 	initilizeMutexConfig()
 	initializeCronConfig()
+	initializeAWSS3BucketConfig()
 }
 
 func initilizeDBConfig() {
@@ -236,6 +239,10 @@ func initializeLookerConfig() {
 		DatumHostname:   datumHostname,
 		DatumAuthSecret: datumAuthSecret,
 	}
+}
+
+func initializeAWSS3BucketConfig() {
+	AWSS3Buckets = strings.TrimSpace(getEnv(os.Getenv("AWS_S3_BUCKETS"), "").(string))
 }
 
 func getEnv(value string, x interface{}) interface{} {

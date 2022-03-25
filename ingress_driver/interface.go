@@ -9,8 +9,10 @@ import (
 )
 
 const (
-	Looker = "looker"
-	AWS    = "aws"
+	Looker           = "looker"
+	AWSSecurityGroup = "awssg"
+	Ingress          = "ingress"
+	AWSS3Bucket      = "awss3"
 
 	DefaultContext = "default"
 	DefaultClass   = "default"
@@ -29,6 +31,7 @@ type IngressDriver interface {
 type ShowAllowedIngressResponse struct {
 	Ingresses      []pkg.IngressList
 	SecurityGroups []pkg.SecurityGroupList
+	Buckets        []pkg.S3BucketList
 	Looker         []pkg.IngressList
 }
 
@@ -69,14 +72,17 @@ type ShowIngressDetailsResponse struct {
 	Ingress       pkg.IngressList
 	Looker        pkg.IngressList
 	SecurityGroup pkg.SecurityGroupList
+	S3Bucket      pkg.S3BucketList
 }
 
 func GetIngressDriverForNamespace(driver string, ns string) IngressDriver {
 	switch driver {
 	case Looker:
 		return getLookerIngressDriver()
-	case AWS:
-		return getAWSIngressDriver(ns)
+	case AWSSecurityGroup:
+		return getAWSSecurityGroupIngressDriver(ns)
+	case AWSS3Bucket:
+		return getAWSS3BucketIngressDriver(ns)
 	default:
 		return getKubernetesIngressDriver(ns)
 	}
@@ -102,6 +108,6 @@ func GetLeaseTypes() []string {
 }
 
 func getAllDrivers() []IngressDriver {
-	drivers := []IngressDriver{getLookerIngressDriver(), getKubernetesIngressDriver(""), getAWSIngressDriver("")}
+	drivers := []IngressDriver{getLookerIngressDriver(), getKubernetesIngressDriver(""), getAWSSecurityGroupIngressDriver(""), getAWSS3BucketIngressDriver("")}
 	return drivers
 }
