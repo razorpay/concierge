@@ -5,15 +5,15 @@ import (
 	"strings"
 )
 
-type AWSIngressDriver struct {
+type AWSSecurityGroupIngressDriver struct {
 	SecurityGroup string
 }
 
-func getAWSIngressDriver(SecurityGroup string) IngressDriver {
-	return &AWSIngressDriver{SecurityGroup}
+func getAWSSecurityGroupIngressDriver(SecurityGroup string) IngressDriver {
+	return &AWSSecurityGroupIngressDriver{SecurityGroup}
 }
 
-func (k *AWSIngressDriver) ShowAllowedIngress() (ShowAllowedIngressResponse, error) {
+func (k *AWSSecurityGroupIngressDriver) ShowAllowedIngress() (ShowAllowedIngressResponse, error) {
 	client := pkg.GetAWSSession()
 	resp := ShowAllowedIngressResponse{
 		SecurityGroups: []pkg.SecurityGroupList{},
@@ -37,7 +37,7 @@ func (k *AWSIngressDriver) ShowAllowedIngress() (ShowAllowedIngressResponse, err
 	return resp, nil
 }
 
-func (k *AWSIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResponse, error) {
+func (k *AWSSecurityGroupIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseResponse, error) {
 	var err error
 	resp := EnableLeaseResponse{}
 
@@ -46,7 +46,7 @@ func (k *AWSIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseRespo
 	ip = ip + "/32"
 
 	client := pkg.GetAWSSession()
-	err = client.WhitelistIP(k.SecurityGroup, ip, req.SecurityGroup, req.User.Email)
+	err = client.WhitelistIPInSecurityGroup(k.SecurityGroup, ip, req.SecurityGroup, req.User.Email)
 	if err != nil {
 		return resp, err
 	}
@@ -58,10 +58,10 @@ func (k *AWSIngressDriver) EnableLease(req EnableLeaseRequest) (EnableLeaseRespo
 	return resp, nil
 }
 
-func (k *AWSIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseResponse, error) {
+func (k *AWSSecurityGroupIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseResponse, error) {
 	resp := DisableLeaseResponse{}
 	client := pkg.GetAWSSession()
-	err := client.RevokeIP(k.SecurityGroup, req.LeaseIdentifier, req.SecurityGroup)
+	err := client.RevokeIPFromSecurityGroup(k.SecurityGroup, req.LeaseIdentifier, req.SecurityGroup)
 	if err != nil {
 		return resp, err
 	}
@@ -69,15 +69,15 @@ func (k *AWSIngressDriver) DisableLease(req DisableLeaseRequest) (DisableLeaseRe
 	return resp, nil
 }
 
-func (k *AWSIngressDriver) isEnabled() bool {
+func (k *AWSSecurityGroupIngressDriver) isEnabled() bool {
 	return true
 }
 
-func (k *AWSIngressDriver) GetLeaseType() string {
-	return "aws"
+func (k *AWSSecurityGroupIngressDriver) GetLeaseType() string {
+	return "awssg"
 }
 
-func (k *AWSIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error) {
+func (k *AWSSecurityGroupIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (ShowIngressDetailsResponse, error) {
 
 	client := pkg.GetAWSSession()
 	resp := ShowIngressDetailsResponse{}
@@ -97,6 +97,6 @@ func (k *AWSIngressDriver) ShowIngressDetails(req ShowIngressDetailsRequest) (Sh
 	return resp, nil
 }
 
-func (k *AWSIngressDriver) GetName() string {
+func (k *AWSSecurityGroupIngressDriver) GetName() string {
 	return "aws"
 }

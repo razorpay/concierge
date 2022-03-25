@@ -15,7 +15,10 @@
             <div class="col-md-8 col-md-offset-2 modal-outer noPad">
                 <ul class="nav nav-tabs" id="myTabs" role="tablist">
                     {{ if .data.SecurityGroups }}
-                    <li role="presentation" class="active"><a href="#aws" id="aws-tab" data-toggle="tab">AWS</a></li>
+                    <li role="presentation" class="active"><a href="#awssg" id="aws-tab-sg" data-toggle="tab">AWS Security Groups</a></li>
+                    {{ end }}
+                    {{ if .data.Buckets }}
+                    <li role="presentation"><a href="#awss3" id="aws-tab-s3" data-toggle="tab">AWS S3 Buckets</a></li>
                     {{ end }}
                     {{ if .data.Looker }}
                     <li role="presentation"><a href="#looker" id="looker-tab" data-toggle="tab">Looker</a></li>
@@ -28,7 +31,7 @@
         </div>
 
         <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade active in" role="tabpanel" aria-labelledby="aws-tab" id="aws">
+            <div class="tab-pane fade active in" role="tabpanel" aria-labelledby="aws-tab-sg" id="awssg">
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2 modal-outer noPad">
                         <h2>All Security Groups</h2>
@@ -44,10 +47,34 @@
                             <tbody>
                                 {{range .data.SecurityGroups}}
                                 <tr>
-                                    <td><a href="/resources/aws/{{.GroupId}}/{{.Name}}">{{.Name}}</a></td>
+                                    <td><a href="/resources/awssg/{{.GroupId}}/{{.Name}}">{{.Name}}</a></td>
                                     <td>{{.GroupId}}</td>
                                     <td>{{.Description}}</td>
                                     <td>{{.VpcId}}</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" aria-labelledby="aws-tab-s3" id="awss3">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                        <h2>All S3 Buckets</h2>
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>ARN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .data.Buckets}}
+                                <tr>
+                                    <td><a href="/resources/awss3/{{.Name}}/{{.Name}}">{{.Name}}</a></td>
+                                    <td>arn:aws:s3:::{{.Name}}</td>
                                 </tr>
                                 {{end}}
                             </tbody>
