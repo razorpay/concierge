@@ -9,12 +9,12 @@ type SecurityGroupIngress struct {
 
 type S3BucketPolicy struct {
 	Version   string
-	ID        string `json:",omitempty"`
+	Id        string `json:",omitempty"`
 	Statement []struct {
 		Sid          string
 		Effect       string
-		NotPrincipal map[string]interface{} `json:",omitempty"`
-		Principal    map[string]interface{} `json:",omitempty"`
+		NotPrincipal interface{} `json:",omitempty"`
+		Principal    interface{} `json:",omitempty"`
 		Action       string
 		Resource     []string
 		Condition    map[string]interface{}
