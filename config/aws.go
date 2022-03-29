@@ -16,7 +16,7 @@ type S3BucketPolicy struct {
 		NotPrincipal interface{} `json:",omitempty"`
 		Principal    interface{} `json:",omitempty"`
 		Action       string
-		Resource     []string
+		Resource     interface{} `json:",omitempty"`
 		Condition    map[string]interface{}
 	}
 }
