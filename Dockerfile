@@ -47,7 +47,7 @@ COPY --from=concierge /concierge/assets assets
 COPY --from=concierge /concierge/templates templates
 COPY --from=concierge /concierge/docker docker
 COPY --from=concierge /concierge/oauth2_proxy oauth2_proxy
-COPY --from=quay.io/oauth2-proxy/oauth2-proxy:v7.1.3 /bin/oauth2-proxy /usr/local/bin/oauth2-proxy
+COPY --from=quay.io/oauth2-proxy/oauth2-proxy:v7.3.0 /bin/oauth2-proxy /usr/local/bin/oauth2-proxy
 
 EXPOSE 8990 3306 4180
 ENTRYPOINT ["docker/entrypoint.sh"]
