@@ -1,4 +1,4 @@
-FROM golang:1.14.0-alpine3.11 as concierge
+FROM c.rzp.io/proxy_dockerhub/library/golang:1.19.0-alpine3.16 as concierge
 RUN apk add git
 WORKDIR /concierge
 COPY go.mod go.sum ./
@@ -7,7 +7,7 @@ COPY . .
 RUN go build -o concierge main.go 
 
 
-FROM alpine:3.12
+FROM c.rzp.io/razorpay/onggi:base-3.16
 
 ENV GOSU_VERSION="1.10"
 ENV ARCH="amd64"
