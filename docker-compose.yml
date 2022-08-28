@@ -1,0 +1,51 @@
+version: '3'
+
+networks:
+  internal:
+
+volumes:
+  db-data:
+  concierge-data:
+
+services:
+  redis:
+    image: redis
+    container_name: ing-concierge-redis
+    networks:
+      - internal
+    restart: always
+
+  mysql:
+    image: mysql:8.0
+    container_name: ing-concierge-db
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - internal
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+
+  concierge:
+    build:
+      context: .
+    image: razorpay/ingress-concierge:v2
+    container_name: ing-concierge
+    networks:
+      - internal
+    volumes:
+      - concierge-data:/app
+      - ~/.kube/config:/root/.kube/config
+      - ./oauth2_proxy/oauth2_proxy.cfg:/app/oauth2_proxy/oauth2_proxy.cfg
+    ports:
+      - 4180:4180
+      - 8190:8190
+    command: start
+    env_file: .env
+    depends_on:
+      - mysql
+      - redis
+    restart: always

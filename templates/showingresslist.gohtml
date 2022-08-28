@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{ template "header" }}
+</head>
+
+<body>
+    {{ template "flashmessage" .message}}
+
+    {{ template "navbar" .user}}
+    
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                <ul class="nav nav-tabs" id="myTabs" role="tablist">
+                    {{ if .data.SecurityGroups }}
+                    <li role="presentation" class="active"><a href="#awssg" id="aws-tab-sg" data-toggle="tab">AWS Security Groups</a></li>
+                    {{ end }}
+                    {{ if .data.Buckets }}
+                    <li role="presentation"><a href="#awss3" id="aws-tab-s3" data-toggle="tab">AWS S3 Buckets</a></li>
+                    {{ end }}
+                    {{ if .data.Looker }}
+                    <li role="presentation"><a href="#looker" id="looker-tab" data-toggle="tab">Looker</a></li>
+                    {{ end }}
+                    {{ if .data.Ingresses }}
+                    <li role="presentation"><a href="#ingress" id="ingress-tab" data-toggle="tab">Ingress</a></li>
+                    {{ end }}
+                </ul>
+            </div>
+        </div>
+
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade active in" role="tabpanel" aria-labelledby="aws-tab-sg" id="awssg">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                        <h2>All Security Groups</h2>
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>ID</th>
+                                    <th>Description</th>
+                                    <th>VPC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .data.SecurityGroups}}
+                                <tr>
+                                    <td><a href="/resources/awssg/{{.GroupId}}/{{.Name}}">{{.Name}}</a></td>
+                                    <td>{{.GroupId}}</td>
+                                    <td>{{.Description}}</td>
+                                    <td>{{.VpcId}}</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" aria-labelledby="aws-tab-s3" id="awss3">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                        <h2>All S3 Buckets</h2>
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>ARN</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .data.Buckets}}
+                                <tr>
+                                    <td><a href="/resources/awss3/{{.Name}}/{{.Name}}">{{.Name}}</a></td>
+                                    <td>arn:aws:s3:::{{.Name}}</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" aria-labelledby="looker-tab" id="looker">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                        <h2>Looker</h2>
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Namespace</th>
+                                    <th>Ingress Name</th>
+                                    <th>Host</th>
+                                    <th>Ingress Class</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .data.Looker}}
+                                <tr>
+                                    <td>{{.Namespace}}</td>
+                                    <td><a href="/resources/looker/{{.Namespace}}/{{.Name}}">{{.Name}}</a></td>
+                                    <td>{{.Host}}</td>
+                                    <td>{{.Class}}</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" role="tabpanel" aria-labelledby="ingress-tab" id="ingress">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2 modal-outer noPad">
+                        <h2>All Ingress List</h2>
+                        <table class="table table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Namespace</th>
+                                    <th>Ingress Name</th>
+                                    <th>Host</th>
+                                    <th>Ingress Class</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .data.Ingresses}}
+                                <tr>
+                                    <td>{{.Namespace}}</td>
+                                    <td><a href="/resources/ingress/{{.Namespace}}/{{.Name}}">{{.Name}}</a></td>
+                                    <td>{{.Host}}</td>
+                                    <td>{{.Class}}</td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ template "footer" }}
+</body>
+</html>

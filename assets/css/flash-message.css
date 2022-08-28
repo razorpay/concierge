@@ -1,0 +1,29 @@
+/* FLash Message Styles */
+.custom-flash {
+    /*background: rgb(108, 146, 131);*/
+    position: fixed;
+    padding: 10px 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    top: 0px;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    z-index: 99;
+    transition: display 0.5s ease;
+    box-shadow: 1px 1px 5px rgba(103, 103, 103, 0.63)
+}
+
+.Success {
+    background-color: #5cb85c;
+}
+.Danger {
+    background-color: #d9534f;
+}
+.Warning {
+    background-color: #f0ad4e;
+}
+.Info {
+    background-color: #5bc0de;
+}
