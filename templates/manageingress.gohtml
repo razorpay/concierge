@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {{ template "header" }}
+</head>
+
+<body>
+    {{ template "flashmessage" .message}}
+
+    {{ template "navbar" .user}}
+    {{$token:=.token}}
+    {{$driver:=.driver}}
+    <div class="container">
+        <div class="row">
+
+        {{if eq $driver "awssg"}}
+            <!-- AWS Start -->
+            <div class="col-md-6 col-md-offset-3 modal-outer noPad">
+                <h2>Security Group Details</h2>
+                <div class="row">
+                    <div class="col-md-3">Name:</div>
+                    <div class="col-md-6">{{.data.SecurityGroup.Name}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">Id:</div>
+                    <div class="col-md-6">{{.data.SecurityGroup.GroupId}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">Description:</div>
+                    <div class="col-md-6">{{.data.SecurityGroup.Description}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">VPC-Id::</div>
+                    <div class="col-md-6">{{.data.SecurityGroup.VpcId}}</div>
+                </div>
+
+                <h2>Create Access On this Security Group</h2>
+                <div>
+                    <button type="button" class="btn btn-primary" onclick="javascript: $('#ssh_form').show(); $('#https_form').hide(); $('#custom_form').hide();">SSH</button>
+                    <button type="button" class="btn btn-primary" onclick="javascript: $('#https_form').show(); $('#ssh_form').hide(); $('#custom_form').hide();">HTTPS</button>
+                    <button type="button" class="btn btn-primary" onclick="javascript: $('#custom_form').show(); $('#ssh_form').hide(); $('#https_form').hide();">Custom</button>
+                </div>
+                <br/>
+
+                <form id="ssh_form" class="form-horizontal" role="form" style="display:none" action="/resources/{{$driver}}/{{.data.SecurityGroup.GroupId}}/{{.data.SecurityGroup.Name}}" method="POST">
+                    <h4>Get SSH Access:</h4>
+                    
+                    <div class="row">
+                        <label for="access" class="col-sm-4 control-label">Access For:</label>
+                      <div class="col-sm-8">
+                          Self
+                      </div>
+                    </div>
+                    <div class="row">
+                        <label for="expiry" class="col-sm-4 control-label">Expiry:</label>
+                        <div class="col-sm-4">
+                            <select name="expiry" class="form-control" required>
+                                <option value="3600" selected>1 hour</option>
+                                <option value="14400">4 hours</option>
+                                <option value="21600">6 hours</option>
+                                <option value="32400">9 hours</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="rule_type" value="ssh" />
+                        <input type="hidden" name="_token" value="{{ $token }}" />
+                        <!-- <input class="col-sm-2" type="submit" name="Access" value="Access" /> -->
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-default" value="Access">Access</button>
+                        </div>
+                    </div>
+                </form>
+
+
+      
+                <form id="https_form" class="form-horizontal" role="form" style="display:none"  action="/resources/{{$driver}}/{{.data.SecurityGroup.GroupId}}/{{.data.SecurityGroup.Name}}" method="POST">
+                    <h4>Get HTTPS Access:</h4>
+                    <div class="row">
+                            <label for="access" class="col-sm-4 control-label">Access For:</label>
+                        <div class="col-sm-8">
+                            Self
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="expiry" class="col-sm-4 control-label">Expiry:</label>
+                        <div class="col-sm-4">
+                            <select name="expiry" class="form-control" required>
+                                <option value="3600" selected>1 hour</option>
+                                <option value="14400">4 hours</option>
+                                <option value="21600">6 hours</option>
+                                <option value="32400">9 hours</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="rule_type" value="https" />
+                        <input type="hidden" name="_token" value="{{ $token }}">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-default" value="Access">Access</button>
+                        </div>
+                    </div>
+                </form>
+      
+                <form id="custom_form" class="form-horizontal" role="form-horizontal" style="display:none" action="/resources/{{$driver}}/{{.data.SecurityGroup.GroupId}}/{{.data.SecurityGroup.Name}}" method="POST">
+                    <h4>Define Custom Rule:</h4>
+                    <div class="row">
+                        <label for="access" class="col-sm-4 control-label">Access For:</label>
+                        <div class="col-sm-8">
+                            Self
+                        </div>
+                    </div>
+                    <div class="row">
+                        <label for="protocol" class="col-sm-4 control-label">Protocol</label>
+                        <div class="col-sm-8">
+                            <input type="text" name="protocol" placeholder="tcp/udp" class="form-control" required />
+                        </div>
+                        <br/>
+                    </div>
+      
+                    <div class="row">
+                        <label for="port_range" class="col-sm-4 control-label">Port Range:</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="port_from" placeholder="From Port" class="form-control" required/>
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="text" name="port_to" placeholder="To port" class="form-control" required/>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="col-sm-offset-4 col-sm-8">Keep From & To Port same for single port access.</div>
+                    </div>
+      
+                    <div class="row">
+                        <label for="expiry" class="col-sm-4 control-label">Expiry:</label>
+                        <div class="col-sm-4">
+                            <select name="expiry" class="form-control" required>
+                                <option value="3600" selected>1 hour</option>
+                                <option value="14400">4 hours</option>
+                                <option value="21600">6 hours</option>
+                                <option value="32400">9 hours</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="rule_type" value="custom" />
+                        <input type="hidden" name="_token" value="{{ $token }}">
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-default" value="Access">Access</button>
+                        </div>
+                    </div>
+                </form>
+      
+
+                {{ if .activeLeases }}
+                <h2>Active Leases</h2>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Creator</th>
+                            <th>Leased IP</th>
+                            <th>Protocol</th>
+                            <th>Port(s)</th>
+                            <th>Time Left</th>
+                            <th>Lease Type</th>
+                            <th>Terminate?</th>
+                            </tr>
+                    </thead>
+                    <tbody>
+                        {{$data:=.data.SecurityGroup}}
+                        {{$user_id:=.user.ID}}
+                        {{$admin:=.user.Admin}}
+                        {{range .activeLeases}}
+                        <tr>
+                            <td>{{.User.Username}}</td>
+                            {{ if eq .User.ID $user_id}}
+                            <td>{{.LeaseIdentifier}}</td>
+                            {{ else if $admin }}
+                            <td>{{.LeaseIdentifier}}</td>
+                            {{ else }}
+                            <td></td>
+                            {{ end }}
+                            <td>{{.Protocol}}</td>
+                            <td>{{.PortFrom}}-{{.PortTo}}</td>
+                            <td class="time" >{{.Expiry}}</td>
+                            <td>{{.LeaseType}}</td>
+                            <td>
+                            {{ if eq .User.ID $user_id}}
+                                <form method="post" action="/resources/{{$driver}}/{{$data.GroupId}}/{{$data.Name}}/{{.ID}}">
+                                    <input type="hidden" name="lease_id" value="{{.ID}}" />
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_token" value="{{ $token }}">
+                                    <a href="" style="color: #ff0000;"
+                                        onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
+                                        <span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
+                                    </a>
+                                </form>
+                            {{end}}
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+                {{end}}
+                <br/>
+            </div>
+            <!-- AWS SG End -->
+            <!-- AWS S3 Start -->
+
+            {{else if eq $driver "awss3"}}
+            <div class="col-md-6 col-md-offset-3 modal-outer noPad">
+                <h2>S3 Buckets Details</h2>
+                <div class="row">
+                    <div class="col-md-3">Name:</div>
+                    <div class="col-md-6">{{.data.S3Bucket.Name}}</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">ARN:</div>
+                    <div class="col-md-6">arn:aws:s3:::{{.data.S3Bucket.Name}}</div>
+                </div>
+
+                <h2>Create Access On this S3 Bucket</h2>
+                <form action="/resources/{{$driver}}/{{.data.S3Bucket.Name}}/{{.data.S3Bucket.Name}}" method="post">
+                    <div class="row">
+                        <label for="expiry" class="col-sm-2 control-label">Expiry:</label>
+                        <div class="col-sm-4">
+                            <select name="expiry" class="form-control" required>
+                                <option value="3600" selected>1 hour</option>
+                                <option value="14400">4 hours</option>
+                                <option value="21600">6 hours</option>
+                                <option value="32400">9 hours</option>
+                            </select>
+                        </div>
+                        <input type="hidden" name="_token" value="{{ $token }}">
+                        <input class="col-sm-2" type="submit" name="Access" value="Access" />
+                    </div>
+                </form>
+
+                {{ if .activeLeases }}
+                <h2>Active Leases</h2>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Creator</th>
+                            <th>Leased IP</th>
+                            <th>Time Left</th>
+                            <th>Lease Type</th>
+                            <th>Terminate?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{$data:=.data.S3Bucket}}
+                        {{$user_id:=.user.ID}}
+                        {{$admin:=.user.Admin}}
+                        {{range .activeLeases}}
+                        <tr>
+                            <td>{{.User.Username}}</td>
+                            {{ if eq .User.ID $user_id}}
+                            <td>{{.LeaseIdentifier}}</td>
+                            {{ else if $admin }}
+                            <td>{{.LeaseIdentifier}}</td>
+                            {{ else }}
+                            <td></td>
+                            {{ end }}
+                            <td class="time" >{{.Expiry}}</td>
+                            <td>{{.LeaseType}}</td>
+                            <td>
+                            {{ if eq .User.ID $user_id}}
+                                <form method="post" action="/resources/{{$driver}}/{{$data.Name}}/{{$data.Name}}/{{.ID}}">
+                                    <input type="hidden" name="lease_id" value="{{.ID}}" />
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_token" value="{{ $token }}">
+                                    <a href="" style="color: #ff0000;"
+                                        onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
+                                        <span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
+                                    </a>
+                                </form>
+                            {{end}}
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+                {{end}}
+                <br/>
+            </div>
+            <!-- AWS S3 End -->
+        {{else}}
+            <!-- Ingress & Looker Start -->
+            {{ $data := "" }}
+            {{if eq $driver "ingress"}}
+            {{ $data = .data.Ingress }}
+            {{ else }}
+            {{ $data = .data.Looker }}
+            {{ end }}
+            <div class="col-md-6 col-md-offset-3 modal-outer noPad">
+                <h2>Ingress Details</h2>
+                <div class="row">
+                    <div class="col-md-3">Name:</div>
+                    <div class="col-md-6">{{$data.Name}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">Namespace:</div>
+                    <div class="col-md-6">{{$data.Namespace}}</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">Host:</div>
+                    <div class="col-md-6"><a href="https://{{$data.Host}}" target="_blank">{{$data.Host}}</a></div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">Ingress Class:</div>
+                    <div class="col-md-6">{{$data.Class}}</div>
+                </div>
+
+                <h2>Create Access On this Ingress</h2>
+		        <div>
+                    <form action="/resources/{{$driver}}/{{$data.Namespace}}/{{$data.Name}}" method="post">
+                        <div class="row">
+                            <label for="expiry" class="col-sm-2 control-label">Expiry:</label>
+                            <div class="col-sm-4">
+                                <select name="expiry" class="form-control" required>
+                                    <option value="3600" selected>1 hour</option>
+                                    <option value="14400">4 hours</option>
+                                    <option value="21600">6 hours</option>
+                                    <option value="32400">9 hours</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="_token" value="{{ $token }}">
+                            <input class="col-sm-2" type="submit" name="Access" value="Access" />
+                        </div>
+                    </form>
+                </div>
+
+                {{ if .activeLeases }}
+                <h2>Active Leases</h2>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Creator</th>
+                            <th>Leased IP</th>
+                            <th>Time Left</th>
+                            <th>Lease Type</th>
+                            <th>Terminate?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ $data := "" }}
+                        {{if eq $driver "ingress"}}
+                        {{ $data = .data.Ingress }}
+                        {{ else }}
+                        {{ $data = .data.Looker }}
+                        {{ end }}
+                        {{$user_id:=.user.ID}}
+                        {{$admin:=.user.Admin}}
+                        {{range .activeLeases}}
+                        <tr>
+                            <td>{{.User.Username}}</td>
+                            {{ if eq .User.ID $user_id}}
+                            <td>{{.LeaseIdentifier}}</td>
+                            {{ else if $admin }}
+                            <td>{{.LeaseIdentifier}}</td>
+                            {{ else }}
+                            <td></td>
+                            {{ end }}
+                            <td class="time" >{{.Expiry}}</td>
+                            <td>{{.LeaseType}}</td>
+                            <td>
+                            {{ if eq .User.ID $user_id}}
+                                <form method="post" action="/resources/{{$driver}}/{{$data.Namespace}}/{{$data.Name}}/{{.ID}}">
+                                    <input type="hidden" name="lease_id" value="{{.ID}}" />
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <input type="hidden" name="_token" value="{{ $token }}">
+                                    <a href="" style="color: #ff0000;"
+                                        onclick="if(confirm('Are you sure you want to terminate this lease?')) {parentNode.submit();} return false;">
+                                        <span title="Terminate Lease" class="glyphicon glyphicon-minus-sign"></span>
+                                    </a>
+                                </form>
+                            {{end}}
+                            </td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+                {{end}}
+                <br/>
+            </div>
+            <!-- Ingress End -->
+        {{end}}
+        </div>
+    </div>
+    {{ template "footer" }}
+</body>
+
+</html>

@@ -1,0 +1,44 @@
+{{define "footer"}}
+<script src='https://code.jquery.com/jquery-2.1.0.min.js'></script>
+<script type="text/javascript" src="/assets/js/flash-message.js"></script>
+<script src='https://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js'></script>
+<script type="text/javascript">
+    setTimeout(function() {
+        $('#sessionMessage').fadeOut('slow');
+    }, 4000);
+</script>
+<script type="text/javascript">
+   function component(x, v) {
+        return Math.floor(x / v);
+    }
+    $('.time').each(function(i, obj) {
+	    var div=$(this)
+	    var timestamp = div.text()
+
+	    if(timestamp>0)
+	    {
+		    setInterval(function() { // execute code each second
+
+		        timestamp--; // decrement timestamp with one second each second
+
+		        var hours   = component(timestamp,      60 * 60), // hours
+		            minutes = component(timestamp,           60) % 60, // minutes
+		            seconds = component(timestamp,            1) % 60; // seconds
+
+		        div.text(("0" + hours).slice(-2) + ":" + ("0" + minutes).slice(-2) + ":" + ("0" + seconds).slice(-2) ); // display
+		        //alert($(this).text());
+
+		    }, 1000); // interval each second = 1000 ms
+	    }
+	    else
+	    {
+	    	div.text("Expired");
+	    }
+	});
+
+	$('#myTabs a').click(function (e) {
+		e.preventDefault()
+		$(this).tab('show')
+	})
+</script>
+{{end}}
