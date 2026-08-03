@@ -1,4 +1,4 @@
-FROM c.rzp.io/razorpay/rzp-docker-image-inventory-multi-arch:rzp-golden-image-base-golang-1.25-alpine3.22 as concierge
+FROM golang:1.25-alpine3.22 as concierge
 RUN apk add git
 WORKDIR /concierge
 COPY go.mod go.sum ./
