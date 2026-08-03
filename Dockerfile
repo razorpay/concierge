@@ -7,7 +7,7 @@ COPY . .
 RUN go build -o concierge main.go 
 
 
-FROM alpine:3.16
+FROM alpine:3.22
 
 ENV GOSU_VERSION="1.10"
 ENV ARCH="amd64"
