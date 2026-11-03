@@ -1,0 +1,18 @@
+# .github/workflows/query-shield.yml
+name: Query Shield
+'on':
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, closed]
+  push:
+    branches: [master, main]
+    paths: ['.github/workflows/query-shield.yml']   # the onboarding merge → baseline (runs it if none is on record)
+  workflow_dispatch: {}
+jobs:
+  query-shield:
+    permissions:            # a called workflow only gets what its caller grants
+      contents: read
+      statuses: write
+      issues: write
+      pull-requests: write
+    uses: razorpay/query-shield/.github/workflows/query-shield.yml@master
+    secrets: inherit        # the runner App's ID and key (org secrets)
