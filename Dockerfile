@@ -8,6 +8,7 @@ RUN go build -o concierge main.go
 
 
 FROM alpine:3.16
+ENV AWS_STS_REGIONAL_ENDPOINTS=regional
 
 ENV GOSU_VERSION="1.10"
 ENV ARCH="amd64"
